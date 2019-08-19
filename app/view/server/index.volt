@@ -1,7 +1,6 @@
-<ol class="breadcrumb">
-    <li><a href="#">默认分组</a></li>
-    <li class="active">添加服务器</li>
-</ol>
+<div class="alert alert-success alert-override">
+    添加服务器
+</div>
 
 <table class="table table-bordered">
     <tbody>
@@ -44,10 +43,9 @@
     </tbody>
 </table>
 
-<ol class="breadcrumb">
-    <li><a href="#">默认分组</a></li>
-    <li class="active">服务器列表</li>
-</ol>
+<div class="alert alert-success alert-override">
+    服务器列表
+</div>
 
 <table class="table table-bordered">
     <tbody>

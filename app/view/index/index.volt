@@ -1,6 +1,13 @@
-<div class="alert alert-success" role="alert" style="height: 40px; padding-top: 9px;">
-    服务状态：RUNNING &nbsp; | &nbsp; 地址: 172.16.210.54 &nbsp; | &nbsp; 端口: 9001 &nbsp; &nbsp;<a href="#" target="_blank">服务日志</a>
+{#<div class="alert alert-info alert-override" role="alert">#}
+
+{#</div>#}
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        服务状态：<span class="text-success">RUNNING</span> &nbsp; | &nbsp; 地址: 172.16.210.54 &nbsp; | &nbsp; 端口: 9001 &nbsp; &nbsp;<a href="#" target="_blank">服务日志</a>
+    </div>
 </div>
+
 
 <div style="margin: -5px 0 15px 0;">
 
@@ -25,14 +32,12 @@
 
 <table class="table table-bordered">
     <tr>
-        <th>进程号</th>
         <th>任务名称</th>
         <th>任务描述</th>
         <th>任务状态</th>
         <th>操作</th>
     </tr>
     <tr>
-        <td>23642</td>
         <td>PUSHARE_RECV_FILE_0_1</td>
         <td>Aug 16 02:31 PM</td>
         <td><span class="label label-danger">STOPPED</span></td>
@@ -45,7 +50,6 @@
         </td>
     </tr>
     <tr>
-        <td>23642</td>
         <td>PUSHARE_RECV_FILE_0_2</td>
         <td>Aug 16 02:31 PM</td>
         <td><span class="label label-danger">STOPPED</span></td>
@@ -63,7 +67,6 @@
 <table class="table table-striped table-bordered">
     <thead>
     <tr>
-        <th>进程号</th>
         <th>任务名称</th>
         <th>任务描述</th>
         <th>任务状态</th>
@@ -72,7 +75,7 @@
     </thead>
     <tbody>
     <tr>
-        <th colspan="4">
+        <th colspan="3">
             <span class="label label-info" style="font-size:14px">DELETE_FILE_NEW</span>&nbsp;
             {#<span class="process-group-tip">(没有负责人，请<a href="#">设置</a>)</span>#}
         </th>
@@ -83,7 +86,6 @@
         </th>
     </tr>
     <tr>
-        <td>23642</td>
         <td>DELETE_FILE_NEW_0</td>
         <td>pid 21059, uptime 0:02:24</td>
         <td>
@@ -98,7 +100,6 @@
         </td>
     </tr>
     <tr>
-        <td>23642</td>
         <td>DELETE_FILE_NEW_1</td>
         <td>pid 21059, uptime 0:02:24</td>
         <td>
@@ -114,7 +115,7 @@
     </tr>
 
     <tr>
-        <th colspan="4">
+        <th colspan="3">
             <span class="label  label-info" style="font-size:14px">DELETE_FILE_NEW</span>&nbsp;
             {#<span class="process-group-tip">(没有负责人，请<a href="#">设置</a>)</span>#}
         </th>
@@ -125,7 +126,6 @@
         </th>
     </tr>
     <tr>
-        <td>23642</td>
         <td>DELETE_FILE_NEW_0</td>
         <td>pid 21059, uptime 0:02:24</td>
         <td>
@@ -140,7 +140,6 @@
         </td>
     </tr>
     <tr>
-        <td>23642</td>
         <td>DELETE_FILE_NEW_1</td>
         <td>pid 21059, uptime 0:02:24</td>
         <td>
