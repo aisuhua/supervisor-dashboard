@@ -27,6 +27,16 @@ class ServerGroup extends Model
             )
         );
 
+        $validator->add(
+            'name',
+            new Uniqueness(
+                [
+                    'field'   => 'name',
+                    'message' => '该分组名称已存在',
+                ]
+            )
+        );
+
         return $this->validate($validator);
     }
 }

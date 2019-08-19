@@ -140,7 +140,7 @@
         </td>
     </tr>
     <tr>
-        <td>DELETE_FILE_NEW_1</td>
+        <td>DELETE_FILE_NEW_1DELETE_FILE_NEW_1</td>
         <td>pid 21059, uptime 0:02:24</td>
         <td>
             <span class="label label-success">RUNNING</span>

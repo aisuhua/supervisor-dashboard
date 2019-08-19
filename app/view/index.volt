@@ -5,22 +5,45 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Supervisor Dashboard</title>
+    <link rel="shortcut icon" type="image/png" href="/favicons/favicon.ico" />
 
-    <link href="https://cdn.bootcss.com/twitter-bootstrap/3.4.1/css/bootstrap.css" rel="stylesheet">
-    <link href="https://cdn.bootcss.com/datatables/1.10.19/css/dataTables.bootstrap.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/buttons/1.5.6/css/buttons.bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/select/1.3.0/css/select.bootstrap.min.css" rel="stylesheet">
+    <!-- bootstrap -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- datatables -->
+    <link href="/plugins/datatables/dataTables.bootstrap.min.css" rel="stylesheet">
+    <link href="/plugins/datatables/button/buttons.bootstrap.min.css" rel="stylesheet">
+    <link href="/plugins/datatables/select/select.bootstrap.min.css" rel="stylesheet">
+
+    <!-- nprogress -->
+    <link href="/plugins/nprogress/nprogress.css" rel="stylesheet">
+
+    <!-- pnotify -->
+    <link href="/plugins/pnotify/pnotify.css" rel="stylesheet">
 
     <link rel="stylesheet" href="/css/override.css">
 
-    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
-    <script src="https://cdn.bootcss.com/twitter-bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    <script src="https://cdn.bootcss.com/datatables/1.10.19/js/jquery.dataTables.js"></script>
-    <script src="https://cdn.bootcss.com/datatables/1.10.19/js/dataTables.bootstrap.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.5.6/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.bootstrap.min.js"></script>
-    <script src="https://cdn.datatables.net/select/1.3.0/js/dataTables.select.min.js"></script>
-    <script src="https://cdn.bootcss.com/jquery.pjax/2.0.1/jquery.pjax.js"></script>
+    <!-- bootstrap -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+
+    <!-- datatables -->
+    <script src="/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="/plugins/datatables/dataTables.bootstrap.min.js"></script>
+    <script src="/plugins/datatables/button/dataTables.buttons.min.js"></script>
+    <script src="/plugins/datatables/button/buttons.bootstrap.min.js"></script>
+    <script src="/plugins/datatables/select/dataTables.select.min.js"></script>
+
+    <!-- pjax -->
+    <script src="/plugins/pjax/jquery.pjax.min.js"></script>
+
+    <!-- nprogress -->
+    <script src="/plugins/nprogress/nprogress.js"></script>
+
+    <!-- pnotify -->
+    <script src="/plugins/pnotify/pnotify.js"></script>
+
+    <script src="/js/override.js"></script>
 
     <!--[if lt IE 9]>
     <script src="https://cdn.bootcss.com/html5shiv/r29/html5.min.js"></script>
@@ -29,7 +52,9 @@
 </head>
 <body>
 
-    {{ content() }}
+    <div id="wrapper">
+        {{ content() }}
+    </div>
 
 </body>
 </html>

@@ -1,5 +1,6 @@
 {{ content() }}
 
+{{ flashSession.output() }}
 
 <ol class="breadcrumb">
     <li><a href="/">首页</a></li>
@@ -10,65 +11,37 @@
 <table id="example" class="table table-striped table-bordered" style="width:100%">
     <thead>
     <tr>
-        <th>Name</th>
-        <th>Position</th>
-        <th>Office</th>
-        <th>Age</th>
-        <th>Start date</th>
-        <th>Salary</th>
+        <th>ID</th>
+        <th>组名</th>
+        <th>描述</th>
+        <th>排序值</th>
     </tr>
     </thead>
-    <tbody>
-    <tr>
-        <td>Shad Decker</td>
-        <td>Regional Director</td>
-        <td>Edinburgh</td>
-        <td>51</td>
-        <td>2008/11/13</td>
-        <td>$183,000</td>
-    </tr>
-    <tr>
-        <td>Michael Bruce</td>
-        <td>Javascript Developer</td>
-        <td>Singapore</td>
-        <td>29</td>
-        <td>2011/06/27</td>
-        <td>$183,000</td>
-    </tr>
-    <tr>
-        <td>Donna Snider</td>
-        <td>Customer Support</td>
-        <td>New York</td>
-        <td>27</td>
-        <td>2011/01/25</td>
-        <td>$112,000</td>
-    </tr>
-    </tbody>
-    <tfoot>
-    <tr>
-        <th>Name</th>
-        <th>Position</th>
-        <th>Office</th>
-        <th>Age</th>
-        <th>Start date</th>
-        <th>Salary</th>
-    </tr>
-    </tfoot>
 </table>
 
 <script>
     $(document).ready(function() {
         var dataTable = $('#example').DataTable({
             processing: true,
-            pageLength: 3,
+            pageLength: 15,
             lengthChange: false,
             select: true,
+            serverSide: true,
+            ajax: '/server-group/list',
+            columns: [
+                { data: 'id' },
+                { data: 'name' },
+                { data: 'description' },
+                { data: 'sort' },
+            ],
             buttons: [
                 {
                     text: '添加',
+                    titleAttr: 'Add a new record',
                     className: 'btn btn-primary',
                     action: function (e, dt, node, config) {
-                        alert( 'Button activated' );
+                        var url = "/server-group/create";
+                        $.pjax({url: url, container: '#pjax-container'})
                     }
                 },
                 {
@@ -78,9 +51,11 @@
                         alert( 'Button activated' );
                     }
                 }
-            ]
+            ],
+            initComplete: function(settings, json) {
+                dataTable.buttons().container().appendTo('#example_wrapper .col-sm-6:eq(0)');
+            }
         });
 
-        dataTable.buttons().container().appendTo( '#example_wrapper .col-sm-6:eq(0)');
     });
 </script>

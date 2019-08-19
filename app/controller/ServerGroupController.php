@@ -7,37 +7,56 @@ class ServerGroupController extends ControllerBase
 
     }
 
-    public function addAction()
+    public function listAction()
     {
+        $draw = $this->request->get('draw', 'int', 0);
+        $offset = $this->request->get('start', 'int', 0);
+        $limit = $this->request->get('length', 'int', 25);
 
+        $serverGroups = ServerGroup::find([
+            'limit' => $limit,
+            'offset' => $offset
+        ]);
+
+        $total = ServerGroup::count();
+
+        $data = [];
+        $data['draw'] = $draw + 1;
+        $data['recordsTotal'] = $total;
+        $data['recordsFiltered'] = $total;
+        $data['data'] = $serverGroups->toArray();
+
+        return $this->response->setJsonContent($data);
     }
 
-    public function add2Action()
+    public function createAction()
     {
-        $name = $this->request->getPost('name', ['trim', 'string'], '');
-        $description = $this->request->getPost('description', ['trim', 'string'], '');
-        $sort = $this->request->getPost('sort', 'int', 0);
-
-        $serverGroup = new ServerGroup();
-        $serverGroup->name = $name;
-        $serverGroup->description = $description;
-        $serverGroup->sort = $sort;
-
-        if ($serverGroup->create())
+        if ($this->request->isPost())
         {
-            $this->flash->success('恭喜你，分组添加成功！');
-        }
-        else
-        {
-            $messages = $serverGroup->getMessages();
+            $name = $this->request->getPost('name', ['trim', 'string'], '');
+            $description = $this->request->getPost('description', ['trim', 'string'], '');
+            $sort = $this->request->getPost('sort', 'int', 0);
 
-            foreach ($messages as $message)
+            $serverGroup = new ServerGroup();
+            $serverGroup->name = $name;
+            $serverGroup->description = $description;
+            $serverGroup->sort = $sort;
+
+            if ($serverGroup->create())
             {
-                $this->flash->error($message->getMessage());
+                $this->flashSession->success('恭喜你，分组添加成功！');
+                return $this->response->redirect('server-group');
+            }
+            else
+            {
+                $messages = $serverGroup->getMessages();
+
+                foreach ($messages as $message)
+                {
+                    $this->flashSession->error($message->getMessage());
+                }
             }
         }
-
-        $this->dispatcher->forward(['action' => 'index']);
     }
 }
 
