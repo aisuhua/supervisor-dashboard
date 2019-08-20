@@ -162,6 +162,4 @@ class ServerGroupController extends ControllerBase
             'edit' => true
         ]);
     }
-
 }
-
