@@ -6,7 +6,7 @@ class FlashBootstrap extends \Phalcon\Flash\Direct
         $cssClass = $this->_cssClasses[$type];
 
         $message = <<<STR
-<div class="{$cssClass}" role="alert">
+<div class="{$cssClass} alert-dismissible" role="alert">
     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">×</span>
     </button>

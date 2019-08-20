@@ -23,5 +23,8 @@ return new Config([
     'volt' => [
         'cacheDir' => APP_PATH . '/cache/volt/'
     ],
+    'logger' => [
+        'logDir' => APP_PATH . '/log/'
+    ]
 
 ]);

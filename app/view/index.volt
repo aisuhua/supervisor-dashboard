@@ -36,7 +36,7 @@
     <script src="/plugins/datatables/select/dataTables.select.min.js"></script>
 
     <!-- pjax -->
-    <script src="/plugins/pjax/jquery.pjax.min.js"></script>
+    <script src="/plugins/pjax/jquery.pjax.js"></script>
 
     <!-- nprogress -->
     <script src="/plugins/nprogress/nprogress.js"></script>
@@ -44,6 +44,8 @@
     <!-- pnotify -->
     <script src="/plugins/pnotify/pnotify.js"></script>
 
+    <!-- https://github.com/jacwright/date.format -->
+    <script src="/js/date.format.js"></script>
     <script src="/js/override.js"></script>
 
     <!--[if lt IE 9]>

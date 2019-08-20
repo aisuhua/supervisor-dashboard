@@ -14,13 +14,8 @@ class ServerGroupForm extends Form
         if (isset($options['edit']) && $options['edit'])
         {
             $id = new Hidden('id');
+            $this->add($id);
         }
-        else
-        {
-            $id = new Text('id');
-        }
-
-        $this->add($id);
 
         // name
         $name = new Text('name', [
@@ -31,13 +26,7 @@ class ServerGroupForm extends Form
         $name->addValidators([
             new PresenceOf([
                 'message' => '组名不能为空'
-            ]),
-            new Uniqueness(
-                [
-                    'model' => new ServerGroup(),
-                    'message' => '该组名已存在',
-                ]
-            )
+            ])
         ]);
 
         $this->add($name);
@@ -54,7 +43,7 @@ class ServerGroupForm extends Form
         $sort = new Text('sort', [
             'class' => 'form-control',
             'autocomplete' => 'off',
-            'value' => 999
+            'value' => 0
         ]);
 
         $this->add($sort);

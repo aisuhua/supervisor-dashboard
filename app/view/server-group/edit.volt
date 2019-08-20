@@ -3,10 +3,13 @@
 <ol class="breadcrumb">
     <li><a href="/">首页</a></li>
     <li><a href="/server-group">分组管理</a></li>
-    <li class="active">添加分组</li>
+    <li class="active">修改分组</li>
 </ol>
 
-<form class="form-horizontal" method="post" action="/server-group/create" data-pjax>
+<form class="form-horizontal" method="post" action="/server-group/edit/{{ serverGroup.id }}" data-pjax>
+
+    {{ form.render('id') }}
+
     <div class="form-group">
         <label for="name" class="col-sm-2 control-label">组名</label>
         <div class="col-sm-10">
@@ -28,7 +31,7 @@
     </div>
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
-            <button type="submit" class="btn btn-primary">提交</button>
+            <button type="submit" class="btn btn-primary">提交修改</button>
             <a class="btn btn-default btn-link" href="/server-group">返回</a>
         </div>
     </div>

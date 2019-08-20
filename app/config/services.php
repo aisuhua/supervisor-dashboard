@@ -7,6 +7,8 @@ use Phalcon\Mvc\Model\Metadata\Memory as MetaDataAdapter;
 use Phalcon\Session\Adapter\Files as SessionAdapter;
 use Phalcon\Flash\Session as FlashSession;
 use Phalcon\Flash\Direct as FlashDirect;
+use Phalcon\Events\Manager as EventsManager;
+use Phalcon\Logger\Adapter\File as FileLogger;
 
 /**
  * Shared configuration service
@@ -55,6 +57,17 @@ $di->setShared('view', function () {
 });
 
 /**
+ * 日志服务
+ */
+$di->setShared('logger', function($filename = null) {
+    $config = $this->getConfig();
+    $filename = empty($filename) ? 'default.log' : $filename;
+    $logger = new FileLogger($config->logger->logDir . $filename);
+
+    return $logger;
+});
+
+/**
  * Database connection is created based in the parameters defined in the configuration file
  */
 $di->setShared('db', function () {
@@ -70,6 +83,30 @@ $di->setShared('db', function () {
     ];
 
     $connection = new $class($params);
+
+    $em = new EventsManager();
+    $di = $this;
+
+    $em->attach(
+        'db',
+        function ($event, $connection) use ($di)
+        {
+            if ($event->getType() == 'beforeQuery')
+            {
+                $variables = $connection->getSQLVariables();
+                $string    = $connection->getSQLStatement();
+
+                if ($variables)
+                {
+                    $string .= ' [' . join(',', $variables) . ']';
+                }
+
+                $di->get('logger', ['db.log'])->debug($string);
+            }
+        }
+    );
+
+    $connection->setEventsManager($em);
 
     return $connection;
 });
@@ -97,24 +134,24 @@ $di->setShared('session', function () {
  */
 $di->set('flashSession', function () {
     return new FlashSession([
-        'error'   => 'alert alert-danger alert-dismissible',
-        'success' => 'alert alert-success alert-dismissible',
-        'notice'  => 'alert alert-info alert-dismissible',
-        'warning' => 'alert alert-warning alert-dismissible'
+        'error'   => 'alert alert-danger pnotify fade',
+        'success' => 'alert alert-success pnotify fade',
+        'notice'  => 'alert alert-info pnotify fade',
+        'warning' => 'alert alert-warning pnotify fade'
     ]);
 });
 
 $di->set('flash', function () {
-    $flashBootstrap = new FlashBootstrap([
-        'error'   => 'alert alert-danger alert-dismissible',
-        'success' => 'alert alert-success alert-dismissible',
-        'notice'  => 'alert alert-info alert-dismissible',
-        'warning' => 'alert alert-warning alert-dismissible'
+    $flash = new FlashDirect([
+        'error'   => 'alert alert-danger pnotify fade',
+        'success' => 'alert alert-success pnotify fade',
+        'notice'  => 'alert alert-info pnotify fade',
+        'warning' => 'alert alert-warning pnotify fade'
     ]);
 
-    $flashBootstrap->setAutoescape(false);
-    $flashBootstrap->setAutomaticHtml(false);
-    return $flashBootstrap;
+//    $flashBootstrap->setAutoescape(false);
+//    $flashBootstrap->setAutomaticHtml(false);
+    return $flash;
 });
 
 

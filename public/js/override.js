@@ -21,6 +21,13 @@ $.extend( true, $.fn.dataTable.defaults, {
         "oAria": {
             "sSortAscending": ": 以升序排列此列",
             "sSortDescending": ": 以降序排列此列"
+        },
+        select: {
+            rows: {
+                _: "选中 %d 项",
+                1: "选中 1 项",
+                0: ""
+            }
         }
     }
 });
@@ -29,9 +36,7 @@ function initPNotify() {
 
     PNotify.prototype.options.styling = 'bootstrap3';
 
-    // PNotify.desktop.permission();
-
-    var $pnotify = $('.pnotify111');
+    var $pnotify = $('.pnotify');
 
     if($pnotify.size() <= 0) {
         return false;
