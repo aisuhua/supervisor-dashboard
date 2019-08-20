@@ -2,8 +2,8 @@
 
 <ol class="breadcrumb">
     <li><a href="/">首页</a></li>
-    <li><a href="/server-group">分组管理</a></li>
-    <li class="active">修改分组</li>
+    <li><a href="/server-group">服务器组管理</a></li>
+    <li class="active">修改服务器组</li>
 </ol>
 
 <form class="form-horizontal" method="post" action="/server-group/edit/{{ serverGroup.id }}" data-pjax>

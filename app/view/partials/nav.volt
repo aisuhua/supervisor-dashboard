@@ -23,7 +23,7 @@
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="/server-group">分组管理</a></li>
+                <li><a href="/server-group">服务器组管理</a></li>
             </ul>
         </div>
     </div>

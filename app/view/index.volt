@@ -19,9 +19,6 @@
     <!-- nprogress -->
     <link href="/plugins/nprogress/nprogress.css" rel="stylesheet">
 
-    <!-- pnotify -->
-    <link href="/plugins/pnotify/pnotify.css" rel="stylesheet">
-
     <link rel="stylesheet" href="/css/override.css">
 
     <!-- bootstrap -->
@@ -42,7 +39,8 @@
     <script src="/plugins/nprogress/nprogress.js"></script>
 
     <!-- pnotify -->
-    <script src="/plugins/pnotify/pnotify.js"></script>
+    <script src="/plugins/pnotify/PNotify.js"></script>
+    <script src="/plugins/pnotify/PNotifyButtons.js"></script>
 
     <!-- https://github.com/jacwright/date.format -->
     <script src="/js/date.format.js"></script>

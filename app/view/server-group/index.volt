@@ -2,8 +2,8 @@
 
 <ol class="breadcrumb">
     <li><a href="/">首页</a></li>
-    <li><a href="/server-group">分组管理</a></li>
-    <li class="active">分组列表</li>
+    <li><a href="/server-group">服务器组管理</a></li>
+    <li class="active">服务器组列表</li>
 </ol>
 
 {{ flashSession.output() }}
@@ -12,7 +12,7 @@
     <thead>
     <tr>
         <th></th>
-        <th>组名</th>
+        <th>服务器组名称</th>
         <th>描述</th>
         <th>排序值</th>
         <th>添加时间</th>
@@ -78,16 +78,18 @@
                     orderable: false,
                     render: function (data, type, full, meta) {
                         var html = '<a href="/server-group/edit/'+ data +'">修改</a> | ';
-                        html += '<a href="javascript: void(0);" class="delete">删除</a>'
+                        html += '<a href="javascript: void(0);" class="delete">删除</a> | ';
+                        html += '<a href="javascript: void(0);" class="delete">服务器管理</a>'
+
                         return html;
                     }
                 }
             ],
             buttons: [
                 {
-                    text: '添加分组',
+                    text: '添加服务器组',
                     titleAttr: 'Add a new record',
-                    className: 'btn btn-primary',
+                    className: 'btn btn-default',
                     action: function (e, dt, node, config) {
                         var url = "/server-group/create";
                         $.pjax({url: url, container: '#pjax-container'})

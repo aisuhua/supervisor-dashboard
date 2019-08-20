@@ -2,19 +2,30 @@
 
 {#</div>#}
 
-<div class="panel panel-default">
-    <div class="panel-body">
-        服务状态：<span class="text-success">RUNNING</span> &nbsp; | &nbsp; 地址: 172.16.210.54 &nbsp; | &nbsp; 端口: 9001 &nbsp; &nbsp;<a href="#" target="_blank">服务日志</a>
-    </div>
-</div>
+{#<div class="panel panel-default">#}
+    {#<div class="panel-body">#}
+        {#服务状态：<span class="text-success">RUNNING</span> &nbsp; | &nbsp; 地址: 172.16.210.54 &nbsp; | &nbsp; 端口: 9001 &nbsp; &nbsp;<a href="#" target="_blank">服务日志</a>#}
+    {#</div>#}
+{#</div>#}
+
+<ol class="breadcrumb">
+    <li><a href="/">首页</a></li>
+    <li><a href="/server-group">默认分组</a></li>
+    <li class="active">192.168.1.229:9001</li>
+</ol>
 
 
-<div style="margin: -5px 0 15px 0;">
+<div style="margin-bottom: 20px;">
 
     <div>
-        <a href="/program"><button class="btn btn-primary btn-sm">修改配置</button></a>&nbsp;
-        <a href="#"><button class="btn btn-warning btn-sm">更新配置</button></a>&nbsp;
-        <a href="#"><button class="btn btn-warning btn-sm">重启服务</button></a>&nbsp;
+
+        <div class="btn-group" role="group" aria-label="...">
+            <a href="/program" class="btn btn-default">修改配置</a>&nbsp;
+            <a href="#" class="btn btn-default">更新配置</a>&nbsp;
+            <a href="#" class="btn btn-default">重启服务</a>&nbsp;
+        </div>
+
+
 
     </div>
 

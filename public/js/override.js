@@ -34,7 +34,9 @@ $.extend( true, $.fn.dataTable.defaults, {
 
 function initPNotify() {
 
-    PNotify.prototype.options.styling = 'bootstrap3';
+    PNotify.defaults.styling = 'bootstrap3';
+    PNotify.defaults.icons = 'bootstrap3';
+    PNotify.closeAll();
 
     var $pnotify = $('.pnotify');
 
@@ -42,49 +44,33 @@ function initPNotify() {
         return false;
     }
 
-    $pnotify.each(function() {
+    if (typeof window.stackTopCenter === 'undefined') {
+        window.stackTopCenter = {
+            'dir1': 'down',
+            'firstpos1': 25
+        };
+    }
 
+    var opts = {
+        stack: window.stackTopCenter
+    };
+
+    $pnotify.each(function() {
         var $that = $(this);
+        opts.text = $that.html();
 
         if($that.hasClass('alert-success')) {
-            new PNotify({
-                title: '成功提示',
-                text: $that.html(),
-                type: 'success',
-                delay: 3000,
-                desktop: {
-                    desktop: false
-                }
-            });
+            opts.type = 'success';
+            opts.delay = 2000;
         } else if($that.hasClass('alert-danger')) {
-            new PNotify({
-                title: '错误提示',
-                text: $that.html(),
-                type: 'error',
-                desktop: {
-                    desktop: false
-                }
-            });
+            opts.type = 'error';
         } else if($that.hasClass('alert-info')) {
-            new PNotify({
-                title: '温馨提示',
-                text: $that.html(),
-                type: 'info',
-                desktop: {
-                    desktop: true
-                }
-            });
+            opts.type = 'info';
         } else if($that.hasClass('alert-warning')) {
-            new PNotify({
-                title: '警告',
-                text: $that.html(),
-                type: 'notice',
-                desktop: {
-                    desktop: false
-                }
-            });
+            opts.type = 'warning';
         }
 
+        PNotify.alert(opts);
         $that.remove();
     });
 }
