@@ -1,78 +1,156 @@
-<div class="alert alert-success alert-override">
-    添加服务器
-</div>
+{{ content() }}
 
-<table class="table table-bordered">
-    <tbody>
+<ol class="breadcrumb">
+    <li><a href="/">首页</a></li>
+    <li><a href="/server-group">{{ serverGroup.name }}</a></li>
+    <li><a href="/">服务器管理</a></li>
+    <li class="active">服务器列表</li>
+</ol>
+
+{{ flashSession.output() }}
+
+
+<table id="server-list" class="table table-bordered table-hover">
+    <thead>
     <tr>
+        <th></th>
         <th>服务器 IP</th>
         <th>XML-RPC 端口</th>
-        <th>XML-RPC 用户名</th>
-        <th>XML-RPC 密码</th>
-        <th style="width: 20%;">配置文件写入的路径</th>
-        <th>更新配置服务所监听的端口</th>
-        <th>排序字段</th>
+        <th>配置同步服务所监听的端口</th>
+        <th>配置文件写入的路径</th>
+        <th>排序值</th>
+        <th>添加时间</th>
         <th>操作</th>
     </tr>
-    <tr>
-        <td class="form-group">
-            <input type="text" class="form-control" name="ip">
-        </td>
-        <td class="form-group">
-            <input type="text" class="form-control" name="port" value="9001">
-        </td>
-        <td class="form-group">
-            <input type="text" class="form-control" name="user_name" placeholder="留空则使用默认用户名">
-        </td>
-        <td class="form-group">
-            <input type="text" class="form-control" name="password" placeholder="留空则使用默认密码">
-        </td>
-        <td class="form-group">
-            <input type="text" class="form-control" name="conf_path" value="/etc/supervisor/conf.d/program.conf">
-        </td>
-        <td class="form-group">
-            <input type="text" class="form-control" name="sync_conf_port" value="8089">
-        </td>
-        <td class="form-group">
-            <input type="text" class="form-control" name="sort" value="0">
-        </td>
-        <td>
-            <button class="btn btn-sm btn-success">添加</button>
-        </td>
-    </tr>
-    </tbody>
+    </thead>
 </table>
 
-<div class="alert alert-success alert-override">
-    服务器列表
-</div>
+<script>
 
-<table class="table table-bordered">
-    <tbody>
-        <tr>
-            <th>ID</th>
-            <th>服务器 IP</th>
-            <th>XML-RPC 端口</th>
-            <th>XML-RPC 用户名</th>
-            <th>XML-RPC 密码</th>
-            <th style="width: 20%;">配置文件写入的路径</th>
-            <th>更新配置服务所监听的端口</th>
-            <th>排序字段</th>
-            <th>操作</th>
-        </tr>
-        <tr>
-            <td>1</td>
-            <td><input class="form-control" type="text" name="ip" value="192.168.1.229"></td>
-            <td><input type="text" class="form-control" name="port" value="9001"></td>
-            <td><input class="form-control" type="text" name="user_name" value="" placeholder="留空则不修改"></td>
-            <td><input class="form-control" type="text" name="password" value="" placeholder="留空则不修改"></td>
-            <td><input type="text" class="form-control" name="conf_path" value="/etc/supervisor/conf.d/program.conf"></td>
-            <td><input type="text" class="form-control" name="sync_conf_port" value="8089"></td>
-            <td><input type="text" class="form-control" name="sort" value="0"></td>
-            <td>
-                <button class="btn btn-sm btn-success">修改</button>
-                <button class="btn btn-sm btn-danger">删除</button>
-            </td>
-        </tr>
-    </tbody>
-</table>
+    $(document).ready(function() {
+
+        var dataTable = $('#server-list').DataTable({
+            processing: true,
+            pageLength: 10,
+            lengthChange: false,
+            searching: false,
+            serverSide: true,
+            stateSave: true,
+            ajax: '/server/list',
+            select: {
+                style:    'os',
+                selector: 'td:first-child'
+            },
+            order: [
+                [3, 'desc']
+            ],
+            columnDefs: [
+                {
+                    data: null,
+                    defaultContent: '',
+                    targets: 0,
+                    orderable: false,
+                    className: 'select-checkbox',
+                    'checkboxes': {'selectRow': true},
+                },
+                {
+                    data: 'name',
+                    targets: 1,
+                    orderable: false
+                },
+                {
+                    data: 'description',
+                    targets: 2,
+                    orderable: false
+                },
+                {
+                    data: 'sort',
+                    targets: 3,
+                    orderable: false
+                },
+                {
+                    data: 'create_time',
+                    targets: 4,
+                    orderable: false,
+                    render: function (data, type, full, meta) {
+                        var myDate = new Date(data * 1000);
+                        return myDate.format('Y-m-d');
+                    }
+                },
+                {
+                    targets: 5,
+                    data: 'id',
+                    orderable: false,
+                    render: function (data, type, full, meta) {
+                        var html = '<a href="/server-group/edit/'+ data +'">修改</a> | ';
+                        html += '<a href="javascript: void(0);" class="delete">删除</a> | ';
+                        html += '<a href="/server?group_id='+ data +'">服务器管理</a>'
+
+                        return html;
+                    }
+                }
+            ],
+            buttons: [
+                {
+                    text: '添加服务器',
+                    titleAttr: 'Add a new record',
+                    className: 'btn btn-default',
+                    action: function (e, dt, node, config) {
+                        var url = "/server/create";
+                        $.pjax({url: url, container: '#pjax-container'})
+                    }
+                },
+                {
+                    text: '批量删除',
+                    className: 'btn btn-default',
+                    action: function () {
+                        var ids = '';
+                        var count = 0;
+                        dataTable.rows({selected: true}).every( function () {
+                            var d = this.data();
+                            ids += d.id + ',';
+                            count++;
+                        });
+
+                        if (count <= 0)
+                        {
+                            alert('请先选择分组');
+                            return false;
+                        }
+
+                        if (confirm("真的要删除这"+ count +"个分组吗？")) {
+                            var url = '/server/delete';
+                            $.pjax({
+                                url: url,
+                                container: '#pjax-container',
+                                type: 'POST',
+                                data: {ids: ids}
+                            });
+                        }
+                    }
+                }
+            ],
+            initComplete: function(settings, json) {
+                dataTable.buttons().container().appendTo('#server-list_wrapper .col-sm-6:eq(0)');
+            }
+        });
+
+        $('#server-group-list tbody').on('click', 'td a.delete', function () {
+            var row = dataTable.row($(this).closest('tr'));
+            var data = row.data();
+
+            if (!confirm('真的要删除“'+ data.name +'”分组吗？')) {
+                return false;
+            }
+
+            var url = '/server-group/delete';
+            $.pjax({
+                url: url,
+                container: '#pjax-container',
+                type: 'POST',
+                data: {ids: data.id}
+            });
+        });
+
+    });
+</script>

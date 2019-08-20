@@ -79,7 +79,7 @@
                     render: function (data, type, full, meta) {
                         var html = '<a href="/server-group/edit/'+ data +'">修改</a> | ';
                         html += '<a href="javascript: void(0);" class="delete">删除</a> | ';
-                        html += '<a href="javascript: void(0);" class="delete">服务器管理</a>'
+                        html += '<a href="/server?group_id='+ data +'">服务器管理</a>'
 
                         return html;
                     }
