@@ -1,7 +1,5 @@
 {{ content() }}
 
-{{ flashSession.output() }}
-
 <ol class="breadcrumb">
     <li><a href="/">首页</a></li>
     <li><a href="/server-group">分组管理</a></li>
@@ -38,7 +36,7 @@
                 {
                     text: '添加',
                     titleAttr: 'Add a new record',
-                    className: 'btn btn-primary',
+                    className: 'btn btn-default',
                     action: function (e, dt, node, config) {
                         var url = "/server-group/create";
                         $.pjax({url: url, container: '#pjax-container'})
@@ -46,7 +44,7 @@
                 },
                 {
                     text: '删除',
-                    className: 'btn btn-danger',
+                    className: 'btn btn-default',
                     action: function ( e, dt, node, config ) {
                         alert( 'Button activated' );
                     }

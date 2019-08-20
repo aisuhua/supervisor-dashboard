@@ -97,20 +97,24 @@ $di->setShared('session', function () {
  */
 $di->set('flashSession', function () {
     return new FlashSession([
-        'error'   => 'alert alert-danger pnotify fade',
-        'success' => 'alert alert-success pnotify fade',
-        'notice'  => 'alert alert-info pnotify fade',
-        'warning' => 'alert alert-warning pnotify fade'
+        'error'   => 'alert alert-danger alert-dismissible',
+        'success' => 'alert alert-success alert-dismissible',
+        'notice'  => 'alert alert-info alert-dismissible',
+        'warning' => 'alert alert-warning alert-dismissible'
     ]);
 });
 
 $di->set('flash', function () {
-    return new FlashDirect([
-        'error'   => 'alert alert-danger pnotify fade',
-        'success' => 'alert alert-success pnotify fade',
-        'notice'  => 'alert alert-info pnotify fade',
-        'warning' => 'alert alert-warning pnotify fade'
+    $flashBootstrap = new FlashBootstrap([
+        'error'   => 'alert alert-danger alert-dismissible',
+        'success' => 'alert alert-success alert-dismissible',
+        'notice'  => 'alert alert-info alert-dismissible',
+        'warning' => 'alert alert-warning alert-dismissible'
     ]);
+
+    $flashBootstrap->setAutoescape(false);
+    $flashBootstrap->setAutomaticHtml(false);
+    return $flashBootstrap;
 });
 
 

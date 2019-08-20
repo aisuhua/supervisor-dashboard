@@ -15,6 +15,7 @@ return new Config([
         'controllerDir' => APP_PATH . '/controller/',
         'modelDir' => APP_PATH . '/model/',
         'viewDir' => APP_PATH . '/view/',
+        'formDir' => APP_PATH . '/form/',
         'libraryDir' => APP_PATH . '/library/',
         'taskDir' => APP_PATH . '/task/',
         'baseUri' => '/'

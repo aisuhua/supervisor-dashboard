@@ -6,6 +6,7 @@ $loader->registerDirs(
     [
         $config->application->controllerDir,
         $config->application->modelDir,
+        $config->application->formDir,
         $config->application->libraryDir,
         $config->application->taskDir,
     ]

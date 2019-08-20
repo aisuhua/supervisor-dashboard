@@ -29,15 +29,6 @@ class ControllerBase extends Controller
         {
             $this->view->setRenderLevel(View::LEVEL_ACTION_VIEW);
         }
-
-        // 发生验证出错时，自动将提交的数据重新填充表单，避免用户再次输入
-        if ($this->request->isPost() && $this->flashSession->has('error'))
-        {
-            foreach ($this->request->getPost() as $key => $value)
-            {
-                $this->view->$key = $value;
-            }
-        }
     }
 
     public function isPjax()

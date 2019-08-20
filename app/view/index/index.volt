@@ -12,9 +12,10 @@
 <div style="margin: -5px 0 15px 0;">
 
     <div>
-        <a href="#"><button class="btn btn-warning">重启服务</button></a>&nbsp;
-        <a href="#"><button class="btn btn-warning">更新配置</button></a>&nbsp;
-        <a href="/program"><button class="btn btn-primary">修改配置</button></a>&nbsp;
+        <a href="/program"><button class="btn btn-primary btn-sm">修改配置</button></a>&nbsp;
+        <a href="#"><button class="btn btn-warning btn-sm">更新配置</button></a>&nbsp;
+        <a href="#"><button class="btn btn-warning btn-sm">重启服务</button></a>&nbsp;
+
     </div>
 
     {#<select id="project-select" class="form-control" style="width: 200px; float:left;">#}

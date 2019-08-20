@@ -1,7 +1,5 @@
 {{ content() }}
 
-{{ flashSession.output() }}
-
 <ol class="breadcrumb">
     <li><a href="/">首页</a></li>
     <li><a href="/server-group">分组管理</a></li>
@@ -12,19 +10,19 @@
     <div class="form-group">
         <label for="name" class="col-sm-2 control-label">组名</label>
         <div class="col-sm-10">
-            <input type="text" class="form-control" id="name" name="name" value="{{ name }}" placeholder="" autocomplete="off">
+            {{ form.render('name') }}
         </div>
     </div>
     <div class="form-group">
         <label for="description" class="col-sm-2 control-label">描述</label>
         <div class="col-sm-10">
-            <input type="text" class="form-control" id="description" name="description" value="{{ description }}" placeholder="" autocomplete="off">
+            {{ form.render('description') }}
         </div>
     </div>
     <div class="form-group">
         <label for="sort" class="col-sm-2 control-label">排序值</label>
         <div class="col-sm-10">
-            <input type="text" class="form-control" id="sort" name="sort" value="{{ sort | default(999) }}" placeholder="" autocomplete="off">
+            {{ form.render('sort') }}
             <span id="helpBlock" class="help-block">值越小排得越靠前，有效值范围 0 ～ 999。</span>
         </div>
     </div>

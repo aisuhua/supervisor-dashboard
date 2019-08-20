@@ -1,7 +1,13 @@
 <?php
+use Phalcon\Tag;
 
 class ServerGroupController extends ControllerBase
 {
+    public function initialize()
+    {
+        $this->tag->setTitle('分组管理');
+    }
+
     public function indexAction()
     {
 
@@ -31,32 +37,38 @@ class ServerGroupController extends ControllerBase
 
     public function createAction()
     {
+        $form = new ServerGroupForm(null);
+
         if ($this->request->isPost())
         {
-            $name = $this->request->getPost('name', ['trim', 'string'], '');
-            $description = $this->request->getPost('description', ['trim', 'string'], '');
-            $sort = $this->request->getPost('sort', 'int', 0);
-
-            $serverGroup = new ServerGroup();
-            $serverGroup->name = $name;
-            $serverGroup->description = $description;
-            $serverGroup->sort = $sort;
-
-            if ($serverGroup->create())
+            if (!$form->isValid($this->request->getPost()))
             {
-                $this->flashSession->success('恭喜你，分组添加成功！');
-                return $this->response->redirect('server-group');
+                foreach ($form->getMessages() as $message)
+                {
+                    $this->flash->error($message);
+                }
             }
             else
             {
-                $messages = $serverGroup->getMessages();
+                $serverGroup = new ServerGroup([
+                    'name' => $this->request->getPost('name', ['trim', 'string'], ''),
+                    'description' => $this->request->getPost('description', ['trim', 'string'], ''),
+                    'sort' => $this->request->getPost('sort', 'int', 0)
+                ]);
 
-                foreach ($messages as $message)
+                if (!$serverGroup->create())
                 {
-                    $this->flashSession->error($message->getMessage());
+                    $this->flash->error($serverGroup->getMessages());
+                }
+                else
+                {
+                    $this->flash->success("分组添加成功！");
+                    $form->clear();
                 }
             }
         }
+
+        $this->view->form = $form;
     }
 }
 

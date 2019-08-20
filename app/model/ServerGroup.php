@@ -2,7 +2,7 @@
 use Phalcon\Mvc\Model;
 use Phalcon\Validation;
 use Phalcon\Validation\Validator\Uniqueness;
-use Phalcon\Validation\Validator\InclusionIn;
+use Phalcon\Validation\Validator\PresenceOf;
 
 class ServerGroup extends Model
 {
@@ -22,17 +22,7 @@ class ServerGroup extends Model
             new Uniqueness(
                 [
                     'field'   => 'name',
-                    'message' => '该分组名称已存在',
-                ]
-            )
-        );
-
-        $validator->add(
-            'name',
-            new Uniqueness(
-                [
-                    'field'   => 'name',
-                    'message' => '该分组名称已存在',
+                    'message' => '该组名已存在',
                 ]
             )
         );

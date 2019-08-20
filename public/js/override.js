@@ -31,7 +31,7 @@ function initPNotify() {
 
     // PNotify.desktop.permission();
 
-    var $pnotify = $('.pnotify');
+    var $pnotify = $('.pnotify111');
 
     if($pnotify.size() <= 0) {
         return false;
