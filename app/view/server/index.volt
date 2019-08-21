@@ -7,6 +7,12 @@
 
 {{ flashSession.output() }}
 
+<div class="panel panel-default">
+    <div class="panel-body">
+        Basic panel example
+    </div>
+</div>
+
 <table id="server-list" class="table table-bordered table-striped table-hover">
     <thead>
     <tr>

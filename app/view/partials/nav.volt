@@ -16,10 +16,16 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ name }} <span class="caret"></span></a>
                     <ul class="dropdown-menu">
+                        {% if menu_servers[id] is not empty %}
+                            {% for server in menu_servers[id] %}
+                                <li><a href="/">{{ server['ip'] }}:{{ server['port'] }}</a></li>
+                            {% endfor %}
 
-                        {% for server in menu_servers[id] %}
-                            <li><a href="/">{{ server['ip'] }}:{{ server['port'] }}</a></li>
-                        {% endfor %}
+                            <li role="separator" class="divider"></li>
+                            <li><a href="/server" data-pjax>服务器管理</a></li>
+                        {% else %}
+                            <li><a href="/server/create">添加服务器</a></li>
+                        {% endif %}
                     </ul>
                 </li>
                 {% else %}

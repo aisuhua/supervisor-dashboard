@@ -33,14 +33,14 @@ class ControllerBase extends Controller
             $result = $this
                 ->modelsManager
                 ->createBuilder()
-                ->from(['s' => Server::class])
-                ->join(ServerGroup::class, "s.server_group_id = g.id", 'g')
+                ->from(['g' => ServerGroup::class])
+                ->leftJoin(Server::class, "s.server_group_id = g.id", 's')
                 ->columns([
+                    'g.id as server_group_id',
+                    'g.name as server_group_name',
                     's.id as server_id',
                     's.ip as server_ip',
                     's.port as server_port',
-                    'g.id as server_group_id',
-                    'g.name as server_group_name'
                 ])
                 ->orderBy('g.sort DESC, s.sort DESC, s.create_time ASC')
                 ->getQuery()
@@ -54,12 +54,15 @@ class ControllerBase extends Controller
                 {
                     $menus[$item['server_group_id']] = $item['server_group_name'];
 
-                    !empty($menu_servers[$item['server_group_id']]) ?: $menu_servers[$item['server_group_id']] = [];
-                    $menu_servers[$item['server_group_id']][] = [
-                        'id' => $item['server_id'],
-                        'ip' => $item['server_ip'],
-                        'port' => $item['server_port'],
-                    ];
+                    if (!empty($item['server_id']))
+                    {
+                        !empty($menu_servers[$item['server_group_id']]) ?: $menu_servers[$item['server_group_id']] = [];
+                        $menu_servers[$item['server_group_id']][] = [
+                            'id' => $item['server_id'],
+                            'ip' => $item['server_ip'],
+                            'port' => $item['server_port'],
+                        ];
+                    }
                 }
             }
 

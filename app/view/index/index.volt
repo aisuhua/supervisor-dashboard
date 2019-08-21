@@ -23,6 +23,7 @@
             <a href="/program" class="btn btn-default">修改配置</a>&nbsp;
             <a href="#" class="btn btn-default">更新配置</a>&nbsp;
             <a href="#" class="btn btn-default">重启服务</a>&nbsp;
+            <a href="#" class="btn btn-default">自动刷新</a>&nbsp;
         </div>
 
 

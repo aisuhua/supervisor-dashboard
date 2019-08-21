@@ -58,7 +58,8 @@
                 {
                     data: 'description',
                     targets: 2,
-                    orderable: false
+                    orderable: false,
+                    visible: true
                 },
                 {
                     data: 'sort',
