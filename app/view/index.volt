@@ -59,7 +59,9 @@
 <body>
 
     <div id="wrapper">
-        {{ content() }}
+        <div class="container">
+            {{ content() }}
+        </div>
     </div>
 
 </body>

@@ -13,9 +13,9 @@
         <th></th>
         <th>服务器 IP</th>
         <th>端口</th>
-        <th>配置文件路径</th>
         <th>sync_conf 端口</th>
-        <th>排序值</th>
+        <th>配置文件路径</th>
+        <th>排序</th>
         <th>更新时间</th>
         <th>所属分组</th>
         <th>操作</th>
@@ -72,12 +72,12 @@
                     orderable: false
                 },
                 {
-                    data: 'conf_path',
+                    data: 'sync_conf_port',
                     targets: 3,
                     orderable: false
                 },
                 {
-                    data: 'sync_conf_port',
+                    data: 'conf_path',
                     targets: 4,
                     orderable: false
                 },
@@ -109,7 +109,7 @@
                     orderable: false,
                     render: function (data, type, full, meta) {
                         var html = '<a href="/" target="_blank">管理</a> | ';
-                        html += '<a href="/server/edit/'+ data +'?server_group_id='+ full.serverGroup.id +'">修改</a> | ';
+                        html += '<a href="/server/edit/'+ data + '">修改</a> | ';
                         html += '<a href="javascript: void(0);" class="delete">删除</a>';
 
                         return html;
@@ -118,7 +118,7 @@
             ],
             buttons: [
                 {
-                    text: '添加服务器',
+                    text: '添加',
                     titleAttr: '添加服务器',
                     className: 'btn btn-default',
                     action: function (e, dt, node, config) {
@@ -140,7 +140,7 @@
 
                         if (count <= 0)
                         {
-                            alert('请先选择分组');
+                            alert('请先选择服务器');
                             return false;
                         }
 

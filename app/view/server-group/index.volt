@@ -11,9 +11,9 @@
     <thead>
     <tr>
         <th></th>
-        <th>分组名称</th>
+        <th>名称</th>
         <th>描述</th>
-        <th>排序值</th>
+        <th>排序</th>
         <th>添加时间</th>
         <th>操作</th>
     </tr>
@@ -50,7 +50,10 @@
                 {
                     data: 'name',
                     targets: 1,
-                    orderable: false
+                    orderable: false,
+                    render: function (data, type, full, meta) {
+                        return data;
+                    }
                 },
                 {
                     data: 'description',
@@ -77,8 +80,7 @@
                     orderable: false,
                     render: function (data, type, full, meta) {
                         var html = '<a href="/server-group/edit/'+ data +'">修改</a> | ';
-                        html += '<a href="javascript: void(0);" class="delete">删除</a> | ';
-                        html += '<a href="/server?server_group_id='+ data +'">服务器管理</a>'
+                        html += '<a href="javascript: void(0);" class="delete">删除</a>';
 
                         return html;
                     }
@@ -86,8 +88,8 @@
             ],
             buttons: [
                 {
-                    text: '添加分组',
-                    titleAttr: 'Add a new record',
+                    text: '添加',
+                    titleAttr: '添加分组',
                     className: 'btn btn-default',
                     action: function (e, dt, node, config) {
                         var url = "/server-group/create";

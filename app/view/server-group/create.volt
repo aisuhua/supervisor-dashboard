@@ -7,7 +7,7 @@
 
 <form class="form-horizontal" method="post" action="/server-group/create" data-pjax>
     <div class="form-group">
-        <label for="name" class="col-sm-2 control-label">分组名称</label>
+        <label for="name" class="col-sm-2 control-label">名称</label>
         <div class="col-sm-10">
             {{ form.render('name') }}
         </div>
@@ -19,7 +19,7 @@
         </div>
     </div>
     <div class="form-group">
-        <label for="sort" class="col-sm-2 control-label">排序值</label>
+        <label for="sort" class="col-sm-2 control-label">排序</label>
         <div class="col-sm-10">
             {{ form.render('sort') }}
             <span id="helpBlock" class="help-block">值越大排得越靠前，有效值范围 0 ～ 999。</span>

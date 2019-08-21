@@ -114,12 +114,11 @@ class ServerGroupController extends ControllerBase
     public function editAction($id)
     {
         $serverGroup = ServerGroup::findFirst($id);
-
         if (!$serverGroup)
         {
             $this->flashSession->error("不存在该分组");
 
-            return $this->response->redirect('server-group');
+            return $this->response->redirect("server-group");
         }
 
         if ($this->request->isPost())

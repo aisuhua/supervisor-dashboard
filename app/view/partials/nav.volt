@@ -12,19 +12,24 @@
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
+                {% for id, name in menus %}
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">默认分組 <span class="caret"></span></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ name }} <span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                        <li><a href="/">192.168.1.229:9001</a></li>
-                        <li role="separator" class="divider"></li>
-                        <li><a href="/server">服务器管理</a></li>
+
+                        {% for server in menu_servers[id] %}
+                            <li><a href="/">{{ server['ip'] }}:{{ server['port'] }}</a></li>
+                        {% endfor %}
                     </ul>
                 </li>
+                {% else %}
+
+                {% endfor %}
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="/server-group">分组管理</a></li>
-                <li><a href="/server">所有服务器</a></li>
+                <li><a href="/server">服务器管理</a></li>
             </ul>
         </div>
     </div>
