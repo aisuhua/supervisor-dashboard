@@ -15,6 +15,7 @@
     <link href="/plugins/datatables/dataTables.bootstrap.min.css" rel="stylesheet">
     <link href="/plugins/datatables/button/buttons.bootstrap.min.css" rel="stylesheet">
     <link href="/plugins/datatables/select/select.bootstrap.min.css" rel="stylesheet">
+    <link href="/plugins/datatables/searchHighlight/dataTables.searchHighlight.css" rel="stylesheet">
 
     <!-- nprogress -->
     <link href="/plugins/nprogress/nprogress.css" rel="stylesheet">
@@ -31,6 +32,9 @@
     <script src="/plugins/datatables/button/dataTables.buttons.min.js"></script>
     <script src="/plugins/datatables/button/buttons.bootstrap.min.js"></script>
     <script src="/plugins/datatables/select/dataTables.select.min.js"></script>
+    <!-- https://datatables.net/blog/2014-10-22 -->
+    <script src="/plugins/datatables/searchHighlight/jquery.highlight.js"></script>
+    <script src="/plugins/datatables/searchHighlight/dataTables.searchHighlight.min.js"></script>
 
     <!-- pjax -->
     <script src="/plugins/pjax/jquery.pjax.js"></script>
@@ -44,6 +48,7 @@
 
     <!-- https://github.com/jacwright/date.format -->
     <script src="/js/date.format.js"></script>
+    <script src="/js/function.js"></script>
     <script src="/js/override.js"></script>
 
     <!--[if lt IE 9]>

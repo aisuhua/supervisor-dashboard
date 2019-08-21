@@ -46,7 +46,8 @@ $di->setShared('view', function () {
             $volt = new VoltEngine($view, $this);
 
             $volt->setOptions([
-                'compiledPath' => $config->volt->cacheDir
+                'compiledPath' => $config->volt->compiledPath,
+                'compileAlways' => $config->volt->compileAlways
             ]);
 
             return $volt;

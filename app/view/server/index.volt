@@ -1,25 +1,23 @@
 {{ content() }}
 
 <ol class="breadcrumb">
-    <li><a href="/">首页</a></li>
-    <li><a href="/server-group">{{ serverGroup.name }}</a></li>
-    <li><a href="/">服务器管理</a></li>
+    <li><a href="/server">服务器管理</a></li>
     <li class="active">服务器列表</li>
 </ol>
 
 {{ flashSession.output() }}
 
-
-<table id="server-list" class="table table-bordered table-hover">
+<table id="server-list" class="table table-bordered table-striped table-hover">
     <thead>
     <tr>
         <th></th>
         <th>服务器 IP</th>
-        <th>XML-RPC 端口</th>
-        <th>配置同步服务所监听的端口</th>
-        <th>配置文件写入的路径</th>
+        <th>端口</th>
+        <th>配置文件路径</th>
+        <th>sync_conf 端口</th>
         <th>排序值</th>
-        <th>添加时间</th>
+        <th>更新时间</th>
+        <th>所属分组</th>
         <th>操作</th>
     </tr>
     </thead>
@@ -31,18 +29,26 @@
 
         var dataTable = $('#server-list').DataTable({
             processing: true,
-            pageLength: 10,
+            pageLength: 25,
             lengthChange: false,
-            searching: false,
-            serverSide: true,
+            searching: true,
+            serverSide: false,
             stateSave: true,
-            ajax: '/server/list',
+            ajax: {
+                url: '/server/list',
+                data: function ( d ) {
+                    if (getParam('server_group_id')) {
+                        d.server_group_id = getParam('server_group_id');
+                    }
+                }
+            },
+            searchHighlight: true,
             select: {
                 style:    'os',
                 selector: 'td:first-child'
             },
             order: [
-                [3, 'desc']
+                [5, 'desc']
             ],
             columnDefs: [
                 {
@@ -50,41 +56,61 @@
                     defaultContent: '',
                     targets: 0,
                     orderable: false,
-                    className: 'select-checkbox',
-                    'checkboxes': {'selectRow': true},
+                    className: 'select-checkbox'
                 },
                 {
-                    data: 'name',
+                    data: 'ip',
                     targets: 1,
-                    orderable: false
+                    orderable: false,
+                    render: function (data, type, full, meta) {
+                        return data;
+                    }
                 },
                 {
-                    data: 'description',
+                    data: 'port',
                     targets: 2,
                     orderable: false
                 },
                 {
-                    data: 'sort',
+                    data: 'conf_path',
                     targets: 3,
                     orderable: false
                 },
                 {
-                    data: 'create_time',
+                    data: 'sync_conf_port',
                     targets: 4,
+                    orderable: false
+                },
+                {
+                    data: 'sort',
+                    targets: 5,
+                    orderable: false
+                },
+                {
+                    data: 'update_time',
+                    targets: 6,
                     orderable: false,
                     render: function (data, type, full, meta) {
                         var myDate = new Date(data * 1000);
-                        return myDate.format('Y-m-d');
+                        return timeAgo(myDate);
                     }
                 },
                 {
-                    targets: 5,
+                    data: 'server_group_id',
+                    targets: 7,
+                    orderable: false,
+                    render: function (data, type, full, meta) {
+                        return '<a href="/server?server_group_id='+ full.serverGroup.id +'">' + full.serverGroup.name + '</a>';
+                    }
+                },
+                {
+                    targets: 8,
                     data: 'id',
                     orderable: false,
                     render: function (data, type, full, meta) {
-                        var html = '<a href="/server-group/edit/'+ data +'">修改</a> | ';
-                        html += '<a href="javascript: void(0);" class="delete">删除</a> | ';
-                        html += '<a href="/server?group_id='+ data +'">服务器管理</a>'
+                        var html = '<a href="/" target="_blank">管理</a> | ';
+                        html += '<a href="/server/edit/'+ data +'?server_group_id='+ full.serverGroup.id +'">修改</a> | ';
+                        html += '<a href="javascript: void(0);" class="delete">删除</a>';
 
                         return html;
                     }
@@ -93,7 +119,7 @@
             buttons: [
                 {
                     text: '添加服务器',
-                    titleAttr: 'Add a new record',
+                    titleAttr: '添加服务器',
                     className: 'btn btn-default',
                     action: function (e, dt, node, config) {
                         var url = "/server/create";
@@ -118,7 +144,7 @@
                             return false;
                         }
 
-                        if (confirm("真的要删除这"+ count +"个分组吗？")) {
+                        if (confirm("真的要删除这"+ count +"台服务器吗？")) {
                             var url = '/server/delete';
                             $.pjax({
                                 url: url,
@@ -135,21 +161,29 @@
             }
         });
 
-        $('#server-group-list tbody').on('click', 'td a.delete', function () {
+        $('#server-list tbody').on('click', 'td a.delete', function () {
             var row = dataTable.row($(this).closest('tr'));
             var data = row.data();
 
-            if (!confirm('真的要删除“'+ data.name +'”分组吗？')) {
+            if (!confirm('真的要删除“'+ data.ip + ':' + data.port +'”吗？')) {
                 return false;
             }
 
-            var url = '/server-group/delete';
+            var url = '/server/delete';
             $.pjax({
                 url: url,
                 container: '#pjax-container',
                 type: 'POST',
                 data: {ids: data.id}
             });
+        });
+
+        $("#select-all").on( "click", function(e) {
+            if ($(this).is( ":checked" )) {
+                dataTable.rows(  ).select();
+            } else {
+                dataTable.rows(  ).deselect();
+            }
         });
 
     });

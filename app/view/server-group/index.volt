@@ -1,9 +1,8 @@
 {{ content() }}
 
 <ol class="breadcrumb">
-    <li><a href="/">首页</a></li>
-    <li><a href="/server-group">服务器组管理</a></li>
-    <li class="active">服务器组列表</li>
+    <li><a href="/server-group">分组管理</a></li>
+    <li class="active">分组列表</li>
 </ol>
 
 {{ flashSession.output() }}
@@ -12,7 +11,7 @@
     <thead>
     <tr>
         <th></th>
-        <th>服务器组名称</th>
+        <th>分组名称</th>
         <th>描述</th>
         <th>排序值</th>
         <th>添加时间</th>
@@ -29,7 +28,7 @@
             processing: true,
             pageLength: 10,
             lengthChange: false,
-            searching: false,
+            searching: true,
             serverSide: true,
             stateSave: true,
             ajax: '/server-group/list',
@@ -64,12 +63,12 @@
                     orderable: false
                 },
                 {
-                    data: 'create_time',
+                    data: 'update_time',
                     targets: 4,
                     orderable: false,
                     render: function (data, type, full, meta) {
                         var myDate = new Date(data * 1000);
-                        return myDate.format('Y-m-d');
+                        return timeAgo(myDate);
                     }
                 },
                 {
@@ -79,7 +78,7 @@
                     render: function (data, type, full, meta) {
                         var html = '<a href="/server-group/edit/'+ data +'">修改</a> | ';
                         html += '<a href="javascript: void(0);" class="delete">删除</a> | ';
-                        html += '<a href="/server?group_id='+ data +'">服务器管理</a>'
+                        html += '<a href="/server?server_group_id='+ data +'">服务器管理</a>'
 
                         return html;
                     }
@@ -87,7 +86,7 @@
             ],
             buttons: [
                 {
-                    text: '添加服务器组',
+                    text: '添加分组',
                     titleAttr: 'Add a new record',
                     className: 'btn btn-default',
                     action: function (e, dt, node, config) {

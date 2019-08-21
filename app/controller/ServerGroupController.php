@@ -149,7 +149,7 @@ class ServerGroupController extends ControllerBase
                 }
                 else
                 {
-                    $this->flashSession->success("更新成功");
+                    $this->flashSession->success("修改成功");
                     $form->clear();
 
                     return $this->response->redirect('server-group');

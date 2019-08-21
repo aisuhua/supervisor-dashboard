@@ -7,6 +7,7 @@ use Phalcon\Validation\Validator\PresenceOf;
 class Server extends Model
 {
     public $id;
+    public $server_group_id;
     public $ip;
     public $port;
     public $username;
@@ -17,9 +18,22 @@ class Server extends Model
     public $create_time;
     public $update_time;
 
+    public function initialize()
+    {
+        $this->belongsTo('server_group_id', 'ServerGroup', 'id', [
+            'alias' => 'serverGroup',
+            'reusable' => true
+        ]);
+    }
+
     public function beforeCreate()
     {
-        $this->create_time = $this->update_time = time();
+        $this->create_time = time();
+    }
+
+    public function beforeSave()
+    {
+        $this->update_time = time();
     }
 
     public function validation()
@@ -27,11 +41,10 @@ class Server extends Model
         $validator = new Validation();
 
         $validator->add(
-            'ip',
+            ['ip', 'port'],
             new Uniqueness(
                 [
-                    'field'   => 'name',
-                    'message' => '该组名已存在',
+                    'message' => '该服务器已存在，不需要重复添加',
                 ]
             )
         );

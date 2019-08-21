@@ -1,9 +1,8 @@
 {{ content() }}
 
 <ol class="breadcrumb">
-    <li><a href="/">首页</a></li>
-    <li><a href="/server-group">服务器组管理</a></li>
-    <li class="active">修改服务器组</li>
+    <li><a href="/server-group">分组管理</a></li>
+    <li class="active">修改分组</li>
 </ol>
 
 <form class="form-horizontal" method="post" action="/server-group/edit/{{ serverGroup.id }}" data-pjax>
@@ -11,7 +10,7 @@
     {{ form.render('id') }}
 
     <div class="form-group">
-        <label for="name" class="col-sm-2 control-label">组名</label>
+        <label for="name" class="col-sm-2 control-label">分组名称</label>
         <div class="col-sm-10">
             {{ form.render('name') }}
         </div>

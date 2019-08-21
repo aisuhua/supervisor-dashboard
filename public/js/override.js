@@ -52,7 +52,7 @@ function initPNotify() {
     }
 
     var opts = {
-        stack: window.stackTopCenter
+        // stack: window.stackTopCenter
     };
 
     $pnotify.each(function() {

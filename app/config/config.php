@@ -21,7 +21,8 @@ return new Config([
         'baseUri' => '/'
     ],
     'volt' => [
-        'cacheDir' => APP_PATH . '/cache/volt/'
+        'compiledPath' => APP_PATH . '/cache/volt/',
+        'compileAlways' => true
     ],
     'logger' => [
         'logDir' => APP_PATH . '/log/'

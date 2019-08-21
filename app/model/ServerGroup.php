@@ -15,7 +15,12 @@ class ServerGroup extends Model
 
     public function beforeCreate()
     {
-        $this->create_time = $this->update_time = time();
+        $this->create_time = time();
+    }
+
+    public function beforeSave()
+    {
+        $this->update_time = time();
     }
 
     public function validation()
