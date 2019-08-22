@@ -1,41 +1,24 @@
-{#<div class="alert alert-info alert-override" role="alert">#}
-
-{#</div>#}
-
-{#<div class="panel panel-default">#}
-    {#<div class="panel-body">#}
-        {#服务状态：<span class="text-success">RUNNING</span> &nbsp; | &nbsp; 地址: 172.16.210.54 &nbsp; | &nbsp; 端口: 9001 &nbsp; &nbsp;<a href="#" target="_blank">服务日志</a>#}
-    {#</div>#}
-{#</div>#}
-
 <ol class="breadcrumb">
-    <li><a href="/">首页</a></li>
-    <li><a href="/server-group">默认分组</a></li>
     <li class="active">192.168.1.229:9001</li>
 </ol>
 
 
 <div style="margin-bottom: 20px;">
-
-    <div>
-
-        <div class="btn-group" role="group" aria-label="...">
-            <a href="/program" class="btn btn-default">修改配置</a>&nbsp;
-            <a href="#" class="btn btn-default">更新配置</a>&nbsp;
-            <a href="#" class="btn btn-default">重启服务</a>&nbsp;
-            <a href="#" class="btn btn-default">自动刷新</a>&nbsp;
+    <div class="btn-group" role="group">
+        <a href="/program" class="btn btn-default">添加任务</a>
+        <a href="#" class="btn btn-default">更新配置</a>
+        <a href="#" class="btn btn-default">自动刷新</a>
+        <div class="btn-group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                更多操作 <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <li><a href="#">查看日志</a></li>
+                <li><a href="#">重启服务</a></li>
+                <li><a href="#">停止服务</a></li>
+            </ul>
         </div>
-
-
-
     </div>
-
-    {#<select id="project-select" class="form-control" style="width: 200px; float:left;">#}
-    {#<option value="#">筛选：全部</option>#}
-    {#<option value="#">PUSHARE_RECV_FILE</option>#}
-    {#</select>#}
-
-    <div style="clear:both;"></div>
 </div>
 
 
@@ -93,9 +76,11 @@
             {#<span class="process-group-tip">(没有负责人，请<a href="#">设置</a>)</span>#}
         </th>
         <th>
-            <button class="btn btn-xs btn-warning" type="button">重启</button>&nbsp;
-            <button class="btn btn-xs btn-warning" type="button">启动</button>&nbsp;
-            <button class="btn btn-xs btn-warning" type="button">停止</button>
+            <button type="button" class="btn btn-xs btn-warning">重启</button>&nbsp;
+            <button type="button" class="btn btn-xs btn-warning">启动</button>&nbsp;
+            <button type="button" class="btn btn-xs btn-warning">停止</button>
+            <button type="button" class="btn btn-xs btn-warning">修改</button>&nbsp;
+            <button type="button" class="btn btn-xs btn-warning">删除</button>&nbsp;
         </th>
     </tr>
     <tr>
@@ -133,9 +118,11 @@
             {#<span class="process-group-tip">(没有负责人，请<a href="#">设置</a>)</span>#}
         </th>
         <th>
-            <button class="btn btn-xs btn-warning" type="button">重启</button>&nbsp;
-            <button class="btn btn-xs btn-warning" type="button">启动</button>&nbsp;
-            <button class="btn btn-xs btn-warning" type="button">停止</button>
+            <button type="button" class="btn btn-xs btn-warning">重启</button>&nbsp;
+            <button type="button" class="btn btn-xs btn-warning">启动</button>&nbsp;
+            <button type="button" class="btn btn-xs btn-warning">停止</button>
+            <button type="button" class="btn btn-xs btn-warning">修改</button>&nbsp;
+            <button type="button" class="btn btn-xs btn-warning">删除</button>&nbsp;
         </th>
     </tr>
     <tr>

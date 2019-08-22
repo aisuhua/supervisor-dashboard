@@ -1,25 +1,41 @@
 {{ content() }}
 
+<div class="page-header">
+    <h1>添加任务</h1>
+</div>
+
 <ol class="breadcrumb">
-    <li><a href="/server">服务器管理</a></li>
+    {% if serverGroup is empty %}
+        <li><a href="/server">服务器列表</a></li>
+        {% set action = '/server/create' %}
+    {% else %}
+        <li><a href="/server-group/{{ serverGroup.id }}/server">{{ serverGroup.name }}的服务器列表</a></li>
+        {% set action = '/server-group/' ~ serverGroup.id ~ '/server/create' %}
+    {% endif %}
     <li class="active">添加服务器</li>
 </ol>
 
-<form class="form-horizontal" method="post" action="/server/create" data-pjax>
+<form class="form-horizontal" method="post" action="{{ action }}" data-pjax>
     <div class="form-group">
         <label for="server_group_id" class="col-sm-2 control-label">所属分组</label>
         <div class="col-sm-10">
-            {{ form.render('server_group_id') }}
+            {% if serverGroup is empty %}
+                {{ form.render('server_group_id') }}
+            {% else %}
+                {#{{ form.render('server_group_id', ['value': serverGroup.id, 'type': 'hidden', 'readonly': 'readonly']) }}#}
+                <p class="form-control-static">{{ serverGroup.name }}</p>
+                <input type="hidden" value="{{ serverGroup.id }}" id="server_group_id" name="server_group_id" />
+            {% endif %}
         </div>
     </div>
     <div class="form-group">
-        <label for="ip" class="col-sm-2 control-label">服务器 IP</label>
+        <label for="ip" class="col-sm-2 control-label">IP 地址</label>
         <div class="col-sm-10">
             {{ form.render('ip') }}
         </div>
     </div>
     <div class="form-group">
-        <label for="port" class="col-sm-2 control-label">端口</label>
+        <label for="port" class="col-sm-2 control-label">Supervisor 端口</label>
         <div class="col-sm-10">
             {{ form.render('port') }}
         </div>
@@ -49,7 +65,7 @@
         </div>
     </div>
     <div class="form-group">
-        <label for="sort" class="col-sm-2 control-label">排序</label>
+        <label for="sort" class="col-sm-2 control-label">排序字段</label>
         <div class="col-sm-10">
             {{ form.render('sort') }}
             <span id="helpBlock" class="help-block">值越大排得越靠前，有效值范围 0 ～ 999。</span>

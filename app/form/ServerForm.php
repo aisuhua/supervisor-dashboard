@@ -61,12 +61,12 @@ class ServerForm extends Form
 
         $ip->addValidators([
             new PresenceOf([
-                'message' => '服务器 IP 不能为空'
+                'message' => 'IP 地址不能为空'
             ]),
             new Regex(
                 [
                     "pattern" => "/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/",
-                    "message" => "服务器 IP 格式不正确",
+                    "message" => "IP 地址格式不正确",
                 ]
             )
         ]);
@@ -83,14 +83,14 @@ class ServerForm extends Form
         $port->addValidators([
             new Numericality(
                 [
-                    "message" => "端口必须是数字",
+                    "message" => "Supervisor 端口必须是数字",
                 ]
             ),
             new Between(
                 [
                     "minimum" => 1,
                     "maximum" => 65535,
-                    "message" => "请填写正确的端口",
+                    "message" => "请填写正确的 Supervisor 端口",
                 ]
             )
         ]);

@@ -25,7 +25,7 @@ class ServerGroupForm extends Form
 
         $name->addValidators([
             new PresenceOf([
-                'message' => '组名不能为空'
+                'message' => '分组名称不能为空'
             ])
         ]);
 

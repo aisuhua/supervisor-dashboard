@@ -61,7 +61,7 @@ function initPNotify() {
 
         if($that.hasClass('alert-success')) {
             opts.type = 'success';
-            opts.delay = 2000;
+            // opts.delay = 5000;
         } else if($that.hasClass('alert-danger')) {
             opts.type = 'error';
         } else if($that.hasClass('alert-info')) {

@@ -1,72 +1,126 @@
-<div class="alert alert-success" style="height: 40px; padding-top: 9px;">
-    当前服务器：172.16.0.69:9001 &nbsp;&nbsp;
-    <a href="#" style="text-decoration: underline">添加配置</a> &nbsp;
-    <a href="#" target="_blank" style="text-decoration: underline;">查看配置文件</a>
+<ol class="breadcrumb">
+    <li class="active">{{ server.ip }}:{{ server.port }}</li>
+</ol>
+
+<div style="margin-bottom: 20px;">
+    <div class="btn-group" role="group">
+        <a href="/program" class="btn btn-default">添加任务</a>
+        <a href="#" class="btn btn-default">更新配置</a>
+        <a href="#" class="btn btn-default">刷新</a>
+        <div class="btn-group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                更多 <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <li><a href="#">重启所有任务</a></li>
+                <li><a href="#">停止所有任务</a></li>
+                <li><a href="#">查看日志</a></li>
+                <li><a href="#">重启服务</a></li>
+                <li><a href="#">停止服务</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% if processes is not empty %}
+
+<div class="alert alert-danger">
+    您有2个任务异常，请联系相关人员进行处理。
 </div>
 
 <table class="table table-bordered">
+    <tr>
+        <th>任务名称</th>
+        <th>任务描述</th>
+        <th>任务状态</th>
+        <th>操作</th>
+    </tr>
+
+    {% for process in processes %}
+        {% if process['statename'] != 'RUNNING' %}
+        <tr>
+            <td>{{ process['name'] }}</td>
+            <td>{{ process['description'] }}</td>
+            <td>
+                {% if process['statename'] == "RUNNING" %}
+                    {% set label_name = "success" %}
+                {% elseif process['statename'] == "STARTING" %}
+                    {% set label_name = "danger" %}
+                {% elseif process['statename'] == "STOPPED" %}
+                    {% set label_name = "danger" %}
+                {% else %}
+                    {% set label_name = "default" %}
+                {% endif %}
+                <span class="label label-{{ label_name }}">{{ process['statename'] }}</span>
+            </td>
+            <td>
+                <a href="#">重启</a>&nbsp;&nbsp;
+                <a href="#">启动</a>&nbsp;&nbsp;
+                <a href="#">停止</a>&nbsp;&nbsp;
+                <a href="#">清理日志</a>&nbsp;&nbsp;
+                <a href="#">查看日志</a>
+            </td>
+        </tr>
+        {% endif %}
+    {% endfor %}
+</table>
+
+{% endif %}
+
+
+<table class="table table-striped table-bordered">
+    <thead>
+    <tr>
+        <th>任务名称</th>
+        <th>任务描述</th>
+        <th>任务状态</th>
+        <th>操作</th>
+    </tr>
+    </thead>
     <tbody>
-    <tr>
-        <th style="width: 15%; vertical-align: middle;">程序名</th>
-        <td><input type="text" class="form-control" name="program" value="CALENDAR_DELETE_NOTICE"></td>
-    </tr>
-    <tr>
-        <th style="width: 15%; vertical-align: middle;">命令</th>
-        <td><input type="text" class="form-control" name="command" value="/usr/bin/php /www/web/life.115.com/App/Task/CALENDAR_DELETE_NOTICE.php"></td>
-    </tr>
-    <tr>
-        <th style="width: 15%; vertical-align: middle;">进程名</th>
-        <td> <input type="text" class="form-control" name="process_name" value="%(program_name)s_%(process_num)s"></td>
-    </tr>
-    <tr>
-        <th style="width: 15%; vertical-align: middle;">进程数</th>
-        <td><input type="text" class="form-control" name="numprocs" value="1"></td>
-    </tr>
-    <tr>
-        <th style="width: 15%; vertical-align: middle;">进程下标起始值</th>
-        <td><input type="text" class="form-control" name="numprocs_start" value="0"></td>
-    </tr>
-    <tr>
-        <th style="width: 15%; vertical-align: middle;">目录</th>
-        <td><input type="text" class="form-control" name="directory" value="%(here)s"></td>
-    </tr>
-    <tr>
-        <th style="width: 15%; vertical-align: middle;">自动启动</th>
-        <td><input type="text" class="form-control" name="autostart" value="true"></td>
-    </tr>
-    <tr>
-        <th style="width: 15%; vertical-align: middle;">启动重试次数</th>
-        <td><input type="text" class="form-control" name="startretries" value="20"></td>
-    </tr>
-    <tr>
-        <th style="width: 15%; vertical-align: middle;">自动重启</th>
-        <td><input type="text" class="form-control" name="autorestart" value="true"></td>
-    </tr>
 
+    {% for processGroup in processGroups %}
     <tr>
-        <th style="width: 15%; vertical-align: middle;">错误重定向(redirect_stderr)</th>
-        <td><input type="text" class="form-control" name="redirect_stderr" value="true"></td>
+        <th colspan="3">
+            <span class="label label-info" style="font-size:14px">{{ processGroup }}</span>&nbsp;
+            {#<span class="process-group-tip">(没有负责人，请<a href="#">设置</a>)</span>#}
+        </th>
+        <th>
+            <button type="button" class="btn btn-xs btn-warning">重启</button>&nbsp;
+            <button type="button" class="btn btn-xs btn-warning">启动</button>&nbsp;
+            <button type="button" class="btn btn-xs btn-warning">停止</button>
+            <button type="button" class="btn btn-xs btn-warning">修改</button>&nbsp;
+            <button type="button" class="btn btn-xs btn-warning">删除</button>&nbsp;
+        </th>
     </tr>
-    <tr>
-        <th style="width: 15%; vertical-align: middle;">标准输出日志文件(stdout_logfile)</th>
-        <td><input type="text" class="form-control" name="stdout_logfile" value="AUTO"></td>
-    </tr>
-    <tr>
-        <th style="width: 15%; vertical-align: middle;">标准输出日志备份</th>
-        <td><input type="text" class="form-control" name="stdout_logfile_backups" value="0"></td>
-    </tr>
-    <tr>
-        <th style="width: 15%; vertical-align: middle;"> 标准输出日志的最大字节数</th>
-        <td><input type="text" class="form-control" name="stdout_logfile_maxbytes" value="1MB"></td>
-    </tr>
-
-    <tr>
-        <th style="width: 15%; vertical-align: middle;">操作</th>
-        <td>
-            <button class="btn btn-sm btn-success" style="width: 70px;">修改</button>&nbsp;
-            <button class="btn btn-sm btn-danger" style="width: 70px;">删除</button>
-        </td>
-    </tr>
-
+        {% for process in processes %}
+            {% if process['group'] == processGroup %}
+            <tr>
+                <td>{{ process['name'] }}</td>
+                <td>{{ process['description'] }}</td>
+                <td>
+                    {% if process['statename'] == "RUNNING" %}
+                        {% set label_name = "success" %}
+                    {% elseif process['statename'] == "STARTING" %}
+                        {% set label_name = "danger" %}
+                    {% elseif process['statename'] == "STOPPED" %}
+                        {% set label_name = "danger" %}
+                    {% else %}
+                        {% set label_name = "default" %}
+                    {% endif %}
+                    <span class="label label-{{ label_name }}">{{ process['statename'] }}</span>
+                </td>
+                <td>
+                    <a href="#">重启</a>&nbsp;&nbsp;
+                    <a href="#">启动</a>&nbsp;&nbsp;
+                    <a href="#">停止</a>&nbsp;&nbsp;
+                    <a href="#">清理日志</a>&nbsp;&nbsp;
+                    <a href="#">查看日志</a>
+                </td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+    {% endfor %}
     </tbody>
 </table>

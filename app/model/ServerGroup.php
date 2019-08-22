@@ -32,7 +32,7 @@ class ServerGroup extends Model
             new Uniqueness(
                 [
                     'field'   => 'name',
-                    'message' => '该组名已存在',
+                    'message' => '该分组名称已存在',
                 ]
             )
         );

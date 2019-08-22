@@ -1,27 +1,34 @@
 {{ content() }}
 
-<ol class="breadcrumb">
-    <li><a href="/server">服务器管理</a></li>
-    <li class="active">服务器列表</li>
-</ol>
-
 {{ flashSession.output() }}
 
-<div class="panel panel-default">
-    <div class="panel-body">
-        Basic panel example
-    </div>
+<div class="page-header">
+
+    {% if serverGroup is empty %}
+        <h1>服务器列表</h1>
+    {% else %}
+        <h1>{{ serverGroup.name }}的服务器列表</h1>
+    {% endif %}
 </div>
+
+<script>
+    var server_group_id = 0;
+
+    {% if serverGroup is not empty %}
+        server_group_id = {{ serverGroup.id }};
+    {% endif %}
+
+</script>
 
 <table id="server-list" class="table table-bordered table-striped table-hover">
     <thead>
     <tr>
         <th></th>
-        <th>服务器 IP</th>
-        <th>端口</th>
+        <th>IP 地址</th>
+        <th>Supervisor 端口</th>
         <th>sync_conf 端口</th>
         <th>配置文件路径</th>
-        <th>排序</th>
+        <th>排序字段</th>
         <th>更新时间</th>
         <th>所属分组</th>
         <th>操作</th>
@@ -43,9 +50,7 @@
             ajax: {
                 url: '/server/list',
                 data: function ( d ) {
-                    if (getParam('server_group_id')) {
-                        d.server_group_id = getParam('server_group_id');
-                    }
+                    d.server_group_id = server_group_id;
                 }
             },
             searchHighlight: true,
@@ -105,8 +110,9 @@
                     data: 'server_group_id',
                     targets: 7,
                     orderable: false,
+                    visible: server_group_id <= 0,
                     render: function (data, type, full, meta) {
-                        return '<a href="/server?server_group_id='+ full.serverGroup.id +'">' + full.serverGroup.name + '</a>';
+                        return '<a href="/server-group/'+ data +'/server">'+ full.serverGroup.name +'</a>';
                     }
                 },
                 {
@@ -114,8 +120,15 @@
                     data: 'id',
                     orderable: false,
                     render: function (data, type, full, meta) {
-                        var html = '<a href="/" target="_blank">管理</a> | ';
-                        html += '<a href="/server/edit/'+ data + '">修改</a> | ';
+                        var html = '<a href="/" target="_blank">控制台</a> | ';
+
+                        var edit_html = '<a href="/server/edit/'+ data +'">修改</a>  | ';
+                        if (server_group_id > 0)
+                        {
+                            edit_html = '<a href="/server-group/'+ server_group_id +'/server/edit/'+ data + '">修改</a> | ';
+                        }
+
+                        html += edit_html;
                         html += '<a href="javascript: void(0);" class="delete">删除</a>';
 
                         return html;
@@ -129,6 +142,12 @@
                     className: 'btn btn-default',
                     action: function (e, dt, node, config) {
                         var url = "/server/create";
+
+                        if (server_group_id > 0)
+                        {
+                            url = '/server-group/'+ server_group_id +'/server/create';
+                        }
+
                         $.pjax({url: url, container: '#pjax-container'})
                     }
                 },
@@ -151,7 +170,14 @@
                         }
 
                         if (confirm("真的要删除这"+ count +"台服务器吗？")) {
-                            var url = '/server/delete';
+
+                            var url = "/server/delete";
+
+                            if (server_group_id > 0)
+                            {
+                                url = '/server-group/'+ server_group_id +'/server/delete';
+                            }
+
                             $.pjax({
                                 url: url,
                                 container: '#pjax-container',
@@ -171,11 +197,11 @@
             var row = dataTable.row($(this).closest('tr'));
             var data = row.data();
 
-            if (!confirm('真的要删除“'+ data.ip + ':' + data.port +'”吗？')) {
+            if (!confirm('真的要删除“'+ data.ip + ':' + data.port +'”这台服务器吗？')) {
                 return false;
             }
 
-            var url = '/server/delete';
+            var url = '/server/delete?server_group_id=' + server_group_id;
             $.pjax({
                 url: url,
                 container: '#pjax-container',

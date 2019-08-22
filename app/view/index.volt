@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ get_title(false) }} - Supervisor Dashboard</title>
+    <title>Supervisor Dashboard</title>
     <title></title>
     <link rel="shortcut icon" type="image/png" href="/favicons/favicon.ico?v=2" />
 

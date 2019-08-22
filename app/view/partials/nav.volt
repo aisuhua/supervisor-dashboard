@@ -18,13 +18,13 @@
                     <ul class="dropdown-menu">
                         {% if menu_servers[id] is not empty %}
                             {% for server in menu_servers[id] %}
-                                <li><a href="/">{{ server['ip'] }}:{{ server['port'] }}</a></li>
+                                <li><a href="/server/{{ server['id'] }}/program">{{ server['ip'] }}:{{ server['port'] }}</a></li>
                             {% endfor %}
 
                             <li role="separator" class="divider"></li>
-                            <li><a href="/server" data-pjax>服务器管理</a></li>
+                            <li><a href="/server-group/{{ id }}/server">服务器管理</a></li>
                         {% else %}
-                            <li><a href="/server/create">添加服务器</a></li>
+                            <li><a href="/server-group/{{ id }}/server/create">添加服务器</a></li>
                         {% endif %}
                     </ul>
                 </li>

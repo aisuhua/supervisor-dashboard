@@ -1,0 +1,5 @@
+{
+    "require": {
+        "yzalis/supervisor": "^1.1"
+    }
+}

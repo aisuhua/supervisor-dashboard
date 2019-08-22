@@ -1,20 +1,24 @@
 {{ content() }}
 
-<ol class="breadcrumb">
-    <li><a href="/server-group">分组管理</a></li>
-    <li class="active">分组列表</li>
-</ol>
-
 {{ flashSession.output() }}
+
+{#<ol class="breadcrumb">#}
+    {#<li><a href="/server-group">分组管理</a></li>#}
+    {#<li class="active">分组列表</li>#}
+{#</ol>#}
+
+<div class="page-header">
+        <h1>分组列表</h1>
+</div>
 
 <table id="server-group-list" class="table table-bordered table-hover">
     <thead>
     <tr>
         <th></th>
-        <th>名称</th>
-        <th>描述</th>
-        <th>排序</th>
-        <th>添加时间</th>
+        <th>分组名称</th>
+        <th>分组描述</th>
+        <th>排序字段</th>
+        <th>更新时间</th>
         <th>操作</th>
     </tr>
     </thead>
@@ -29,9 +33,10 @@
             pageLength: 10,
             lengthChange: false,
             searching: true,
-            serverSide: true,
+            serverSide: false,
             stateSave: true,
             ajax: '/server-group/list',
+            searchHighlight: true,
             select: {
                 style:    'os',
                 selector: 'td:first-child'
@@ -81,7 +86,8 @@
                     orderable: false,
                     render: function (data, type, full, meta) {
                         var html = '<a href="/server-group/edit/'+ data +'">修改</a> | ';
-                        html += '<a href="javascript: void(0);" class="delete">删除</a>';
+                        html += '<a href="javascript: void(0);" class="delete">删除</a> | ';
+                        html += '<a href="/server-group/'+ data +'/server">服务器管理</a>';
 
                         return html;
                     }

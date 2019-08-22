@@ -4,7 +4,19 @@ class ServerController extends ControllerBase
 {
     public function initialize()
     {
-        $this->tag->setTitle('服务器管理');
+        $server_group_id = $this->dispatcher->getParam('server_group_id');
+
+        if ($server_group_id)
+        {
+            $serverGroup = ServerGroup::findFirst($server_group_id);
+            if (!$serverGroup)
+            {
+                $this->flashSession->error("不存在该服务器组");
+                return $this->response->redirect($this->request->getHTTPReferer());
+            }
+
+            $this->view->serverGroup = $serverGroup;
+        }
     }
 
     public function indexAction()
@@ -84,10 +96,10 @@ class ServerController extends ControllerBase
                 }
                 else
                 {
-                    $this->flashSession->success("添加成功");
+                    $this->flash->success("添加成功");
                     $form->clear();
 
-                    return $this->response->redirect('server');
+                    // return $this->response->redirect('server');
                 }
             }
         }
@@ -95,15 +107,25 @@ class ServerController extends ControllerBase
         $this->view->form = $form;
     }
 
-    public function editAction($id)
+    public function editAction($server_group_id = 0, $id = 0)
     {
+        // 兼容
+        // server-group/:server_group_id/server/edit/:id
+        // /server/edit/:id
+        if (!$id)
+        {
+            $id = $server_group_id;
+        }
+
         $server = Server::findFirst($id);
 
         if (!$server)
         {
             $this->flashSession->error("不存在该服务器");
 
-            return $this->response->redirect('server');
+            return $this->response->redirect(
+                $this->request->getHTTPReferer()
+            );
         }
 
         if ($this->request->isPost())
@@ -133,10 +155,10 @@ class ServerController extends ControllerBase
                 }
                 else
                 {
-                    $this->flashSession->success("修改成功");
+                    $this->flash->success("修改成功");
                     $form->clear();
 
-                    return $this->response->redirect('server');
+//                    return $this->response->redirect('server');
                 }
             }
         }
@@ -181,7 +203,9 @@ class ServerController extends ControllerBase
             }
         }
 
-        return $this->response->redirect('server');
+        return $this->response->redirect(
+            $this->request->getHTTPReferer()
+        );
     }
 }
 
