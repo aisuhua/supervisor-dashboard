@@ -1,4 +1,6 @@
 <ol class="breadcrumb">
+    <li><a href="/">首页</a></li>
+    <li><a href="/">默认分组</a></li>
     <li class="active">{{ server.ip }}:{{ server.port }}</li>
 </ol>
 
@@ -22,55 +24,55 @@
     </div>
 </div>
 
-{% if processes is not empty %}
+{% if process_warnings is not empty %}
 
 <div class="alert alert-danger">
-    您有2个任务异常，请联系相关人员进行处理。
+    您有 {{ process_warnings | length }} 个任务异常，请联系相关人员进行处理。
 </div>
 
-<table class="table table-bordered">
-    <tr>
-        <th>任务名称</th>
-        <th>任务描述</th>
-        <th>任务状态</th>
-        <th>操作</th>
-    </tr>
+<table class="table table-bordered ">
+<tr>
+    <th>进程号</th>
+    <th>任务名称</th>
+    <th>任务描述</th>
+    <th>任务状态</th>
+    <th>操作</th>
+</tr>
 
-    {% for process in processes %}
-        {% if process['statename'] != 'RUNNING' %}
-        <tr>
-            <td>{{ process['name'] }}</td>
-            <td>{{ process['description'] }}</td>
-            <td>
-                {% if process['statename'] == "RUNNING" %}
-                    {% set label_name = "success" %}
-                {% elseif process['statename'] == "STARTING" %}
-                    {% set label_name = "danger" %}
-                {% elseif process['statename'] == "STOPPED" %}
-                    {% set label_name = "danger" %}
-                {% else %}
-                    {% set label_name = "default" %}
-                {% endif %}
-                <span class="label label-{{ label_name }}">{{ process['statename'] }}</span>
-            </td>
-            <td>
-                <a href="#">重启</a>&nbsp;&nbsp;
-                <a href="#">启动</a>&nbsp;&nbsp;
-                <a href="#">停止</a>&nbsp;&nbsp;
-                <a href="#">清理日志</a>&nbsp;&nbsp;
-                <a href="#">查看日志</a>
-            </td>
-        </tr>
-        {% endif %}
-    {% endfor %}
+{% for process in process_warnings %}
+    <tr>
+        <td>{{ process['pid'] }}</td>
+        <td>{{ process['name'] }}</td>
+        <td>{{ process['description'] }}</td>
+        <td>
+            {% if process['statename'] == "RUNNING" %}
+                {% set label_name = "success" %}
+            {% elseif process['statename'] == "STARTING" %}
+                {% set label_name = "danger" %}
+            {% elseif process['statename'] == "STOPPED" %}
+                {% set label_name = "danger" %}
+            {% else %}
+                {% set label_name = "default" %}
+            {% endif %}
+            <span class="label label-{{ label_name }}">{{ process['statename'] }}</span>
+        </td>
+        <td>
+            <a href="#">重启</a>&nbsp;&nbsp;
+            <a href="#">启动</a>&nbsp;&nbsp;
+            <a href="#">停止</a>&nbsp;&nbsp;
+            <a href="#">清理日志</a>&nbsp;&nbsp;
+            <a href="#">查看日志</a>
+        </td>
+    </tr>
+{% endfor %}
 </table>
 
 {% endif %}
 
-
-<table class="table table-striped table-bordered">
+<table class="table table-striped table-bordered table-hover">
     <thead>
     <tr>
+        <th>进程号</th>
         <th>任务名称</th>
         <th>任务描述</th>
         <th>任务状态</th>
@@ -81,7 +83,7 @@
 
     {% for processGroup in processGroups %}
     <tr>
-        <th colspan="3">
+        <th colspan="4">
             <span class="label label-info" style="font-size:14px">{{ processGroup }}</span>&nbsp;
             {#<span class="process-group-tip">(没有负责人，请<a href="#">设置</a>)</span>#}
         </th>
@@ -96,6 +98,7 @@
         {% for process in processes %}
             {% if process['group'] == processGroup %}
             <tr>
+                <td>{{ process['pid'] }}</td>
                 <td>{{ process['name'] }}</td>
                 <td>{{ process['description'] }}</td>
                 <td>

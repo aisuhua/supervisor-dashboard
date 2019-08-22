@@ -2,10 +2,10 @@
 
 {{ flashSession.output() }}
 
-{#<ol class="breadcrumb">#}
-    {#<li><a href="/server-group">分组管理</a></li>#}
-    {#<li class="active">分组列表</li>#}
-{#</ol>#}
+<ol class="breadcrumb">
+    <li><a href="/">首页</a></li>
+    <li class="active">分组列表</li>
+</ol>
 
 <div class="page-header">
         <h1>分组列表</h1>
@@ -77,7 +77,7 @@
                     orderable: false,
                     render: function (data, type, full, meta) {
                         var myDate = new Date(data * 1000);
-                        return timeAgo(myDate);
+                        return timeAgo(myDate) == "刚刚" ? '<span class="text-success">刚刚</span>' :  timeAgo(myDate);
                     }
                 },
                 {

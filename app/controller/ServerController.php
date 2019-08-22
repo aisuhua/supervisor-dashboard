@@ -17,6 +17,8 @@ class ServerController extends ControllerBase
 
             $this->view->serverGroup = $serverGroup;
         }
+
+        $this->view->setTemplateBefore('container');
     }
 
     public function indexAction()
@@ -64,7 +66,7 @@ class ServerController extends ControllerBase
         return $this->response->setJsonContent($result);
     }
 
-    public function createAction()
+    public function createAction($server_group_id = 0)
     {
         $form = new ServerForm(null);
 
@@ -96,10 +98,17 @@ class ServerController extends ControllerBase
                 }
                 else
                 {
-                    $this->flash->success("添加成功");
+                    $this->flashSession->success("添加成功");
                     $form->clear();
 
-                    // return $this->response->redirect('server');
+                    if ($server_group_id > 0)
+                    {
+                        return $this->response->redirect("/server-group/{$server_group_id}/server");
+                    }
+                    else
+                    {
+                        return $this->response->redirect("/server");
+                    }
                 }
             }
         }
@@ -112,12 +121,13 @@ class ServerController extends ControllerBase
         // 兼容
         // server-group/:server_group_id/server/edit/:id
         // /server/edit/:id
+        $server_id = $id;
         if (!$id)
         {
-            $id = $server_group_id;
+            $server_id = $server_group_id;
         }
 
-        $server = Server::findFirst($id);
+        $server = Server::findFirst($server_id);
 
         if (!$server)
         {
@@ -155,10 +165,17 @@ class ServerController extends ControllerBase
                 }
                 else
                 {
-                    $this->flash->success("修改成功");
+                    $this->flashSession->success("修改成功");
                     $form->clear();
 
-//                    return $this->response->redirect('server');
+                    if ($id > 0)
+                    {
+                        return $this->response->redirect("/server-group/{$server_group_id}/server");
+                    }
+                    else
+                    {
+                        return $this->response->redirect("/server");
+                    }
                 }
             }
         }

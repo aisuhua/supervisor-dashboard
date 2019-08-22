@@ -1,22 +1,26 @@
 {{ content() }}
 
 <div class="page-header">
-    <h1>添加任务</h1>
+    <h1>添加服务器</h1>
 </div>
 
 <ol class="breadcrumb">
+    <li><a href="/">首页</a></li>
+
     {% if serverGroup is empty %}
         <li><a href="/server">服务器列表</a></li>
         {% set action = '/server/create' %}
+        {% set style = '' %}
     {% else %}
         <li><a href="/server-group/{{ serverGroup.id }}/server">{{ serverGroup.name }}的服务器列表</a></li>
         {% set action = '/server-group/' ~ serverGroup.id ~ '/server/create' %}
+        {% set style = 'display: none;' %}
     {% endif %}
     <li class="active">添加服务器</li>
 </ol>
 
 <form class="form-horizontal" method="post" action="{{ action }}" data-pjax>
-    <div class="form-group">
+    <div class="form-group" style="{{ style }}">
         <label for="server_group_id" class="col-sm-2 control-label">所属分组</label>
         <div class="col-sm-10">
             {% if serverGroup is empty %}

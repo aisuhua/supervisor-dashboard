@@ -1,4 +1,5 @@
 <ol class="breadcrumb">
+
     <li class="active">192.168.1.229:9001</li>
 </ol>
 
@@ -26,7 +27,7 @@
     您有2个任务异常，请联系相关人员进行处理。
 </div>
 
-<table class="table table-bordered">
+<table class="table table-bordered table-hover">
     <tr>
         <th>任务名称</th>
         <th>任务描述</th>
@@ -60,7 +61,7 @@
 </table>
 
 
-<table class="table table-striped table-bordered">
+<table class="table table-striped table-bordered table-hover">
     <thead>
     <tr>
         <th>任务名称</th>

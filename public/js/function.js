@@ -15,7 +15,7 @@ function timeAgo(dateParam) {
     const today = new Date();
     const seconds = Math.round((today - date) / 1000);
 
-    if (seconds < 60) {
+    if (seconds < 3) {
         return '刚刚';
     }
 

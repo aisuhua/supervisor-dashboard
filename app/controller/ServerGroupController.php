@@ -6,6 +6,7 @@ class ServerGroupController extends ControllerBase
     public function initialize()
     {
         $this->tag->setTitle('分组管理');
+        $this->view->setTemplateBefore('container');
     }
 
     public function indexAction()

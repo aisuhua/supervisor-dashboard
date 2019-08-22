@@ -1,5 +1,5 @@
 <nav class="navbar navbar-default navbar-fixed-top">
-    <div class="container">
+    <div class="container-fluid">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
                 <span class="sr-only">Toggle navigation</span>
@@ -34,8 +34,13 @@
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="/server-group">分组管理</a></li>
-                <li><a href="/server">服务器管理</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">管理功能 <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/server-group">分组管理</a></li>
+                        <li><a href="/server">服务器管理</a></li>
+                    </ul>
+                </li>
             </ul>
         </div>
     </div>

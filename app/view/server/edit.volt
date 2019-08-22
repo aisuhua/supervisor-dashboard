@@ -5,18 +5,22 @@
 </div>
 
 <ol class="breadcrumb">
+    <li><a href="/">首页</a></li>
+
     {% if serverGroup is empty %}
         <li><a href="/server">服务器列表</a></li>
         {% set action = '/server/edit/' ~ server.id %}
+        {% set style = '' %}
     {% else %}
         <li><a href="/server-group/{{ serverGroup.id }}/server">{{ serverGroup.name }}的服务器列表</a></li>
         {% set action = '/server-group/' ~ serverGroup.id ~ '/server/edit/' ~ server.id %}
+        {% set style = 'display: none;' %}
     {% endif %}
     <li class="active">修改服务器</li>
 </ol>
 
 <form class="form-horizontal" method="post" action="{{ action }}" data-pjax>
-    <div class="form-group">
+    <div class="form-group" style="{{ style }}">
         <label for="server_group_id" class="col-sm-2 control-label">所属分组</label>
         <div class="col-sm-10">
             {{ form.render('server_group_id') }}

@@ -3,7 +3,6 @@
 {{ flashSession.output() }}
 
 <div class="page-header">
-
     {% if serverGroup is empty %}
         <h1>服务器列表</h1>
     {% else %}
@@ -11,13 +10,21 @@
     {% endif %}
 </div>
 
+<ol class="breadcrumb">
+    <li><a href="/">首页</a></li>
+    {% if serverGroup is empty %}
+        <li class="active">服务器列表</li>
+    {% else %}
+        <li class="active">{{ serverGroup.name }}的服务器列表</li>
+    {% endif %}
+</ol>
+
 <script>
     var server_group_id = 0;
 
     {% if serverGroup is not empty %}
         server_group_id = {{ serverGroup.id }};
     {% endif %}
-
 </script>
 
 <table id="server-list" class="table table-bordered table-striped table-hover">
@@ -103,7 +110,7 @@
                     orderable: false,
                     render: function (data, type, full, meta) {
                         var myDate = new Date(data * 1000);
-                        return timeAgo(myDate);
+                        return timeAgo(myDate) == "刚刚" ? '<span class="text-success">刚刚</span>' :  timeAgo(myDate);
                     }
                 },
                 {
@@ -112,7 +119,7 @@
                     orderable: false,
                     visible: server_group_id <= 0,
                     render: function (data, type, full, meta) {
-                        return '<a href="/server-group/'+ data +'/server">'+ full.serverGroup.name +'</a>';
+                        return full.serverGroup.name;
                     }
                 },
                 {
@@ -120,7 +127,7 @@
                     data: 'id',
                     orderable: false,
                     render: function (data, type, full, meta) {
-                        var html = '<a href="/" target="_blank">控制台</a> | ';
+                        var html = '<a href="/server/'+ data +'/program" target="_blank">控制台</a> | ';
 
                         var edit_html = '<a href="/server/edit/'+ data +'">修改</a>  | ';
                         if (server_group_id > 0)

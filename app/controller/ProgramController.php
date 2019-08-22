@@ -38,9 +38,13 @@ class ProgramController extends ControllerBase
 
         $processes = $supervisor->getAllProcessInfo();
         $processGroups = array_unique(array_column($processes, 'group'));
+        $process_warnings = array_filter($processes, function($process) {
+            return $process['statename'] != 'RUNNING';
+        });
 
         $this->view->processes = $processes;
         $this->view->processGroups = $processGroups;
+        $this->view->process_warnings = $process_warnings;
     }
 
     public function createAction()

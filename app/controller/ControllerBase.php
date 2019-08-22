@@ -72,7 +72,7 @@ class ControllerBase extends Controller
 
         if($this->isPjax())
         {
-            $this->view->setRenderLevel(View::LEVEL_ACTION_VIEW);
+            $this->view->setRenderLevel(View::LEVEL_BEFORE_TEMPLATE);
         }
     }
 }
