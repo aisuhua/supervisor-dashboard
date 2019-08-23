@@ -18,7 +18,7 @@
                     <ul class="dropdown-menu">
                         {% if menu_servers[id] is not empty %}
                             {% for server in menu_servers[id] %}
-                                <li><a href="/server/{{ server['id'] }}/program">{{ server['ip'] }}:{{ server['port'] }}</a></li>
+                                <li><a href="/server/{{ server['id'] }}/process">{{ server['ip'] }}:{{ server['port'] }}</a></li>
                             {% endfor %}
 
                             <li role="separator" class="divider"></li>

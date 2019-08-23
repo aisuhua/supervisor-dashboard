@@ -3,7 +3,7 @@
 {{ flashSession.output() }}
 
 <ol class="breadcrumb">
-    <li><a href="/">首页</a></li>
+
     <li class="active">分组列表</li>
 </ol>
 

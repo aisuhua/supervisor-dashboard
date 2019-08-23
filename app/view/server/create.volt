@@ -5,8 +5,6 @@
 </div>
 
 <ol class="breadcrumb">
-    <li><a href="/">首页</a></li>
-
     {% if serverGroup is empty %}
         <li><a href="/server">服务器列表</a></li>
         {% set action = '/server/create' %}

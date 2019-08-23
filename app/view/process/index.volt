@@ -1,6 +1,8 @@
+{{ content() }}
+{{ flashSession.output() }}
+
 <ol class="breadcrumb">
-    <li><a href="/">首页</a></li>
-    <li><a href="/">默认分组</a></li>
+    <li><a href="/server-group/{{ server.serverGroup.id }}/server">{{ server.serverGroup.name }}</a></li>
     <li class="active">{{ server.ip }}:{{ server.port }}</li>
 </ol>
 
@@ -8,7 +10,7 @@
     <div class="btn-group" role="group">
         <a href="/program" class="btn btn-default">添加任务</a>
         <a href="#" class="btn btn-default">更新配置</a>
-        <a href="#" class="btn btn-default">刷新</a>
+        <a href="/server/{{ server.id }}/process" class="btn btn-default">刷新</a>
         <div class="btn-group">
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 更多 <span class="caret"></span>
@@ -30,7 +32,7 @@
     您有 {{ process_warnings | length }} 个任务异常，请联系相关人员进行处理。
 </div>
 
-<table class="table table-bordered ">
+<table class="table table-bordered">
 <tr>
     <th>进程号</th>
     <th>任务名称</th>
@@ -57,11 +59,9 @@
             <span class="label label-{{ label_name }}">{{ process['statename'] }}</span>
         </td>
         <td>
-            <a href="#">重启</a>&nbsp;&nbsp;
-            <a href="#">启动</a>&nbsp;&nbsp;
-            <a href="#">停止</a>&nbsp;&nbsp;
-            <a href="#">清理日志</a>&nbsp;&nbsp;
-            <a href="#">查看日志</a>
+            <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/start" class="start">启动</a>&nbsp;&nbsp;
+            <a href="#" class="clear_log">清理日志</a>&nbsp;&nbsp;
+            <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/taillog" target="_blank" class="tail_log">查看日志</a>
         </td>
     </tr>
 {% endfor %}
@@ -88,11 +88,11 @@
             {#<span class="process-group-tip">(没有负责人，请<a href="#">设置</a>)</span>#}
         </th>
         <th>
-            <button type="button" class="btn btn-xs btn-warning">重启</button>&nbsp;
-            <button type="button" class="btn btn-xs btn-warning">启动</button>&nbsp;
-            <button type="button" class="btn btn-xs btn-warning">停止</button>
-            <button type="button" class="btn btn-xs btn-warning">修改</button>&nbsp;
-            <button type="button" class="btn btn-xs btn-warning">删除</button>&nbsp;
+            <a class="btn btn-xs btn-warning restart" href="/server/{{ server.id }}/process/{{ processGroup }}/restart">重启</a>&nbsp;
+            <a class="btn btn-xs btn-warning start" href="/server/{{ server.id }}/process/{{ processGroup }}/start">启动</a>&nbsp;
+            <a class="btn btn-xs btn-warning stop" href="/server/{{ server.id }}/process/{{ processGroup }}/stop">停止</a>
+            <a class="btn btn-xs btn-warning">修改</a>&nbsp;
+            <a class="btn btn-xs btn-warning">删除</a>&nbsp;
         </th>
     </tr>
         {% for process in processes %}
@@ -114,11 +114,11 @@
                     <span class="label label-{{ label_name }}">{{ process['statename'] }}</span>
                 </td>
                 <td>
-                    <a href="#">重启</a>&nbsp;&nbsp;
-                    <a href="#">启动</a>&nbsp;&nbsp;
-                    <a href="#">停止</a>&nbsp;&nbsp;
-                    <a href="#">清理日志</a>&nbsp;&nbsp;
-                    <a href="#">查看日志</a>
+                    <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/restart" class="restart">重启</a>&nbsp;&nbsp;
+                    <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/start" class="start">启动</a>&nbsp;&nbsp;
+                    <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/stop" class="stop">停止</a>&nbsp;&nbsp;
+                    <a href="#" class="clear_log">清理日志</a>&nbsp;&nbsp;
+                    <a href="#" class="tail_log">查看日志</a>
                 </td>
             </tr>
             {% endif %}
@@ -127,3 +127,31 @@
     {% endfor %}
     </tbody>
 </table>
+
+<script>
+$(function () {
+    var $table = $('table');
+    var $table1 = $table.first();
+    var $table2 = $table.eq(1);
+
+    // 防止 pjax 执行
+    $('.tail_log').unbind().click(function() {
+        event.stopPropagation();
+    });
+
+    var $links = $('.start, .restart, .stop, .clear_log').unbind();
+    $links.click(function(event) {
+        event.stopPropagation();
+
+        var url = $(this).attr('href');
+        $.get(url, function(data) {
+            if (data.state) {
+                PNotify.success(data.message);
+            } else {
+                PNotify.error(data.message);
+            }
+        });
+        return false;
+    });
+});
+</script>

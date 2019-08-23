@@ -32,10 +32,68 @@ $.extend( true, $.fn.dataTable.defaults, {
     }
 });
 
-function initPNotify() {
+/**
+ * pnotify
+ */
+PNotify.defaults.styling = 'bootstrap3';
+PNotify.defaults.icons = 'bootstrap3';
+PNotify.closeAll();
 
-    PNotify.defaults.styling = 'bootstrap3';
-    PNotify.defaults.icons = 'bootstrap3';
+function success(message) {
+    PNotify.success(message);
+}
+
+function error(message) {
+    PNotify.error(message);
+}
+
+function info(message) {
+    PNotify.info(message);
+}
+
+function notice(message) {
+    PNotify.notice(message);
+}
+
+/**
+ * Pjax
+ */
+//maximum cache size for previous container contents
+//https://github.com/defunkt/jquery-pjax
+$.pjax.defaults.maxCacheLength = 0;
+$.pjax.defaults.timeout = 5000;
+
+$(document).pjax('a', '#pjax-container');
+
+$(document).on('submit', 'form[data-pjax]', function(event) {
+    $.pjax.submit(event, '#pjax-container');
+});
+
+/**
+ * NProgress
+ */
+$(document).on('pjax:send', function() {
+    NProgress.start();
+});
+
+$(document).on('pjax:complete', function() {
+    NProgress.done();
+});
+
+$(document).on("pjax:end", function() {
+    flash();
+});
+
+$(document).on('ajaxStart', function() {
+    NProgress.start();
+});
+
+$(document).on('ajaxStop', function() {
+    NProgress.done();
+});
+
+function flash() {
+    // 先关闭已有的提示窗
     PNotify.closeAll();
 
     var $pnotify = $('.pnotify');
@@ -44,69 +102,33 @@ function initPNotify() {
         return false;
     }
 
-    if (typeof window.stackTopCenter === 'undefined') {
-        window.stackTopCenter = {
-            'dir1': 'down',
-            'firstpos1': 25
-        };
-    }
-
-    var opts = {
-        // stack: window.stackTopCenter
-    };
-
     $pnotify.each(function() {
         var $that = $(this);
-        opts.text = $that.html();
 
-        if($that.hasClass('alert-success')) {
-            opts.type = 'success';
-            // opts.delay = 5000;
-        } else if($that.hasClass('alert-danger')) {
-            opts.type = 'error';
-        } else if($that.hasClass('alert-info')) {
-            opts.type = 'info';
-        } else if($that.hasClass('alert-warning')) {
-            opts.type = 'warning';
+        // 只显示最后一条提醒
+        if ($(this)[0] !== $pnotify.last()[0]) {
+            $that.remove();
+            return true;
         }
 
-        PNotify.alert(opts);
+        var message = $that.html();
+
+        if($that.hasClass('alert-success')) {
+            success(message);
+        } else if($that.hasClass('alert-danger')) {
+            error(message);
+        } else if($that.hasClass('alert-info')) {
+            info(message);
+        } else if($that.hasClass('alert-warning')) {
+            notice(message);
+        }
+
         $that.remove();
     });
 }
 
-
 $(function () {
-
-    /**
-     * Pjax
-     */
-    //maximum cache size for previous container contents
-    //https://github.com/defunkt/jquery-pjax
-    $.pjax.defaults.maxCacheLength = 0;
-
-    $(document).pjax('a', '#pjax-container');
-
-    $(document).on('submit', 'form[data-pjax]', function(event) {
-        $.pjax.submit(event, '#pjax-container');
-    });
-
-    /**
-     * NProgress
-     */
-    $(document).on('pjax:send', function() {
-        NProgress.start();
-    });
-
-    $(document).on('pjax:complete', function() {
-        NProgress.done();
-    });
-
-    $(document).on("pjax:end", function() {
-        initPNotify();
-    });
-
-    initPNotify();
+    flash();
 });
 
 
