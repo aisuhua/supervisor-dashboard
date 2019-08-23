@@ -37,22 +37,71 @@ $.extend( true, $.fn.dataTable.defaults, {
  */
 PNotify.defaults.styling = 'bootstrap3';
 PNotify.defaults.icons = 'bootstrap3';
-PNotify.closeAll();
+
+function clearSuccess() {
+    if (PNotify.notices.length > 0) {
+        $.each(PNotify.notices, function( index, value ) {
+            if (value.options.data.type == 'success') {
+                PNotify.notices[index].remove();
+            }
+        });
+    }
+}
 
 function success(message) {
+    clearSuccess();
     PNotify.success(message);
 }
 
 function error(message) {
+    clearSuccess();
     PNotify.error(message);
 }
 
 function info(message) {
+    clearSuccess();
     PNotify.info(message);
 }
 
 function notice(message) {
+    clearSuccess();
     PNotify.notice(message);
+}
+
+function flash() {
+    // 先关闭已有的提示窗
+    // PNotify.closeAll();
+    clearSuccess();
+
+    var $pnotify = $('.pnotify');
+
+    if($pnotify.size() <= 0) {
+        return false;
+    }
+
+    $pnotify.each(function() {
+        var $that = $(this);
+
+        // 只显示最后一条提醒
+        if ($(this)[0] !== $pnotify.last()[0]) {
+            $that.remove();
+            return true;
+        }
+
+        var message = $that.html();
+
+        if($that.hasClass('alert-success')) {
+            success(message);
+        } else if($that.hasClass('alert-danger')) {
+            error(message);
+        } else if($that.hasClass('alert-info')) {
+            info(message);
+        } else if($that.hasClass('alert-warning')) {
+            notice(message);
+        }
+
+        $that.remove();
+    });
 }
 
 /**
@@ -91,41 +140,6 @@ $(document).on('ajaxStart', function() {
 $(document).on('ajaxStop', function() {
     NProgress.done();
 });
-
-function flash() {
-    // 先关闭已有的提示窗
-    PNotify.closeAll();
-
-    var $pnotify = $('.pnotify');
-
-    if($pnotify.size() <= 0) {
-        return false;
-    }
-
-    $pnotify.each(function() {
-        var $that = $(this);
-
-        // 只显示最后一条提醒
-        if ($(this)[0] !== $pnotify.last()[0]) {
-            $that.remove();
-            return true;
-        }
-
-        var message = $that.html();
-
-        if($that.hasClass('alert-success')) {
-            success(message);
-        } else if($that.hasClass('alert-danger')) {
-            error(message);
-        } else if($that.hasClass('alert-info')) {
-            info(message);
-        } else if($that.hasClass('alert-warning')) {
-            notice(message);
-        }
-
-        $that.remove();
-    });
-}
 
 $(function () {
     flash();

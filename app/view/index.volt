@@ -11,6 +11,8 @@
     <!-- bootstrap -->
     <link href="/css/bootstrap.min.css" rel="stylesheet">
 
+    <link rel="stylesheet" href="/fonts/font-awesome/css/font-awesome.min.css">
+
     <!-- datatables -->
     <link href="/plugins/datatables/dataTables.bootstrap.min.css" rel="stylesheet">
     <link href="/plugins/datatables/button/buttons.bootstrap.min.css" rel="stylesheet">

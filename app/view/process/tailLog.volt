@@ -1,18 +1,5 @@
-{#{{ content() }}#}
-{#{{ flashSession.output() }}#}
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ name }}</title>
-</head>
-<body>
+{#<pre class='log'>暂无日志: SNAPSHOT_CREATE_0_9</pre>#}
 
 <pre>{{ log[0] }}</pre>
-
-<script>
-</script>
-</body>
-</html>
-
 

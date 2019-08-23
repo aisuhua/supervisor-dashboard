@@ -7,7 +7,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/">Superman</a>
+            <a class="navbar-brand" href="/">Supervisor</a>
         </div>
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -18,7 +18,7 @@
                     <ul class="dropdown-menu">
                         {% if menu_servers[id] is not empty %}
                             {% for server in menu_servers[id] %}
-                                <li><a href="/server/{{ server['id'] }}/process">{{ server['ip'] }}:{{ server['port'] }}</a></li>
+                                <li><a href="/server/{{ server['id'] }}/process?ip={{ server['ip'] }}&port={{ server['port'] }}">{{ server['ip'] }}:{{ server['port'] }}</a></li>
                             {% endfor %}
 
                             <li role="separator" class="divider"></li>

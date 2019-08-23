@@ -2,9 +2,22 @@
 {{ flashSession.output() }}
 
 <ol class="breadcrumb">
-    <li><a href="/server-group/{{ server.serverGroup.id }}/server">{{ server.serverGroup.name }}</a></li>
     <li class="active">{{ server.ip }}:{{ server.port }}</li>
 </ol>
+
+{#<p class="bg-success" style="padding:10px;">#}
+
+{#</p>#}
+
+{#<div class="alert alert-success" role="alert" style="height: 40px; padding-top: 9px;">#}
+    {#{{ server.ip }}:{{ server.port }}#}
+{#</div>#}
+
+{#<div class="panel panel-default">#}
+    {#<div class="panel-body">#}
+        {#{{ server.ip }}:{{ server.port }}#}
+    {#</div>#}
+{#</div>#}
 
 <div style="margin-bottom: 20px;">
     <div class="btn-group" role="group">
@@ -61,7 +74,7 @@
         <td>
             <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/start" class="start">启动</a>&nbsp;&nbsp;
             <a href="#" class="clear_log">清理日志</a>&nbsp;&nbsp;
-            <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/taillog" target="_blank" class="tail_log">查看日志</a>
+            <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/taillog?ip={{ server.ip }}&port={{ server.port }}" target="_blank" class="tail_log">查看日志</a>
         </td>
     </tr>
 {% endfor %}
@@ -118,7 +131,7 @@
                     <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/start" class="start">启动</a>&nbsp;&nbsp;
                     <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/stop" class="stop">停止</a>&nbsp;&nbsp;
                     <a href="#" class="clear_log">清理日志</a>&nbsp;&nbsp;
-                    <a href="#" class="tail_log">查看日志</a>
+                    <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/taillog?ip={{ server.ip }}&port={{ server.port }}" target="_blank" class="tail_log">查看日志</a>
                 </td>
             </tr>
             {% endif %}
@@ -130,9 +143,6 @@
 
 <script>
 $(function () {
-    var $table = $('table');
-    var $table1 = $table.first();
-    var $table2 = $table.eq(1);
 
     // 防止 pjax 执行
     $('.tail_log').unbind().click(function() {
@@ -146,9 +156,9 @@ $(function () {
         var url = $(this).attr('href');
         $.get(url, function(data) {
             if (data.state) {
-                PNotify.success(data.message);
+                success(data.message);
             } else {
-                PNotify.error(data.message);
+                error(data.message);
             }
         });
         return false;

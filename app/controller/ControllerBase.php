@@ -23,6 +23,8 @@ class ControllerBase extends Controller
             {
                 $this->response->setHeader('X-PJAX-URL', $_SERVER['REQUEST_URI']);
             }
+
+            $this->view->setRenderLevel(View::LEVEL_BEFORE_TEMPLATE);
         }
     }
 
@@ -68,11 +70,6 @@ class ControllerBase extends Controller
 
             $this->view->menus = $menus;
             $this->view->menu_servers = $menu_servers;
-        }
-
-        if($this->isPjax())
-        {
-            $this->view->setRenderLevel(View::LEVEL_BEFORE_TEMPLATE);
         }
     }
 }

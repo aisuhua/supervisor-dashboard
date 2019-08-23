@@ -71,7 +71,7 @@ class ProcessController extends ControllerBase
         }
 
         $result['state'] = 1;
-        $result['message'] = "{$name} 已停止";
+        $result['message'] = Tool::shortName($name) . " 已停止";
 
         return $this->response->setJsonContent($result);
     }
@@ -88,7 +88,7 @@ class ProcessController extends ControllerBase
         }
 
         $result['state'] = 1;
-        $result['message'] = "{$name} 已启动";
+        $result['message'] = Tool::shortName($name) . " 已启动";
 
         return $this->response->setJsonContent($result);
     }
@@ -107,7 +107,7 @@ class ProcessController extends ControllerBase
         $this->supervisor->startProcess($name);
 
         $result['state'] = 1;
-        $result['message'] = "{$name} 已重启";
+        $result['message'] = Tool::shortName($name) . " 已重启";
 
         return $this->response->setJsonContent($result);
     }
@@ -158,8 +158,21 @@ class ProcessController extends ControllerBase
 
         $log = $this->supervisor->tailProcessStdoutLog($name, 0, 1024 * 1024);
 
-        $this->view->setRenderLevel(View::LEVEL_ACTION_VIEW);
-        $this->view->name = $name;
+        $this->view->disableLevel([
+            View::LEVEL_LAYOUT => true,
+        ]);
+
+        $this->view->setTemplateBefore('tailLog');
+
+        if ($this->request->isAjax())
+        {
+            $this->view->setRenderLevel(View::LEVEL_ACTION_VIEW);
+        }
+
+        $exploded = explode(':', $name);
+
+        $this->view->group = $exploded[0];
+        $this->view->name = $exploded[1];
         $this->view->log = $log;
     }
 
