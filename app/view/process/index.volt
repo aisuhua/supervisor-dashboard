@@ -1,23 +1,4 @@
-{{ content() }}
-{{ flashSession.output() }}
-
-<ol class="breadcrumb">
-    <li class="active">{{ server.ip }}:{{ server.port }}</li>
-</ol>
-
-{#<p class="bg-success" style="padding:10px;">#}
-
-{#</p>#}
-
-{#<div class="alert alert-success" role="alert" style="height: 40px; padding-top: 9px;">#}
-    {#{{ server.ip }}:{{ server.port }}#}
-{#</div>#}
-
-{#<div class="panel panel-default">#}
-    {#<div class="panel-body">#}
-        {#{{ server.ip }}:{{ server.port }}#}
-    {#</div>#}
-{#</div>#}
+{% include 'process/breadcrumb.volt' %}
 
 <div style="margin-bottom: 20px;">
     <div class="btn-group" role="group">
@@ -32,8 +13,8 @@
                 <li><a href="/server/{{ server.id }}/process/restartall">重启所有任务</a></li>
                 <li><a href="/server/{{ server.id }}/process/stopall" class="stopall">停止所有任务</a></li>
                 <li><a href="#">查看日志</a></li>
-                <li><a href="#">重启服务</a></li>
-                <li><a href="#">停止服务</a></li>
+                <li><a href="/server/{{ server.id }}/supervisor/restart">重启服务</a></li>
+                {#<li><a href="/server/{{ server.id }}/supervisor/shutdown">停止服务</a></li>#}
             </ul>
         </div>
     </div>
@@ -42,7 +23,7 @@
 {% if process_warnings is not empty %}
 
 <div class="alert alert-danger">
-    <strong>您有 {{ process_warnings | length }} 个任务状态异常</strong>，请联系相关人员进行处理。
+    您有 {{ process_warnings | length }} 个任务异常，请联系相关人员进行处理。
 </div>
 
 <table class="table table-bordered">

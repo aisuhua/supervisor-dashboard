@@ -41,6 +41,33 @@ $router->add(
 );
 
 /**
+ * 服务器 Supervisor 管理
+ */
+$router->add(
+    '/server/{server_id:[0-9]+}/supervisor/shutdown',
+    [
+        'controller' => 'supervisor',
+        'action' => 'shutdown'
+    ]
+);
+
+$router->add(
+    '/server/{server_id:[0-9]+}/supervisor/restart',
+    [
+        'controller' => 'supervisor',
+        'action' => 'restart'
+    ]
+);
+
+$router->add(
+    '/server/{server_id:[0-9]+}/supervisor/error',
+    [
+        'controller' => 'supervisor',
+        'action' => 'error'
+    ]
+);
+
+/**
  * 服務器進程管理
  */
 

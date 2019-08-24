@@ -10,8 +10,10 @@ class ProcessController extends ControllerBase
      */
     private $supervisor;
 
-    public function initialize()
+    public function beforeExecuteRoute()
     {
+        parent::beforeExecuteRoute();
+
         $server_id = $this->dispatcher->getParam('server_id', 'int');
 
         if ($server_id)
@@ -37,7 +39,27 @@ class ProcessController extends ControllerBase
             $this->server = $server;
             $this->supervisor = $supervisor;
             $this->view->server = $server;
+
+            try
+            {
+                $supervisor->getState();
+            }
+            catch (Exception $e)
+            {
+                return $this->dispatcher->forward([
+                    'controller' => 'supervisor',
+                    'action' => 'error',
+                    'params' => [
+                        'server_id' => $server_id
+                    ]
+                ]);
+            }
         }
+    }
+
+    public function initialize()
+    {
+
     }
 
     public function indexAction()

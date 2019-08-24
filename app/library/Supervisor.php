@@ -32,4 +32,14 @@ class Supervisor extends SupervisorBase
     {
         return $this->rpcClient->call('supervisor.clearProcessLogs', array($name));
     }
+
+    public function shutdown()
+    {
+        return $this->rpcClient->call('supervisor.shutdown');
+    }
+
+    public function restart()
+    {
+        return $this->rpcClient->call('supervisor.restart');
+    }
 }
