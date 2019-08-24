@@ -37,7 +37,6 @@ class ProcessController extends ControllerBase
             $this->server = $server;
             $this->supervisor = $supervisor;
             $this->view->server = $server;
-
         }
     }
 
@@ -156,7 +155,8 @@ class ProcessController extends ControllerBase
     {
         $name = $this->dispatcher->getParam('name', 'string');
 
-        $log = $this->supervisor->tailProcessStdoutLog($name, 0, 1024 * 1024);
+        // 只看前面 1M 的日志
+        $log = $this->supervisor->tailProcessStdoutLog($name, 0, 1 * 1024 * 1024);
 
         $this->view->disableLevel([
             View::LEVEL_LAYOUT => true,
@@ -164,7 +164,7 @@ class ProcessController extends ControllerBase
 
         $this->view->setTemplateBefore('tailLog');
 
-        if ($this->request->isAjax())
+        if ($this->isPjax())
         {
             $this->view->setRenderLevel(View::LEVEL_ACTION_VIEW);
         }
@@ -178,7 +178,34 @@ class ProcessController extends ControllerBase
 
     public function clearLogAction()
     {
+        $result = [];
+        $name = $this->dispatcher->getParam('name', 'string');
 
+        $this->supervisor->clearProcessLogs($name);
+
+        $result['state'] = 1;
+        $result['message'] = "{$name} 日志清理完成";
+
+        return $this->response->setJsonContent($result);
+    }
+
+    public function stopAllAction()
+    {
+        $this->supervisor->stopAllProcesses();
+
+        $this->flashSession->success("已停止所有任务");
+
+        return $this->response->redirect($this->request->getHTTPReferer());
+    }
+
+    public function restartAllAction()
+    {
+        $this->supervisor->stopAllProcesses();
+        $this->supervisor->startAllProcesses();
+
+        $this->flashSession->success("已重启所有任务");
+
+        return $this->response->redirect($this->request->getHTTPReferer());
     }
 }
 

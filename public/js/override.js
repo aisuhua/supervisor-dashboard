@@ -48,9 +48,11 @@ function clearSuccess() {
     }
 }
 
-function success(message) {
+function success(message, options = {}) {
     clearSuccess();
-    PNotify.success(message);
+
+    options.text = message;
+    PNotify.success(options);
 }
 
 function error(message) {

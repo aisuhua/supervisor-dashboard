@@ -54,6 +54,22 @@ $router->add(
 );
 
 $router->add(
+    '/server/{server_id:[0-9]+}/process/stopall',
+    [
+        'controller' => 'process',
+        'action' => 'stopAll'
+    ]
+);
+
+$router->add(
+    '/server/{server_id:[0-9]+}/process/restartall',
+    [
+        'controller' => 'process',
+        'action' => 'restartAll'
+    ]
+);
+
+$router->add(
     '/server/{server_id:[0-9]+}/process/{name:\w+:\w+}/stop',
     [
         'controller' => 'process',
@@ -85,6 +101,14 @@ $router->add(
     ]
 );
 
+$router->add(
+    '/server/{server_id:[0-9]+}/process/{name:\w+:\w+}/clearlog',
+    [
+        'controller' => 'process',
+        'action' => 'clearLog'
+    ]
+);
+
 // 进程组管理
 $router->add(
     '/server/{server_id:[0-9]+}/process/{name:[^:]+}/stop',
@@ -110,7 +134,6 @@ $router->add(
         'action' => 'restartGroup'
     ]
 );
-
 
 
 $router->handle();

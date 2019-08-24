@@ -23,14 +23,14 @@
     <div class="btn-group" role="group">
         <a href="/program" class="btn btn-default">添加任务</a>
         <a href="#" class="btn btn-default">更新配置</a>
-        <a href="/server/{{ server.id }}/process" class="btn btn-default">刷新</a>
+        <a href="/server/{{ server.id }}/process" class="btn btn-default">刷新页面</a>
         <div class="btn-group">
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 更多 <span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
-                <li><a href="#">重启所有任务</a></li>
-                <li><a href="#">停止所有任务</a></li>
+                <li><a href="/server/{{ server.id }}/process/restartall">重启所有任务</a></li>
+                <li><a href="/server/{{ server.id }}/process/stopall" class="stopall">停止所有任务</a></li>
                 <li><a href="#">查看日志</a></li>
                 <li><a href="#">重启服务</a></li>
                 <li><a href="#">停止服务</a></li>
@@ -42,7 +42,7 @@
 {% if process_warnings is not empty %}
 
 <div class="alert alert-danger">
-    您有 {{ process_warnings | length }} 个任务异常，请联系相关人员进行处理。
+    <strong>您有 {{ process_warnings | length }} 个任务状态异常</strong>，请联系相关人员进行处理。
 </div>
 
 <table class="table table-bordered">
@@ -72,8 +72,7 @@
             <span class="label label-{{ label_name }}">{{ process['statename'] }}</span>
         </td>
         <td>
-            <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/start" class="start">启动</a>&nbsp;&nbsp;
-            <a href="#" class="clear_log">清理日志</a>&nbsp;&nbsp;
+            <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/start" class="start">启动</a>&nbsp;
             <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/taillog?ip={{ server.ip }}&port={{ server.port }}" target="_blank" class="tail_log">查看日志</a>
         </td>
     </tr>
@@ -103,9 +102,10 @@
         <th>
             <a class="btn btn-xs btn-warning restart" href="/server/{{ server.id }}/process/{{ processGroup }}/restart">重启</a>&nbsp;
             <a class="btn btn-xs btn-warning start" href="/server/{{ server.id }}/process/{{ processGroup }}/start">启动</a>&nbsp;
-            <a class="btn btn-xs btn-warning stop" href="/server/{{ server.id }}/process/{{ processGroup }}/stop">停止</a>
+            <a class="btn btn-xs btn-warning stop" href="/server/{{ server.id }}/process/{{ processGroup }}/stop">停止</a>&nbsp;
             <a class="btn btn-xs btn-warning">修改</a>&nbsp;
-            <a class="btn btn-xs btn-warning">删除</a>&nbsp;
+            <a class="btn btn-xs btn-warning">复制</a>&nbsp;
+            <a class="btn btn-xs btn-warning">删除</a>
         </th>
     </tr>
         {% for process in processes %}
@@ -127,10 +127,10 @@
                     <span class="label label-{{ label_name }}">{{ process['statename'] }}</span>
                 </td>
                 <td>
-                    <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/restart" class="restart">重启</a>&nbsp;&nbsp;
-                    <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/start" class="start">启动</a>&nbsp;&nbsp;
-                    <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/stop" class="stop">停止</a>&nbsp;&nbsp;
-                    <a href="#" class="clear_log">清理日志</a>&nbsp;&nbsp;
+                    <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/restart" class="restart">重启</a>&nbsp;
+                    <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/start" class="start">启动</a>&nbsp;
+                    <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/stop" class="stop">停止</a>&nbsp;
+                    <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/clearlog" class="clear_log">清理日志</a>&nbsp;
                     <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/taillog?ip={{ server.ip }}&port={{ server.port }}" target="_blank" class="tail_log">查看日志</a>
                 </td>
             </tr>
