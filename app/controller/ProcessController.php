@@ -232,7 +232,7 @@ class ProcessController extends ControllerSupervisorBase
         $this->invoke();
 
         $result['state'] = 1;
-        $result['message'] = "{$name} 日志清理完成";
+        $result['message'] = Tool::shortName($name) . " 日志清理完成";
 
         return $this->response->setJsonContent($result);
     }
