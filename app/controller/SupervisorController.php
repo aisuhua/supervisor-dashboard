@@ -48,7 +48,7 @@ class SupervisorController extends ControllerBase
         {
             $this->supervisor->getState();
 
-            return $this->dispatcher->forward([
+            $this->dispatcher->forward([
                 'controller' => 'process',
                 'action' => 'index',
                 'params' => [

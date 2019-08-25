@@ -46,7 +46,7 @@ class ProcessController extends ControllerBase
             }
             catch (Exception $e)
             {
-                return $this->dispatcher->forward([
+                $this->dispatcher->forward([
                     'controller' => 'supervisor',
                     'action' => 'error',
                     'params' => [

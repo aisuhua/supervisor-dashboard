@@ -8,8 +8,8 @@
         {% if message == 'Unauthorized' %}
             <li>Supervisor 的帐号或密码不正确，<a href="###">修改配置</a>。</li>
         {% else %}
-            <li>{{ server.ip }} 服务器上的 Supervisor 没有启动。</li>
-            <li>Supervisor 的 XML-RPC 通讯端口填写错误，<a href="###">修改配置</a>。</li>
+            <li>Supervisor 服务没有启动。</li>
+            <li>Supervisor 的 XML-RPC 端口不正确，<a href="###">修改配置</a>。</li>
         {% endif %}
     </ul>
     <div style="padding-bottom: 10px;"></div>
