@@ -75,6 +75,14 @@ $router->add(
     ]
 );
 
+$router->add(
+    '/server/{server_id:[0-9]+}/supervisor/status',
+    [
+        'controller' => 'supervisor',
+        'action' => 'status'
+    ]
+);
+
 /**
  * 服務器進程管理
  */

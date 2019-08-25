@@ -8,6 +8,11 @@ class ControllerSupervisorBase extends ControllerBase
      * @var Server $server
      */
     protected $server;
+
+    /**
+     * @var Supervisor $supervisor;
+     */
+    protected $supervisor;
     protected $callback;
 
     /**
@@ -22,7 +27,7 @@ class ControllerSupervisorBase extends ControllerBase
     protected function invoke()
     {
         $exception = null;
-        for ($i = 0; $i < 3600; $i++)
+        for ($i = 1; $i <= 1800; $i++)
         {
             try
             {

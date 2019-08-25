@@ -3,15 +3,7 @@ use Phalcon\Mvc\View;
 
 class SupervisorController extends ControllerSupervisorBase
 {
-    /**
-     * @var Server $server
-     */
-    protected $server;
 
-    /**
-     * @var Supervisor $supervisor;
-     */
-    protected $supervisor;
 
     public function initialize()
     {
@@ -41,6 +33,17 @@ class SupervisorController extends ControllerSupervisorBase
             $this->supervisor = $supervisor;
             $this->view->server = $server;
         }
+    }
+
+    public function statusAction()
+    {
+        $callback = function ()
+        {
+          $status = $this->supervisor->getState();
+        };
+        $this->setCallback($callback);
+        $this->invoke();
+        exit;
     }
 
     public function readLogAction()
