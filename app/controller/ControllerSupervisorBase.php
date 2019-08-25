@@ -45,8 +45,11 @@ class ControllerSupervisorBase extends ControllerBase
 
     protected function redirectToIndex()
     {
-        return $this->response->redirect(
-            "/server/{$this->server->id}/process?ip={$this->server->ip}&port={$this->server->port}"
-        );
+        return $this->response->redirect(self::getIndexUrl());
+    }
+
+    protected function getIndexUrl()
+    {
+        return "/server/{$this->server->id}/process?ip={$this->server->ip}&port={$this->server->port}";
     }
 }

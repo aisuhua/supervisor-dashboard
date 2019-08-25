@@ -239,31 +239,81 @@ class ProcessController extends ControllerSupervisorBase
 
     public function stopAllAction()
     {
-        $callback = function()
+        $wait = (bool) $this->request->get('wait', 'int', 1);
+
+        if ($wait)
         {
-            $this->supervisor->stopAllProcesses();
-        };
-        $this->setCallback($callback);
-        $this->invoke();
+            $callback = function()
+            {
+                $this->supervisor->stopAllProcesses(true);
+            };
+            $this->setCallback($callback);
+            $this->invoke();
 
-        $this->flashSession->success("已停止所有任务");
+            $this->flashSession->success("已停止所有进程");
 
-        return $this->redirectToIndex();
+            return $this->redirectToIndex();
+        }
+        else
+        {
+            $result = [];
+            $result['state'] = 1;
+            $result['message'] = "正在停止所有进程，请刷新页面查看进度";
+            $this->response->setJsonContent($result)->send();
+
+            fastcgi_finish_request();
+
+            $callback = function()
+            {
+                $this->supervisor->stopAllProcesses(false);
+            };
+            $this->setCallback($callback);
+            $this->invoke();
+
+            $this->view->setRenderLevel(
+                View::LEVEL_NO_RENDER
+            );
+        }
     }
 
     public function restartAllAction()
     {
-        $callback = function()
+        $wait = (bool) $this->request->get('wait', 'int', 1);
+
+        if ($wait)
         {
-            $this->supervisor->stopAllProcesses();
-            $this->supervisor->startAllProcesses();
-        };
-        $this->setCallback($callback);
-        $this->invoke();
+            $callback = function() use ($wait)
+            {
+                $this->supervisor->stopAllProcesses(true);
+                $this->supervisor->startAllProcesses(true);
+            };
+            $this->setCallback($callback);
+            $this->invoke();
 
-        $this->flashSession->success("已重启所有任务");
+            $this->flashSession->success("已重启所有进程");
+            return $this->redirectToIndex();
+        }
+        else
+        {
+            $result = [];
+            $result['state'] = 1;
+            $result['message'] = "正在重启所有进程，请刷新页面查看进度";
+            $this->response->setJsonContent($result)->send();
 
-        return $this->redirectToIndex();
+            fastcgi_finish_request();
+
+            $callback = function() use ($wait)
+            {
+                $this->supervisor->stopAllProcesses(false);
+                $this->supervisor->startAllProcesses(false);
+            };
+            $this->setCallback($callback);
+            $this->invoke();
+
+            $this->view->setRenderLevel(
+                View::LEVEL_NO_RENDER
+            );
+        }
     }
 }
 

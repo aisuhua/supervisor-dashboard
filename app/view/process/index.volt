@@ -15,7 +15,7 @@
                 更多 <span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
-                <li><a href="/server/{{ server.id }}/process/restartall">重启所有进程</a></li>
+                <li><a href="/server/{{ server.id }}/process/restartall" class="restartall">重启所有进程</a></li>
                 <li><a href="/server/{{ server.id }}/process/stopall" class="stopall">停止所有进程</a></li>
                 <li><a href="/server/{{ server.id }}/supervisor/readlog?ip={{ server.ip }}&port={{ server.port }}" target="_blank" class="read_log">查看日志</a></li>
                 <li><a href="/server/{{ server.id }}/supervisor/restart">重启服务</a></li>
@@ -133,6 +133,25 @@ $(function () {
     // 防止 pjax 执行
     $('.tail_log, .read_log').unbind().click(function() {
         event.stopPropagation();
+    });
+
+    // 超过 50 个进程，则采用异步重启方式
+    $('.restartall, .stopall').click(function() {
+        var size = $('table.table-striped tr:not(:has(th))').size();
+        if (size > 50) {
+            event.stopPropagation();
+
+            var url = $(this).attr('href') + '?wait=0';
+            $.get(url, function(data) {
+                if (data.state) {
+                    success(data.message);
+                } else {
+                    error(data.message);
+                }
+            });
+
+            return false;
+        }
     });
 
     var $links = $('.start, .restart, .stop, .clear_log').unbind();

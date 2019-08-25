@@ -112,7 +112,7 @@ function flash() {
 //maximum cache size for previous container contents
 //https://github.com/defunkt/jquery-pjax
 $.pjax.defaults.maxCacheLength = 0;
-$.pjax.defaults.timeout = 20000;
+$.pjax.defaults.timeout = 180000;
 
 $(document).pjax('a', '#pjax-container');
 
