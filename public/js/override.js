@@ -38,6 +38,15 @@ $.extend( true, $.fn.dataTable.defaults, {
 PNotify.defaults.styling = 'bootstrap3';
 PNotify.defaults.icons = 'bootstrap3';
 
+function getTextWidth(text, font) {
+    // re-use canvas object for better performance
+    var canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
+    var context = canvas.getContext("2d");
+    context.font = font;
+    var metrics = context.measureText(text);
+    return metrics.width;
+}
+
 function clearSuccess() {
     if (PNotify.notices.length > 0) {
         $.each(PNotify.notices, function( index, value ) {
@@ -48,26 +57,52 @@ function clearSuccess() {
     }
 }
 
+function applyDefault(options = {}) {
+    var length = getTextWidth(options.text, 'Helvetica Neue');
+    console.log(length);
+
+    var width = 360;
+    if (length > 187) {
+        var width2 = 360 + (length - 187) + 35;
+
+        width = width2 > width * 2 ? width * 2 : width2;
+    }
+
+    options.width = width + 'px';
+
+    return options;
+}
+
 function success(message, options = {}) {
     clearSuccess();
 
     options.text = message;
+    options = applyDefault(options);
     PNotify.success(options);
 }
 
-function error(message) {
+function error(message, options = {}) {
     clearSuccess();
-    PNotify.error(message);
+
+    options.text = message;
+    options = applyDefault(options);
+    PNotify.error(options);
 }
 
-function info(message) {
+function info(message, options = {}) {
     clearSuccess();
-    PNotify.info(message);
+
+    options.text = message;
+    options = applyDefault(options);
+    PNotify.info(options);
 }
 
-function notice(message) {
+function notice(message, options = {}) {
     clearSuccess();
-    PNotify.notice(message);
+
+    options.text = message;
+    options = applyDefault(options);
+    PNotify.notice(options);
 }
 
 function flash() {

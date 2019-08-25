@@ -9,15 +9,15 @@
     <div class="btn-group" role="group">
         <a href="/program" class="btn btn-default">添加进程</a>
         <a href="#" class="btn btn-default">更新配置</a>
-        <a href="/server/{{ server.id }}/process" class="btn btn-default">刷新页面</a>
+        <a href="/server/{{ server.id }}/process?ip={{ server.ip }}&port={{ server.port }}" class="btn btn-default">刷新页面</a>
         <div class="btn-group">
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 更多 <span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
+                <li><a href="/server/{{ server.id }}/supervisor/readlog?ip={{ server.ip }}&port={{ server.port }}" target="_blank" class="read_log">查看 Supervisor 日志</a></li>
                 <li><a href="/server/{{ server.id }}/process/restartall" class="restartall">重启所有进程</a></li>
                 <li><a href="/server/{{ server.id }}/process/stopall" class="stopall">停止所有进程</a></li>
-                <li><a href="/server/{{ server.id }}/supervisor/readlog?ip={{ server.ip }}&port={{ server.port }}" target="_blank" class="read_log">查看 Supervisor 日志</a></li>
                 <li><a href="/server/{{ server.id }}/supervisor/restart" class="restart_supervisor">重启 Supervisor</a></li>
                 {#<li><a href="/server/{{ server.id }}/supervisor/shutdown">停止服务</a></li>#}
             </ul>
@@ -137,11 +137,18 @@ $(function () {
 
     // 超过 50 个进程，则采用异步重启方式
     $('.restartall, .stopall, .restart_supervisor').click(function() {
+        event.stopPropagation();
+
+        if (!confirm("真的要" + $(this).text() + '吗？')) {
+            event.stopPropagation();
+            return false;
+        }
+
+        var url = $(this).attr('href');
+
         var size = $('table.table-striped tr:not(:has(th))').size();
         if (size > 50) {
-            event.stopPropagation();
-
-            var url = $(this).attr('href') + '?wait=0';
+            url += '?wait=0';
             $.get(url, function(data) {
                 if (data.state) {
                     success(data.message);
@@ -149,9 +156,15 @@ $(function () {
                     error(data.message);
                 }
             });
-
-            return false;
+        } else {
+            $.pjax({
+                url: url,
+                container: '#pjax-container',
+                push: false
+            });
         }
+
+        return false;
     });
 
     var $links = $('.start, .restart, .stop, .clear_log').unbind();

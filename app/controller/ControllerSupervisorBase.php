@@ -38,7 +38,8 @@ class ControllerSupervisorBase extends ControllerBase
             catch (Exception $e)
             {
                 $exception = $e;
-                usleep(500000);
+                // usleep(500000);
+                sleep(1);
             }
         }
 
