@@ -17,8 +17,8 @@
             <ul class="dropdown-menu">
                 <li><a href="/server/{{ server.id }}/process/restartall" class="restartall">重启所有进程</a></li>
                 <li><a href="/server/{{ server.id }}/process/stopall" class="stopall">停止所有进程</a></li>
-                <li><a href="/server/{{ server.id }}/supervisor/readlog?ip={{ server.ip }}&port={{ server.port }}" target="_blank" class="read_log">查看日志</a></li>
-                <li><a href="/server/{{ server.id }}/supervisor/restart">重启服务</a></li>
+                <li><a href="/server/{{ server.id }}/supervisor/readlog?ip={{ server.ip }}&port={{ server.port }}" target="_blank" class="read_log">查看 Supervisor 日志</a></li>
+                <li><a href="/server/{{ server.id }}/supervisor/restart" class="restart_supervisor">重启 Supervisor</a></li>
                 {#<li><a href="/server/{{ server.id }}/supervisor/shutdown">停止服务</a></li>#}
             </ul>
         </div>
@@ -136,7 +136,7 @@ $(function () {
     });
 
     // 超过 50 个进程，则采用异步重启方式
-    $('.restartall, .stopall').click(function() {
+    $('.restartall, .stopall, .restart_supervisor').click(function() {
         var size = $('table.table-striped tr:not(:has(th))').size();
         if (size > 50) {
             event.stopPropagation();

@@ -84,40 +84,50 @@ class SupervisorController extends ControllerSupervisorBase
 
     public function restartAction()
     {
-        $callback1 = function()
+        $wait = (bool)$this->request->get('wait', 'int', 1);
+
+        $callback1 = function ()
         {
             $this->supervisor->restart();
         };
         $this->setCallback($callback1);
         $this->invoke();
 
-        $timeout = 10;
-        $start_time = time();
-        $has_starting = true;
-
-        // 10 秒内如果还有启动中的脚本则不再检测
-        while (time() - $start_time < $timeout && $has_starting)
+        if ($wait)
         {
-            $has_starting = false;
+            $timeout = 10;
+            $start_time = time();
+            $has_starting = true;
 
-            $callback2 = function() use (&$has_starting)
+            // 10 秒内如果还有启动中的脚本则不再检测
+            while (time() - $start_time < $timeout && $has_starting)
             {
-                $allProcessInfo = $this->supervisor->getAllProcessInfo();
-                foreach ($allProcessInfo as $processInfo)
+                $has_starting = false;
+
+                $callback2 = function () use (&$has_starting)
                 {
-                    if ($processInfo['statename'] == 'STARTING')
+                    $allProcessInfo = $this->supervisor->getAllProcessInfo();
+                    foreach ($allProcessInfo as $processInfo)
                     {
-                        $has_starting = true;
-                        break;
+                        if ($processInfo['statename'] == 'STARTING')
+                        {
+                            $has_starting = true;
+                            break;
+                        }
                     }
-                }
-            };
-            $this->setCallback($callback2);
-            $this->invoke();
+                };
+                $this->setCallback($callback2);
+                $this->invoke();
+            }
+
+            $this->flashSession->success("Supervisor 重启完成");
+            return $this->redirectToIndex();
         }
 
-        $this->flashSession->success("Supervisor 重启完成");
-        return $this->redirectToIndex();
+        $result = [];
+        $result['state'] = 1;
+        $result['message'] = "Supervisor 正在重启，刷新页面查看进度";
+        return $this->response->setJsonContent($result);
     }
 
     public function shutdownAction()
