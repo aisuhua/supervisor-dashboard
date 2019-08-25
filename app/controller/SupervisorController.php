@@ -1,15 +1,17 @@
 <?php
 use Phalcon\Mvc\View;
 
-class SupervisorController extends ControllerBase
+class SupervisorController extends ControllerSupervisorBase
 {
-    private $server_id;
-    private $server;
+    /**
+     * @var Server $server
+     */
+    protected $server;
 
     /**
      * @var Supervisor $supervisor;
      */
-    private $supervisor;
+    protected $supervisor;
 
     public function initialize()
     {
@@ -35,42 +37,59 @@ class SupervisorController extends ControllerBase
                 $server->port
             );
 
-            $this->server_id = $server_id;
             $this->server = $server;
             $this->supervisor = $supervisor;
             $this->view->server = $server;
         }
     }
 
-    public function errorAction()
+    public function readLogAction()
     {
-        try
+        $callback = function ()
         {
-            $this->supervisor->getState();
+            // 只看前面 1M 的日志
+            $log = $this->supervisor->readLog(0, 1024 * 1024);
+            $this->view->log = $log;
+        };
+        $this->setCallback($callback);
+        $this->invoke();
 
-            $this->dispatcher->forward([
-                'controller' => 'process',
-                'action' => 'index',
-                'params' => [
-                    'server_id' => $this->server_id
-                ]
-            ]);
-        }
-        catch (Exception $e)
+        $this->view->disableLevel([
+            View::LEVEL_LAYOUT => true,
+        ]);
+
+        $this->view->setTemplateBefore('readLog');
+
+        if ($this->isPjax())
         {
-            if ($e instanceof Zend\XmlRpc\Client\Exception\HttpException &&
-                $e->getMessage() == 'Unauthorized')
-            {
-
-            }
-
-            $this->view->message = $e->getMessage();;
+            $this->view->setRenderLevel(View::LEVEL_ACTION_VIEW);
         }
+    }
+
+    public function clearLogAction()
+    {
+        $result = [];
+        $callback = function()
+        {
+            $this->supervisor->clearLog();
+        };
+        $this->setCallback($callback);
+        $this->invoke();
+
+        $result['state'] = 1;
+        $result['message'] = "日志清理完成";
+
+        return $this->response->setJsonContent($result);
     }
 
     public function restartAction()
     {
-        $this->supervisor->restart();
+        $callback1 = function()
+        {
+            $this->supervisor->restart();
+        };
+        $this->setCallback($callback1);
+        $this->invoke();
 
         $timeout = 10;
         $start_time = time();
@@ -80,26 +99,37 @@ class SupervisorController extends ControllerBase
         while (time() - $start_time < $timeout && $has_starting)
         {
             $has_starting = false;
-            $allProcessInfo = $this->supervisor->getAllProcessInfo();
-            foreach ($allProcessInfo as $processInfo)
+
+            $callback2 = function() use (&$has_starting)
             {
-                if ($processInfo['statename'] == 'STARTING')
+                $allProcessInfo = $this->supervisor->getAllProcessInfo();
+                foreach ($allProcessInfo as $processInfo)
                 {
-                    $has_starting = true;
-                    break;
+                    if ($processInfo['statename'] == 'STARTING')
+                    {
+                        $has_starting = true;
+                        break;
+                    }
                 }
-            }
+            };
+            $this->setCallback($callback2);
+            $this->invoke();
         }
 
-        $this->flashSession->success("Supervisor 服务重启完成");
-        return $this->response->redirect($this->request->getHTTPReferer());
+        $this->flashSession->success("Supervisor 重启完成");
+        return $this->redirectToIndex();
     }
 
     public function shutdownAction()
     {
-        $this->supervisor->shutdown();
+        $callback = function()
+        {
+            $this->supervisor->shutdown();
+        };
+        $this->setCallback($callback);
+        $this->invoke();
 
-        return $this->response->redirect($this->request->getHTTPReferer());
+        return $this->redirectToIndex();
     }
 
 }

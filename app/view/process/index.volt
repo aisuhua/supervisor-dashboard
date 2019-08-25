@@ -1,8 +1,13 @@
-{% include 'process/breadcrumb.volt' %}
+{{ content() }}
+{{ flashSession.output() }}
+
+<ol class="breadcrumb">
+    <li class="active">{{ server.ip }}:{{ server.port }}</li>
+</ol>
 
 <div style="margin-bottom: 20px;">
     <div class="btn-group" role="group">
-        <a href="/program" class="btn btn-default">添加任务</a>
+        <a href="/program" class="btn btn-default">添加进程</a>
         <a href="#" class="btn btn-default">更新配置</a>
         <a href="/server/{{ server.id }}/process" class="btn btn-default">刷新页面</a>
         <div class="btn-group">
@@ -10,9 +15,9 @@
                 更多 <span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
-                <li><a href="/server/{{ server.id }}/process/restartall">重启所有任务</a></li>
-                <li><a href="/server/{{ server.id }}/process/stopall" class="stopall">停止所有任务</a></li>
-                <li><a href="#">查看日志</a></li>
+                <li><a href="/server/{{ server.id }}/process/restartall">重启所有进程</a></li>
+                <li><a href="/server/{{ server.id }}/process/stopall" class="stopall">停止所有进程</a></li>
+                <li><a href="/server/{{ server.id }}/supervisor/readlog?ip={{ server.ip }}&port={{ server.port }}" target="_blank" class="read_log">查看日志</a></li>
                 <li><a href="/server/{{ server.id }}/supervisor/restart">重启服务</a></li>
                 {#<li><a href="/server/{{ server.id }}/supervisor/shutdown">停止服务</a></li>#}
             </ul>
@@ -23,15 +28,15 @@
 {% if process_warnings is not empty %}
 
 <div class="alert alert-danger">
-    您有 {{ process_warnings | length }} 个任务异常，请联系相关人员进行处理。
+    您有 {{ process_warnings | length }} 个进程异常，请联系相关人员进行处理。
 </div>
 
 <table class="table table-bordered">
 <tr>
     <th>进程号</th>
-    <th>任务名称</th>
-    <th>任务描述</th>
-    <th>任务状态</th>
+    <th>进程名称</th>
+    <th>进程描述</th>
+    <th>进程状态</th>
     <th>操作</th>
 </tr>
 
@@ -66,9 +71,9 @@
     <thead>
     <tr>
         <th>进程号</th>
-        <th>任务名称</th>
-        <th>任务描述</th>
-        <th>任务状态</th>
+        <th>进程名称</th>
+        <th>进程描述</th>
+        <th>进程状态</th>
         <th>操作</th>
     </tr>
     </thead>
@@ -126,7 +131,7 @@
 $(function () {
 
     // 防止 pjax 执行
-    $('.tail_log').unbind().click(function() {
+    $('.tail_log, .read_log').unbind().click(function() {
         event.stopPropagation();
     });
 

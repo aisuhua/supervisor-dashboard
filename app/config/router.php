@@ -60,10 +60,18 @@ $router->add(
 );
 
 $router->add(
-    '/server/{server_id:[0-9]+}/supervisor/error',
+    '/server/{server_id:[0-9]+}/supervisor/readlog',
     [
         'controller' => 'supervisor',
-        'action' => 'error'
+        'action' => 'readLog'
+    ]
+);
+
+$router->add(
+    '/server/{server_id:[0-9]+}/supervisor/clearlog',
+    [
+        'controller' => 'supervisor',
+        'action' => 'clearLog'
     ]
 );
 

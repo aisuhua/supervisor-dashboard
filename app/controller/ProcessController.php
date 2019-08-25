@@ -1,19 +1,20 @@
 <?php
 use Phalcon\Mvc\View;
 
-class ProcessController extends ControllerBase
+class ProcessController extends ControllerSupervisorBase
 {
-    private $server;
+    /**
+     * @var Server $server
+     */
+    protected $server;
 
     /**
      * @var Supervisor $supervisor;
      */
-    private $supervisor;
+    protected $supervisor;
 
-    public function beforeExecuteRoute()
+    public function initialize()
     {
-        parent::beforeExecuteRoute();
-
         $server_id = $this->dispatcher->getParam('server_id', 'int');
 
         if ($server_id)
@@ -25,7 +26,7 @@ class ProcessController extends ControllerBase
             if (!$server)
             {
                 $this->flashSession->error("不存在该服务器");
-                return $this->response->redirect($this->request->getHTTPReferer());
+                return $this->response->redirect('/');
             }
 
             $supervisor = new Supervisor(
@@ -39,40 +40,26 @@ class ProcessController extends ControllerBase
             $this->server = $server;
             $this->supervisor = $supervisor;
             $this->view->server = $server;
-
-            try
-            {
-                $supervisor->getState();
-            }
-            catch (Exception $e)
-            {
-                $this->dispatcher->forward([
-                    'controller' => 'supervisor',
-                    'action' => 'error',
-                    'params' => [
-                        'server_id' => $server_id
-                    ]
-                ]);
-            }
         }
-    }
-
-    public function initialize()
-    {
-
     }
 
     public function indexAction()
     {
-        $processes = $this->supervisor->getAllProcessInfo();
-        $processGroups = array_unique(array_column($processes, 'group'));
-        $process_warnings = array_filter($processes, function($process) {
-            return $process['statename'] != 'RUNNING';
-        });
+        $callback = function ()
+        {
+            $processes = $this->supervisor->getAllProcessInfo();
+            $processGroups = array_unique(array_column($processes, 'group'));
+            $process_warnings = array_filter($processes, function($process) {
+                return $process['statename'] != 'RUNNING';
+            });
 
-        $this->view->processes = $processes;
-        $this->view->processGroups = $processGroups;
-        $this->view->process_warnings = $process_warnings;
+            $this->view->processes = $processes;
+            $this->view->processGroups = $processGroups;
+            $this->view->process_warnings = $process_warnings;
+        };
+
+        $this->setCallback($callback);
+        $this->invoke();
     }
 
     public function createAction()
@@ -85,11 +72,15 @@ class ProcessController extends ControllerBase
         $result = [];
         $name = $this->dispatcher->getParam('name', 'string');
 
-        $process = $this->supervisor->getProcessInfo($name);
-        if ($process['statename'] == 'RUNNING')
-        {
-            $this->supervisor->stopProcess($name);
-        }
+        $callback = function () use ($name) {
+            $process = $this->supervisor->getProcessInfo($name);
+            if ($process['statename'] == 'RUNNING')
+            {
+                $this->supervisor->stopProcess($name);
+            }
+        };
+        $this->setCallback($callback);
+        $this->invoke();
 
         $result['state'] = 1;
         $result['message'] = Tool::shortName($name) . " 已停止";
@@ -102,11 +93,16 @@ class ProcessController extends ControllerBase
         $result = [];
         $name = $this->dispatcher->getParam('name', 'string');
 
-        $process = $this->supervisor->getProcessInfo($name);
-        if ($process['statename'] != 'RUNNING')
+        $callback = function() use ($name)
         {
-            $this->supervisor->startProcess($name);
-        }
+            $process = $this->supervisor->getProcessInfo($name);
+            if ($process['statename'] != 'RUNNING')
+            {
+                $this->supervisor->startProcess($name);
+            }
+        };
+        $this->setCallback($callback);
+        $this->invoke();
 
         $result['state'] = 1;
         $result['message'] = Tool::shortName($name) . " 已启动";
@@ -119,13 +115,18 @@ class ProcessController extends ControllerBase
         $result = [];
         $name = $this->dispatcher->getParam('name', 'string');
 
-        $process = $this->supervisor->getProcessInfo($name);
-        if ($process['statename'] == 'RUNNING')
+        $callback = function() use ($name)
         {
-            $this->supervisor->stopProcess($name);
-        }
+            $process = $this->supervisor->getProcessInfo($name);
+            if ($process['statename'] == 'RUNNING')
+            {
+                $this->supervisor->stopProcess($name);
+            }
 
-        $this->supervisor->startProcess($name);
+            $this->supervisor->startProcess($name);
+        };
+        $this->setCallback($callback);
+        $this->invoke();
 
         $result['state'] = 1;
         $result['message'] = Tool::shortName($name) . " 已重启";
@@ -138,7 +139,12 @@ class ProcessController extends ControllerBase
         $result = [];
         $name = $this->dispatcher->getParam('name', 'string');
 
-        $this->supervisor->stopProcessGroup($name);
+        $callback = function() use($name)
+        {
+            $this->supervisor->stopProcessGroup($name);
+        };
+        $this->setCallback($callback);
+        $this->invoke();
 
         $result['state'] = 1;
         $result['message'] = "{$name} 进程组已停止";
@@ -151,7 +157,12 @@ class ProcessController extends ControllerBase
         $result = [];
         $name = $this->dispatcher->getParam('name', 'string');
 
-        $this->supervisor->startProcessGroup($name);
+        $callback = function() use ($name)
+        {
+            $this->supervisor->startProcessGroup($name);
+        };
+        $this->setCallback($callback);
+        $this->invoke();
 
         $result['state'] = 1;
         $result['message'] = "{$name} 进程组已启动";
@@ -164,8 +175,13 @@ class ProcessController extends ControllerBase
         $result = [];
         $name = $this->dispatcher->getParam('name', 'string');
 
-        $this->supervisor->stopProcessGroup($name);
-        $this->supervisor->startProcessGroup($name);
+        $callback = function() use ($name)
+        {
+            $this->supervisor->stopProcessGroup($name);
+            $this->supervisor->startProcessGroup($name);
+        };
+        $this->setCallback($callback);
+        $this->invoke();
 
         $result['state'] = 1;
         $result['message'] = "{$name} 进程组已重启";
@@ -177,8 +193,14 @@ class ProcessController extends ControllerBase
     {
         $name = $this->dispatcher->getParam('name', 'string');
 
-        // 只看前面 1M 的日志
-        $log = $this->supervisor->tailProcessStdoutLog($name, 0, 1 * 1024 * 1024);
+        $callback = function() use ($name)
+        {
+            // 只看前面 1M 的日志
+            $log = $this->supervisor->tailProcessStdoutLog($name, 0, 1 * 1024 * 1024);
+            $this->view->log = $log;
+        };
+        $this->setCallback($callback);
+        $this->invoke();
 
         $this->view->disableLevel([
             View::LEVEL_LAYOUT => true,
@@ -195,7 +217,6 @@ class ProcessController extends ControllerBase
 
         $this->view->group = $exploded[0];
         $this->view->name = $exploded[1];
-        $this->view->log = $log;
     }
 
     public function clearLogAction()
@@ -203,7 +224,12 @@ class ProcessController extends ControllerBase
         $result = [];
         $name = $this->dispatcher->getParam('name', 'string');
 
-        $this->supervisor->clearProcessLogs($name);
+        $callback = function() use ($name)
+        {
+            $this->supervisor->clearProcessLogs($name);
+        };
+        $this->setCallback($callback);
+        $this->invoke();
 
         $result['state'] = 1;
         $result['message'] = "{$name} 日志清理完成";
@@ -213,21 +239,31 @@ class ProcessController extends ControllerBase
 
     public function stopAllAction()
     {
-        $this->supervisor->stopAllProcesses();
+        $callback = function()
+        {
+            $this->supervisor->stopAllProcesses();
+        };
+        $this->setCallback($callback);
+        $this->invoke();
 
         $this->flashSession->success("已停止所有任务");
 
-        return $this->response->redirect($this->request->getHTTPReferer());
+        return $this->redirectToIndex();
     }
 
     public function restartAllAction()
     {
-        $this->supervisor->stopAllProcesses();
-        $this->supervisor->startAllProcesses();
+        $callback = function()
+        {
+            $this->supervisor->stopAllProcesses();
+            $this->supervisor->startAllProcesses();
+        };
+        $this->setCallback($callback);
+        $this->invoke();
 
         $this->flashSession->success("已重启所有任务");
 
-        return $this->response->redirect($this->request->getHTTPReferer());
+        return $this->redirectToIndex();
     }
 }
 

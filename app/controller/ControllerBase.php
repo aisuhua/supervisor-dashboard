@@ -30,7 +30,7 @@ class ControllerBase extends Controller
 
     public function afterExecuteRoute()
     {
-        if (!$this->isPjax())
+        if (!$this->isPjax() && !$this->request->isAjax())
         {
             $result = $this
                 ->modelsManager
