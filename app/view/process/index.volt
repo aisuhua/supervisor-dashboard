@@ -7,7 +7,7 @@
 
 <div style="margin-bottom: 20px;">
     <div class="btn-group" role="group">
-        <a href="/program" class="btn btn-default">添加进程</a>
+        <a href="javascript:void(0);" class="btn btn-default add_process">添加进程</a>
         <a href="#" class="btn btn-default">更新配置</a>
         <a href="/server/{{ server.id }}/process?ip={{ server.ip }}&port={{ server.port }}" class="btn btn-default">刷新页面</a>
         <div class="btn-group">
