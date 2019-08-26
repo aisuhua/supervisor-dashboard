@@ -27,7 +27,7 @@ class ControllerSupervisorBase extends ControllerBase
     protected function invoke()
     {
         $exception = null;
-        for ($i = 1; $i <= 1800; $i++)
+        for ($i = 1; $i <= 3600; $i++)
         {
             try
             {
@@ -38,8 +38,7 @@ class ControllerSupervisorBase extends ControllerBase
             catch (Exception $e)
             {
                 $exception = $e;
-                // usleep(500000);
-                sleep(1);
+                usleep(500000);
             }
         }
 

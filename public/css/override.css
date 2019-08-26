@@ -8,3 +8,6 @@ body {
 .page-header {
     display: none;
 }
+.pnotify-word-break {
+    word-break: break-all
+}

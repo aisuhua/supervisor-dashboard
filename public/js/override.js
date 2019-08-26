@@ -58,17 +58,8 @@ function clearSuccess() {
 }
 
 function applyDefault(options = {}) {
-    var length = getTextWidth(options.text, 'Helvetica Neue');
-    console.log(length);
-
-    var width = 360;
-    if (length > 187) {
-        var width2 = 360 + (length - 187) + 35;
-
-        width = width2 > width * 2 ? width * 2 : width2;
-    }
-
-    options.width = width + 'px';
+    options.addClass = "pnotify-word-break";
+    options.textTrusted = true;
 
     return options;
 }

@@ -147,7 +147,7 @@ $(function () {
         var url = $(this).attr('href');
 
         var size = $('table.table-striped tr:not(:has(th))').size();
-        if (size > 50) {
+        if (size > 0) {
             url += '?wait=0';
             $.get(url, function(data) {
                 if (data.state) {

@@ -67,6 +67,11 @@ class ProcessController extends ControllerSupervisorBase
 
     }
 
+    private function formatMessage($message)
+    {
+        return "<strong>{$message}</strong>\n刷新页面查看进度";
+    }
+
     public function stopAction()
     {
         $result = [];
@@ -76,14 +81,14 @@ class ProcessController extends ControllerSupervisorBase
             $process = $this->supervisor->getProcessInfo($name);
             if ($process['statename'] == 'RUNNING')
             {
-                $this->supervisor->stopProcess($name);
+                $this->supervisor->stopProcess($name, false);
             }
         };
         $this->setCallback($callback);
         $this->invoke();
 
         $result['state'] = 1;
-        $result['message'] = Tool::shortName($name) . " 已停止";
+        $result['message'] = self::formatMessage(Tool::shortName($name) . " 正在停止");
 
         return $this->response->setJsonContent($result);
     }
@@ -98,14 +103,14 @@ class ProcessController extends ControllerSupervisorBase
             $process = $this->supervisor->getProcessInfo($name);
             if ($process['statename'] != 'RUNNING')
             {
-                $this->supervisor->startProcess($name);
+                $this->supervisor->startProcess($name, false);
             }
         };
         $this->setCallback($callback);
         $this->invoke();
 
         $result['state'] = 1;
-        $result['message'] = Tool::shortName($name) . " 已启动";
+        $result['message'] = self::formatMessage(Tool::shortName($name) . " 正在启动");
 
         return $this->response->setJsonContent($result);
     }
@@ -115,23 +120,25 @@ class ProcessController extends ControllerSupervisorBase
         $result = [];
         $name = $this->dispatcher->getParam('name', 'string');
 
+        $result['state'] = 1;
+        $result['message'] = self::formatMessage(Tool::shortName($name) . " 正在重启");
+
+        $this->response->setJsonContent($result)->send();
+
+        fastcgi_finish_request();
+
         $callback = function() use ($name)
         {
             $process = $this->supervisor->getProcessInfo($name);
             if ($process['statename'] == 'RUNNING')
             {
-                $this->supervisor->stopProcess($name);
+                $this->supervisor->stopProcess($name, true);
             }
 
-            $this->supervisor->startProcess($name);
+            $this->supervisor->startProcess($name, false);
         };
         $this->setCallback($callback);
         $this->invoke();
-
-        $result['state'] = 1;
-        $result['message'] = Tool::shortName($name) . " 已重启";
-
-        return $this->response->setJsonContent($result);
     }
 
     public function stopGroupAction()
@@ -141,13 +148,13 @@ class ProcessController extends ControllerSupervisorBase
 
         $callback = function() use($name)
         {
-            $this->supervisor->stopProcessGroup($name);
+            $this->supervisor->stopProcessGroup($name, false);
         };
         $this->setCallback($callback);
         $this->invoke();
 
         $result['state'] = 1;
-        $result['message'] = "{$name} 进程组已停止";
+        $result['message'] = self::formatMessage($name . " 正在停止");
 
         return $this->response->setJsonContent($result);
     }
@@ -159,13 +166,13 @@ class ProcessController extends ControllerSupervisorBase
 
         $callback = function() use ($name)
         {
-            $this->supervisor->startProcessGroup($name);
+            $this->supervisor->startProcessGroup($name, false);
         };
         $this->setCallback($callback);
         $this->invoke();
 
         $result['state'] = 1;
-        $result['message'] = "{$name} 进程组已启动";
+        $result['message'] = self::formatMessage($name . " 正在启动");
 
         return $this->response->setJsonContent($result);
     }
@@ -175,18 +182,20 @@ class ProcessController extends ControllerSupervisorBase
         $result = [];
         $name = $this->dispatcher->getParam('name', 'string');
 
+        $result['state'] = 1;
+        $result['message'] = self::formatMessage($name . " 正在重启");
+
+        $this->response->setJsonContent($result)->send();
+
+        fastcgi_finish_request();
+
         $callback = function() use ($name)
         {
-            $this->supervisor->stopProcessGroup($name);
-            $this->supervisor->startProcessGroup($name);
+            $this->supervisor->stopProcessGroup($name, true);
+            $this->supervisor->startProcessGroup($name, false);
         };
         $this->setCallback($callback);
         $this->invoke();
-
-        $result['state'] = 1;
-        $result['message'] = "{$name} 进程组已重启";
-
-        return $this->response->setJsonContent($result);
     }
 
     public function tailLogAction()
@@ -258,7 +267,7 @@ class ProcessController extends ControllerSupervisorBase
         {
             $result = [];
             $result['state'] = 1;
-            $result['message'] = "正在停止所有进程，请刷新页面查看进度";
+            $result['message'] = self::formatMessage("正在停止进程");
             $this->response->setJsonContent($result)->send();
 
             fastcgi_finish_request();
@@ -269,6 +278,8 @@ class ProcessController extends ControllerSupervisorBase
             };
             $this->setCallback($callback);
             $this->invoke();
+
+            $this->flashSession->success("已停止所有进程");
 
             $this->view->setRenderLevel(
                 View::LEVEL_NO_RENDER
@@ -297,18 +308,20 @@ class ProcessController extends ControllerSupervisorBase
         {
             $result = [];
             $result['state'] = 1;
-            $result['message'] = "正在重启所有进程，请刷新页面查看进度";
+            $result['message'] = self::formatMessage("正在重启进程");
             $this->response->setJsonContent($result)->send();
 
             fastcgi_finish_request();
 
             $callback = function() use ($wait)
             {
-                $this->supervisor->stopAllProcesses(false);
+                $this->supervisor->stopAllProcesses(true);
                 $this->supervisor->startAllProcesses(false);
             };
             $this->setCallback($callback);
             $this->invoke();
+
+            $this->flashSession->success("已重启所有进程");
 
             $this->view->setRenderLevel(
                 View::LEVEL_NO_RENDER
