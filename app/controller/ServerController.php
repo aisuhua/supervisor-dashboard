@@ -18,7 +18,7 @@ class ServerController extends ControllerBase
             $this->view->serverGroup = $serverGroup;
         }
 
-        $this->view->setTemplateBefore('container');
+        //$this->view->setTemplateBefore('container');
     }
 
     public function indexAction()

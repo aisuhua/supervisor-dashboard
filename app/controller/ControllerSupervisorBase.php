@@ -94,6 +94,6 @@ class ControllerSupervisorBase extends ControllerBase
 
     protected function formatMessage($message)
     {
-        return "<strong>{$message}</strong>\n刷新页面查看进度";
+        return "<strong>{$message}</strong>\n请刷新页面查看进度";
     }
 }

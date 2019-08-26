@@ -5,6 +5,8 @@ class SupervisorConfigController extends ControllerSupervisorBase
 {
     public function indexAction()
     {
+        $form = new ProgramForm(null);
+
         $programs = Program::find([
             'server_id = :server_id:',
             'bind' => [
@@ -14,6 +16,7 @@ class SupervisorConfigController extends ControllerSupervisorBase
         ]);
 
         $this->view->programs = $programs;
+        $this->view->form = $form;
     }
 
     public function createAction()
@@ -62,11 +65,12 @@ class SupervisorConfigController extends ControllerSupervisorBase
                 }
             }
 
-            $this->flashSession->success("添加成功");
+            $this->flashSession->success("配置添加成功");
             $form->clear();
 
             $result['state'] = 1;
-            $result['message'] = '添加成功';
+            $result['message'] = '配置添加成功';
+            $result['data'] = $program->toArray();
 
             return $this->response->setJsonContent($result);
         }

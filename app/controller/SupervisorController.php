@@ -87,6 +87,7 @@ class SupervisorController extends ControllerSupervisorBase
         $result = [];
         $result['state'] = 1;
         $result['message'] = self::formatMessage("Supervisor 正在重启");
+
         return $this->response->setJsonContent($result);
     }
 }

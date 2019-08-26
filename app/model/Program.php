@@ -34,19 +34,19 @@ class Program extends Model
         $this->update_time = time();
     }
 
-    public function validation()
-    {
-        $validator = new Validation();
-
-        $validator->add(
-            ['server_id', 'program'],
-            new Uniqueness(
-                [
-                    'message' => '该程序名称已存在，换个名字试试吧~',
-                ]
-            )
-        );
-
-        return $this->validate($validator);
-    }
+//    public function validation()
+//    {
+//        $validator = new Validation();
+//
+//        $validator->add(
+//            ['server_id', 'program'],
+//            new Uniqueness(
+//                [
+//                    'message' => '该程序名称已存在，换个名字试试吧~',
+//                ]
+//            )
+//        );
+//
+//        return $this->validate($validator);
+//    }
 }

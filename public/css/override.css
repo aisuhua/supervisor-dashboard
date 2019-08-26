@@ -18,3 +18,7 @@ body {
     width: 38px;    /* Width of image */
     height: 38px;   /* Height of image */
 }
+.table-form tbody tr th {
+    width: 15%;
+    vertical-align: middle;
+}
