@@ -3,46 +3,6 @@ use Phalcon\Mvc\View;
 
 class ProcessController extends ControllerSupervisorBase
 {
-    /**
-     * @var Server $server
-     */
-    protected $server;
-
-    /**
-     * @var Supervisor $supervisor;
-     */
-    protected $supervisor;
-
-    public function initialize()
-    {
-        $server_id = $this->dispatcher->getParam('server_id', 'int');
-
-        if ($server_id)
-        {
-            /**
-             * @var Server $server
-             */
-            $server = Server::findFirst($server_id);
-            if (!$server)
-            {
-                $this->flashSession->error("不存在该服务器");
-                return $this->response->redirect('/');
-            }
-
-            $supervisor = new Supervisor(
-                $server->id,
-                $server->ip,
-                $server->username ? $server->username : 'worker',
-                $server->password ? $server->password : '111111',
-                $server->port
-            );
-
-            $this->server = $server;
-            $this->supervisor = $supervisor;
-            $this->view->server = $server;
-        }
-    }
-
     public function indexAction()
     {
         $callback = function ()
@@ -60,11 +20,6 @@ class ProcessController extends ControllerSupervisorBase
 
         $this->setCallback($callback);
         $this->invoke();
-    }
-
-    public function createAction()
-    {
-
     }
 
     public function stopAction()
@@ -323,7 +278,5 @@ class ProcessController extends ControllerSupervisorBase
             );
         }
     }
-
-
 }
 

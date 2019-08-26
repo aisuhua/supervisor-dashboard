@@ -13,7 +13,41 @@ class ControllerSupervisorBase extends ControllerBase
      * @var Supervisor $supervisor;
      */
     protected $supervisor;
+
+    /**
+     * @var Callback $callback
+     */
     protected $callback;
+
+    public function initialize()
+    {
+        $server_id = $this->dispatcher->getParam('server_id', 'int');
+
+        if ($server_id)
+        {
+            /**
+             * @var Server $server
+             */
+            $server = Server::findFirst($server_id);
+            if (!$server)
+            {
+                $this->flashSession->error("不存在该服务器");
+                return $this->response->redirect($this->request->getHTTPReferer());
+            }
+
+            $supervisor = new Supervisor(
+                $server->id,
+                $server->ip,
+                $server->username ? $server->username : 'worker',
+                $server->password ? $server->password : '111111',
+                $server->port
+            );
+
+            $this->server = $server;
+            $this->supervisor = $supervisor;
+            $this->view->server = $server;
+        }
+    }
 
     /**
      * @link https://stackoverflow.com/questions/16941456/adding-a-php-anonymous-function-to-an-object

@@ -84,6 +84,33 @@ $router->add(
 );
 
 /**
+ * Supervisor 配置管理
+ */
+$router->add(
+    '/server/{server_id:[0-9]+}/config',
+    [
+        'controller' => 'supervisor-config',
+        'action' => 'index'
+    ]
+);
+
+$router->add(
+    '/server/{server_id:[0-9]+}/config/edit',
+    [
+        'controller' => 'supervisor-config',
+        'action' => 'edit'
+    ]
+);
+
+$router->add(
+    '/server/{server_id:[0-9]+}/config/create',
+    [
+        'controller' => 'supervisor-config',
+        'action' => 'create'
+    ]
+);
+
+/**
  * 服務器進程管理
  */
 
@@ -101,6 +128,14 @@ $router->add(
     [
         'controller' => 'process',
         'action' => 'create'
+    ]
+);
+
+$router->add(
+    '/server/{server_id:[0-9]+}/process/edit',
+    [
+        'controller' => 'process',
+        'action' => 'edit'
     ]
 );
 

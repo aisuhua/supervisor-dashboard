@@ -3,49 +3,6 @@ use Phalcon\Mvc\View;
 
 class SupervisorController extends ControllerSupervisorBase
 {
-
-
-    public function initialize()
-    {
-        $server_id = $this->dispatcher->getParam('server_id', 'int');
-
-        if ($server_id)
-        {
-            /**
-             * @var Server $server
-             */
-            $server = Server::findFirst($server_id);
-            if (!$server)
-            {
-                $this->flashSession->error("不存在该服务器");
-                return $this->response->redirect($this->request->getHTTPReferer());
-            }
-
-            $supervisor = new Supervisor(
-                $server->id,
-                $server->ip,
-                $server->username ? $server->username : 'worker',
-                $server->password ? $server->password : '111111',
-                $server->port
-            );
-
-            $this->server = $server;
-            $this->supervisor = $supervisor;
-            $this->view->server = $server;
-        }
-    }
-
-    public function statusAction()
-    {
-        $callback = function ()
-        {
-          $status = $this->supervisor->getState();
-        };
-        $this->setCallback($callback);
-        $this->invoke();
-        exit;
-    }
-
     public function readLogAction()
     {
         $callback = function ()
@@ -132,18 +89,5 @@ class SupervisorController extends ControllerSupervisorBase
         $result['message'] = self::formatMessage("Supervisor 正在重启");
         return $this->response->setJsonContent($result);
     }
-
-    public function shutdownAction()
-    {
-        $callback = function()
-        {
-            $this->supervisor->shutdown();
-        };
-        $this->setCallback($callback);
-        $this->invoke();
-
-        return $this->redirectToIndex();
-    }
-
 }
 
