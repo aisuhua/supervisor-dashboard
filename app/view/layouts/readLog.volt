@@ -10,7 +10,7 @@
             <a class="navbar-brand" href="">Supervisor 服务日志</a>
         </div>
         <div class="collapse navbar-collapse navbar-right">
-            <a class="btn btn-primary navbar-btn refresh" href="/server/{{ server.id }}/supervisor/readlog?ip={{ server.ip }}&port={{ server.port }}">
+            <a class="btn btn-primary navbar-btn refresh" href="javascript:void(0);" data-href="/server/{{ server.id }}/supervisor/readlog?ip={{ server.ip }}&port={{ server.port }}">
                 自动刷新
             </a>
             <a class="btn btn-default navbar-btn clear_log" href="/server/{{ server.id }}/supervisor/clearlog?ip={{ server.ip }}&port={{ server.port }}">
@@ -60,21 +60,9 @@ $(function() {
         }
     }
 
-    var refresh_url = $(this).attr('href');
-
-    function refresh() {
-        $.pjax({
-            url: refresh_url,
-            container: '#pjax-container',
-            push: false
-        }).done(function() {
-            $('html, body').scrollTop(function() {
-                return $(this).height();
-            });
-        });
-    }
 
    $('.refresh').click(function() {
+       event.preventDefault();
        event.stopPropagation();
 
        if (timerId) {
@@ -91,11 +79,25 @@ $(function() {
            return $(this).height();
        });
 
+       var refresh_url = $(this).attr('data-href');
+
+       function refresh() {
+           $.pjax({
+               url: refresh_url + '&random=' + Math.random(),
+               container: '#pjax-container',
+               push: false
+           }).done(function() {
+               $('html, body').scrollTop(function() {
+                   return $(this).height();
+               });
+           });
+       }
+
        refresh();
        timerId = setTimeout(function run() {
            refresh();
-           timerId = setTimeout(run, 1000);
-       }, 1000);
+           timerId = setTimeout(run, 2000);
+       }, 2000);
 
        return false;
    });

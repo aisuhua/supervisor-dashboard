@@ -1,79 +1,241 @@
 {{ content() }}
-
-<div class="page-header">
-    <h1>添加服务器</h1>
-</div>
+{{ flashSession.output() }}
 
 <ol class="breadcrumb">
-    {% if serverGroup is empty %}
-        <li><a href="/server">服务器列表</a></li>
-        {% set action = '/server/create' %}
-    {% else %}
-        <li><a href="/server-group/{{ serverGroup.id }}/server">{{ serverGroup.name }}的服务器列表</a></li>
-        {% set action = '/server-group/' ~ serverGroup.id ~ '/server/create' %}
-    {% endif %}
-    <li class="active">添加服务器</li>
+    <li><a href="/server/{{ server.id }}/process?ip={{ server.ip }}&port={{ server.port }}">{{ server.ip }}:{{ server.port }}</a></li>
+    <li class="active">修改配置</li>
 </ol>
 
-<form class="form-horizontal" method="post" action="{{ action }}" data-pjax>
-    <div class="form-group">
-        <label for="server_group_id" class="col-sm-2 control-label">所属分组</label>
-        <div class="col-sm-10">
-            {% if serverGroup is empty %}
-                {{ form.render('server_group_id') }}
-            {% else %}
-                {#{{ form.render('server_group_id', ['value': serverGroup.id, 'type': 'hidden', 'readonly': 'readonly']) }}#}
-                <p class="form-control-static">{{ serverGroup.name }}</p>
-                <input type="hidden" value="{{ serverGroup.id }}" id="server_group_id" name="server_group_id" />
-            {% endif %}
-        </div>
+<div style="margin-bottom: 20px;">
+    <div class="btn-group" role="group">
+        <a class="btn btn-default add-process-btn">添加配置</a>
+        <a class="btn btn-default expand-all-btn"><span class="glyphicon glyphicon-menu-down"></span> 展开所有</a>
+   </div>
+
+    <div>
+
     </div>
-    <div class="form-group">
-        <label for="ip" class="col-sm-2 control-label">IP 地址</label>
-        <div class="col-sm-10">
-            {{ form.render('ip') }}
-        </div>
-    </div>
-    <div class="form-group">
-        <label for="port" class="col-sm-2 control-label">Supervisor 端口</label>
-        <div class="col-sm-10">
-            {{ form.render('port') }}
-        </div>
-    </div>
-    <div class="form-group">
-        <label for="username" class="col-sm-2 control-label">用户名</label>
-        <div class="col-sm-10">
-            {{ form.render('username') }}
-        </div>
-    </div>
-    <div class="form-group">
-        <label for="password" class="col-sm-2 control-label">密码</label>
-        <div class="col-sm-10">
-            {{ form.render('password') }}
-        </div>
-    </div>
-    <div class="form-group">
-        <label for="sync_conf_port" class="col-sm-2 control-label">sync_conf 端口</label>
-        <div class="col-sm-10">
-            {{ form.render('sync_conf_port') }}
-        </div>
-    </div>
-    <div class="form-group">
-        <label for="conf_path" class="col-sm-2 control-label">配置文件路径</label>
-        <div class="col-sm-10">
-            {{ form.render('conf_path') }}
-        </div>
-    </div>
-    <div class="form-group">
-        <label for="sort" class="col-sm-2 control-label">排序字段</label>
-        <div class="col-sm-10">
-            {{ form.render('sort') }}
-            <span id="helpBlock" class="help-block">值越大排得越靠前，有效值范围 0 ～ 999。</span>
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-10">
-            <button type="submit" class="btn btn-primary">提交</button>
-        </div>
-    </div>
+</div>
+
+<style>
+
+</style>
+
+{% set arr = 0..0 %}
+{% for i in arr %}
+
+    <table class="table table-bordered">
+        <tbody>
+        <tr>
+            <th style="width: 15%; vertical-align: middle;">程序名</th>
+            <td><input type="text" class="form-control" name="program" value="CALENDAR_DELETE_NOTICE"></td>
+        </tr>
+        <tr>
+            <th style="width: 15%; vertical-align: middle;">命令</th>
+            <td><input type="text" class="form-control" name="command" value="/usr/bin/php /www/web/life.115.com/App/Task/CALENDAR_DELETE_NOTICE.php"></td>
+        </tr>
+        <tr>
+            <th style="width: 15%; vertical-align: middle;">进程名</th>
+            <td> <input type="text" class="form-control" name="process_name" value="%(program_name)s_%(process_num)s"></td>
+        </tr>
+        <tr>
+            <th style="width: 15%; vertical-align: middle;">进程数</th>
+            <td><input type="text" class="form-control" name="numprocs" value="1"></td>
+        </tr>
+        <tr>
+            <th style="width: 15%; vertical-align: middle;">进程下标起始值</th>
+            <td><input type="text" class="form-control" name="numprocs_start" value="0"></td>
+        </tr>
+        <tr class="expand-tr hidden">
+            <th style="width: 15%; vertical-align: middle;">目录</th>
+            <td><input type="text" class="form-control" name="directory" value="%(here)s"></td>
+        </tr>
+        <tr class="expand-tr hidden">
+            <th style="width: 15%; vertical-align: middle;">自动启动</th>
+            <td>
+                <select class="form-control" name="autostart">
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                </select>
+            </td>
+        </tr>
+        <tr class="expand-tr hidden">
+            <th style="width: 15%; vertical-align: middle;">启动重试次数</th>
+            <td><input type="text" class="form-control" name="startretries" value="20"></td>
+        </tr>
+        <tr class="expand-tr hidden">
+            <th style="width: 15%; vertical-align: middle;">自动重启</th>
+            <td>
+                <select class="form-control" name="autorestart">
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                </select>
+            </td>
+        </tr>
+        <tr class="expand-tr hidden">
+            <th style="width: 15%; vertical-align: middle;">错误重定向(redirect_stderr)</th>
+            <td>
+                <select class="form-control" name="redirect_stderr">
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                </select>
+            </td>
+        </tr>
+        <tr class="expand-tr hidden">
+            <th style="width: 15%; vertical-align: middle;">标准输出日志文件(stdout_logfile)</th>
+            <td><input type="text" class="form-control" name="stdout_logfile" value="AUTO"></td>
+        </tr>
+        <tr class="expand-tr hidden">
+            <th style="width: 15%; vertical-align: middle;">标准输出日志备份</th>
+            <td><input type="text" class="form-control" name="stdout_logfile_backups" value="0"></td>
+        </tr>
+        <tr class="expand-tr hidden">
+            <th style="width: 15%; vertical-align: middle;"> 标准输出日志的最大字节数</th>
+            <td><input type="text" class="form-control" name="stdout_logfile_maxbytes" value="1MB"></td>
+        </tr>
+        <tr>
+            <th style="width: 15%; vertical-align: middle;">操作</th>
+            <td>
+                <button class="btn btn-sm btn-success">修改</button>
+                <button class="btn btn-sm btn-danger">删除</button>
+                <button class="btn btn-sm btn-primary">复制</button>
+                <a class="btn btn-sm btn-link expand-btn"><span class="glyphicon glyphicon-menu-down"></span> 展开配置</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+{% endfor %}
+
+<h3>添加配置</h3>
+
+<form method="post" action="/server/{{ server.id }}/process/create">
+    <table class="table table-bordered">
+        <tbody>
+        <tr>
+            <th style="width: 15%; vertical-align: middle;">程序名</th>
+            <td><input type="text" class="form-control" name="program" value=""></td>
+        </tr>
+        <tr>
+            <th style="width: 15%; vertical-align: middle;">命令</th>
+            <td><input type="text" class="form-control" name="command" value=""></td>
+        </tr>
+        <tr>
+            <th style="width: 15%; vertical-align: middle;">进程名</th>
+            <td> <input type="text" class="form-control" name="process_name" value="%(program_name)s_%(process_num)s"></td>
+        </tr>
+        <tr>
+            <th style="width: 15%; vertical-align: middle;">进程数</th>
+            <td><input type="text" class="form-control" name="numprocs" value="1"></td>
+        </tr>
+        <tr>
+            <th style="width: 15%; vertical-align: middle;">进程下标起始值</th>
+            <td><input type="text" class="form-control" name="numprocs_start" value="0"></td>
+        </tr>
+        <tr class="expand-tr hidden">
+            <th style="width: 15%; vertical-align: middle;">目录</th>
+            <td><input type="text" class="form-control" name="directory" value="%(here)s"></td>
+        </tr>
+        <tr class="expand-tr hidden">
+            <th style="width: 15%; vertical-align: middle;">自动启动</th>
+            <td>
+                <select class="form-control" name="autostart">
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                </select>
+            </td>
+        </tr>
+        <tr class="expand-tr hidden">
+            <th style="width: 15%; vertical-align: middle;">启动重试次数</th>
+            <td><input type="text" class="form-control" name="startretries" value="20"></td>
+        </tr>
+        <tr class="expand-tr hidden">
+            <th style="width: 15%; vertical-align: middle;">自动重启</th>
+            <td>
+                <select class="form-control" name="autorestart">
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                </select>
+            </td>
+        </tr>
+        <tr class="expand-tr hidden">
+            <th style="width: 15%; vertical-align: middle;">错误重定向(redirect_stderr)</th>
+            <td>
+                <select class="form-control" name="redirect_stderr">
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                </select>
+            </td>
+        </tr>
+        <tr class="expand-tr hidden">
+            <th style="width: 15%; vertical-align: middle;">标准输出日志文件(stdout_logfile)</th>
+            <td><input type="text" class="form-control" name="stdout_logfile" value="AUTO"></td>
+        </tr>
+        <tr class="expand-tr hidden">
+            <th style="width: 15%; vertical-align: middle;">标准输出日志备份</th>
+            <td><input type="text" class="form-control" name="stdout_logfile_backups" value="0"></td>
+        </tr>
+        <tr class="expand-tr hidden">
+            <th style="width: 15%; vertical-align: middle;"> 标准输出日志的最大字节数</th>
+            <td><input type="text" class="form-control" name="stdout_logfile_maxbytes" value="1MB"></td>
+        </tr>
+        <tr>
+            <th style="width: 15%; vertical-align: middle;">操作</th>
+            <td>
+                <button type="submit" id="add-process" class="btn btn-sm btn-success">确定添加</button>
+                <a class="btn btn-sm btn-link expand-btn"><span class="glyphicon glyphicon-menu-down"></span> 展开配置</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </form>
+
+<script>
+$(function() {
+    // 回到顶部
+    $.scrollUp({
+        animation: 'fade',
+        scrollImg: true
+    });
+
+    $('.expand-tr').removeClass('hidden');
+
+    $('.expand-btn').click(function() {
+        var html = '';
+
+        if ($(this).hasClass('expanded')) {
+            html = '<span class="glyphicon glyphicon-menu-down"></span> 展开配置';
+            $(this).html(html);
+            $(this).removeClass('expanded');
+            $(this).closest('table').find('tr.expand-tr').addClass('hidden');
+        } else {
+            html = '<span class="glyphicon glyphicon-menu-up"></span> 收起配置';
+            $(this).html(html);
+            $(this).addClass('expanded');
+            $(this).closest('table').find('tr.expand-tr').removeClass('hidden');
+        }
+    });
+
+    $('.expand-all-btn').click(function() {
+        var html = '';
+
+        if ($(this).hasClass('expanded')) {
+            html = '<span class="glyphicon glyphicon-menu-down"></span> 展开所有';
+            $(this).html(html);
+            $(this).removeClass('expanded');
+
+            $('.expand-btn').filter('.expanded').click();
+        } else {
+            html = '<span class="glyphicon glyphicon-menu-up"></span> 收起所有';
+            $(this).html(html);
+            $(this).addClass('expanded');
+
+            $('.expand-btn').not('.expanded').click();
+        }
+    });
+
+    $('.add-process-btn').click(function() {
+        $('html, body').animate({scrollTop: $("h3").offset().top});
+    });
+});
+</script>

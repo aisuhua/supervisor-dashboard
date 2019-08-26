@@ -57,4 +57,9 @@ class ControllerSupervisorBase extends ControllerBase
     {
         return "/server/{$this->server->id}/process?ip={$this->server->ip}&port={$this->server->port}";
     }
+
+    protected function formatMessage($message)
+    {
+        return "<strong>{$message}</strong>\n刷新页面查看进度";
+    }
 }

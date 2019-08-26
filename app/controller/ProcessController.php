@@ -67,11 +67,6 @@ class ProcessController extends ControllerSupervisorBase
 
     }
 
-    private function formatMessage($message)
-    {
-        return "<strong>{$message}</strong>\n刷新页面查看进度";
-    }
-
     public function stopAction()
     {
         $result = [];
@@ -267,7 +262,7 @@ class ProcessController extends ControllerSupervisorBase
         {
             $result = [];
             $result['state'] = 1;
-            $result['message'] = self::formatMessage("正在停止进程");
+            $result['message'] = self::formatMessage("正在停止所有进程");
             $this->response->setJsonContent($result)->send();
 
             fastcgi_finish_request();
@@ -308,7 +303,7 @@ class ProcessController extends ControllerSupervisorBase
         {
             $result = [];
             $result['state'] = 1;
-            $result['message'] = self::formatMessage("正在重启进程");
+            $result['message'] = self::formatMessage("正在重启所有进程");
             $this->response->setJsonContent($result)->send();
 
             fastcgi_finish_request();
@@ -328,5 +323,7 @@ class ProcessController extends ControllerSupervisorBase
             );
         }
     }
+
+
 }
 

@@ -60,20 +60,6 @@ $(function() {
         }
     }
 
-    var refresh_url = $(this).attr('href');
-
-    function refresh() {
-        $.pjax({
-            url: refresh_url,
-            container: '#pjax-container',
-            push: false
-        }).done(function() {
-            $('html, body').scrollTop(function() {
-                return $(this).height();
-            });
-        });
-    }
-
    $('.refresh').click(function() {
        event.stopPropagation();
 
@@ -91,11 +77,26 @@ $(function() {
            return $(this).height();
        });
 
+       var refresh_url = $(this).attr('href');
+
+       function refresh() {
+           $.pjax({
+               url: refresh_url + '?random=' + Math.random(),
+               container: '#pjax-container',
+               push: false,
+               timeout: 180000
+           }).done(function() {
+               $('html, body').scrollTop(function() {
+                   return $(this).height();
+               });
+           });
+       }
+
        refresh();
        timerId = setTimeout(function run() {
            refresh();
-           timerId = setTimeout(run, 1000);
-       }, 1000);
+           timerId = setTimeout(run, 2000);
+       }, 2000);
 
        return false;
    });

@@ -48,6 +48,9 @@
     <script src="/plugins/pnotify/PNotify.js"></script>
     <script src="/plugins/pnotify/PNotifyButtons.js"></script>
 
+    <!-- scrollup -->
+    <script src="/plugins/scrollup/jquery.scrollUp.min.js"></script>
+
     <!-- https://github.com/jacwright/date.format -->
     <script src="/js/date.format.js"></script>
     <script src="/js/function.js"></script>

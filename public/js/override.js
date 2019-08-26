@@ -146,6 +146,10 @@ $(document).on('submit', 'form[data-pjax]', function(event) {
     $.pjax.submit(event, '#pjax-container');
 });
 
+$(document).on('pjax:timeout', function() {
+    console.log('pjax.timeout');
+});
+
 /**
  * NProgress
  */
@@ -168,6 +172,13 @@ $(document).on('ajaxStart', function() {
 $(document).on('ajaxStop', function() {
     NProgress.done();
 });
+
+// $(document).ready(function(){
+//     NProgress.start();
+// });
+// $(window).load(function(){
+//     NProgress.done();
+// });
 
 $(function () {
     flash();

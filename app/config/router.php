@@ -97,6 +97,14 @@ $router->add(
 );
 
 $router->add(
+    '/server/{server_id:[0-9]+}/process/create',
+    [
+        'controller' => 'process',
+        'action' => 'create'
+    ]
+);
+
+$router->add(
     '/server/{server_id:[0-9]+}/process/stopall',
     [
         'controller' => 'process',
