@@ -47,7 +47,7 @@ class SupervisorConfigController extends ControllerSupervisorBase
                 'directory' => $this->request->getPost('directory', ['trim', 'string'], '%(here)s'),
                 'autostart' => $this->request->getPost('autostart', ['trim', 'string'], 'true'),
                 'startretries' => $this->request->getPost('startretries', 'int', 20),
-                'autorestart' => $this->request->getPost('autostart', ['trim', 'string'], 'true'),
+                'autorestart' => $this->request->getPost('autorestart', ['trim', 'string'], 'true'),
                 'redirect_stderr' => $this->request->getPost('redirect_stderr', ['trim', 'string'], 'true'),
                 'stdout_logfile' => $this->request->getPost('stdout_logfile', ['trim', 'string'], 'AUTO'),
                 'stdout_logfile_backups' => $this->request->getPost('stdout_logfile_backups', 'int', 0),

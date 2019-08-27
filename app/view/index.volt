@@ -51,8 +51,6 @@
     <!-- scrollup -->
     <script src="/plugins/scrollup/jquery.scrollUp.min.js"></script>
 
-    <script src="/js/scrollspy.js"></script>
-
     <!-- https://github.com/jacwright/date.format -->
     <script src="/js/date.format.js"></script>
     <script src="/js/function.js"></script>
