@@ -95,7 +95,7 @@ $router->add(
 );
 
 $router->add(
-    '/server/{server_id:[0-9]+}/config/edit',
+    '/server/{server_id:[0-9]+}/config/edit/{id:[0-9]+}',
     [
         'controller' => 'supervisor-config',
         'action' => 'edit'
@@ -107,6 +107,14 @@ $router->add(
     [
         'controller' => 'supervisor-config',
         'action' => 'create'
+    ]
+);
+
+$router->add(
+    '/server/{server_id:[0-9]+}/config/delete',
+    [
+        'controller' => 'supervisor-config',
+        'action' => 'delete'
     ]
 );
 

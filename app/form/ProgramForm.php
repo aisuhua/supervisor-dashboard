@@ -15,11 +15,8 @@ class ProgramForm extends Form
     public function initialize($entity = null, $options = null)
     {
         // id
-        if (isset($options['edit']) && $options['edit'])
-        {
-            $id = new Hidden('id');
-            $this->add($id);
-        }
+        $id = new Hidden('id');
+        $this->add($id);
 
         // server_id
         $server_id = new Hidden('server_id');

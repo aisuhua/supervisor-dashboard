@@ -1,19 +1,6 @@
 {{ content() }}
 {{ flashSession.output() }}
 
-<div id="myModal"></div>
-
-<script>
-// $(document).ready(function(){
-//     console.log('111');
-//     $('#myModal').modal('show')
-// });
-// $(window).load(function(){
-//     //$('#myModal').modal({ show: false});
-// });
-
-</script>
-
 <ol class="breadcrumb">
     <li><a href="/server/{{ server.id }}/process?ip={{ server.ip }}&port={{ server.port }}">{{ server.ip }}:{{ server.port }}</a></li>
     <li class="active">修改配置</li>
@@ -27,8 +14,13 @@
 </div>
 
 {% for index, program in programs %}
-<form method="post" action="/server/{{ server.id }}/config/create" class="form-update" id="{{ program.program }}">
+<form method="post" action="/server/{{ server.id }}/config/edit/{{ program.id }}" class="form-edit" id="form-{{ program.id }}">
+    <!-- anchor -->
+    <a id="{{ program.program }}" style="position: relative; top: -65px;" class="invisible"></a>
+
+    {{ form.render('id', ['value': program.id]) }}
     {{ form.render('server_id', ['value': program.server_id]) }}
+
     <table class="table table-bordered table-form">
         <tbody>
             <tr>
@@ -92,8 +84,8 @@
             <tr>
                 <th>操作</th>
                 <td>
-                    <button class="btn btn-sm btn-success">修改</button>
-                    <button class="btn btn-sm btn-danger">删除</button>
+                    <button type="submit" class="btn btn-sm btn-success">修改</button>
+                    <a href="/server/{{ server.id }}/config/delete" class="btn btn-sm btn-danger btn-delete">删除</a>
                     <button class="btn btn-sm btn-primary">复制</button>
                     <a class="btn btn-sm btn-link expand-btn"><span class="glyphicon glyphicon-menu-down"></span> 展开配置</a>
                 </td>
@@ -101,13 +93,21 @@
         </tbody>
     </table>
 </form>
+{% else %}
+    <div class="panel panel-default">
+        <div class="panel-body">
+            没有任何配置信息可修改，请先 <a href="javascript:void(0);" class="add-process-btn">添加配置</a>。
+        </div>
+    </div>
 {% endfor %}
 
-<h3 id="add-config" name="add-config">添加配置</h3>
+<hr>
+{#<h3 id="add-config">添加配置</h3>#}
 
-<form method="post" action="/server/{{ server.id }}/config/create" class="form-create">
+<form method="post" action="/server/{{ server.id }}/config/create#form-create" class="form-create" id="form-create">
     {{ form.render('server_id', ['value': server.id]) }}
     <table class="table table-bordered table-form">
+    <caption id="add-config">添加配置</caption>
     <tbody>
     <tr>
         <th>程序名</th>
@@ -180,19 +180,31 @@
 
 <script>
 $(function() {
+
     // 回到顶部
     $.scrollUp({
         animation: 'fade',
         scrollImg: true
     });
 
-    if (window.location.hash) {
-        //$('html, body').animate({scrollTop: $(window.location.hash).offset().top - 70}, 'fast');
-    }
+    $(document).on('pjax:complete', function() {
+        var location_hash = window.location.hash;
+        if (location_hash) {
+            var $anchor = $(location_hash);
+            if ($anchor.size() > 0) {
+                $('html, body').animate({
+                        scrollTop: $anchor.offset().top
+                    }, 'fast'
+                );
+
+                $anchor.closest('form').find('input#program').focus();
+            }
+        }
+    });
 
     //$('.expand-tr').removeClass('hidden');
 
-    $('.expand-btn').click(function() {
+    $('a.expand-btn').click(function() {
         var html = '';
 
         if ($(this).hasClass('expanded')) {
@@ -200,6 +212,8 @@ $(function() {
             $(this).html(html);
             $(this).removeClass('expanded');
             $(this).closest('table').find('tr.expand-tr').addClass('hidden');
+
+            sessionStorage.setItem('name', 'suhua');
         } else {
             html = '<span class="glyphicon glyphicon-menu-up"></span> 收起配置';
             $(this).html(html);
@@ -208,44 +222,89 @@ $(function() {
         }
     });
 
-    $('.expand-all-btn').click(function() {
+    $('a.expand-all-btn').click(function() {
         var html = '';
+        var $this = $(this);
 
-        if ($(this).hasClass('expanded')) {
+        if ($this.hasClass('expanded')) {
             html = '<span class="glyphicon glyphicon-menu-down"></span> 展开所有';
-            $(this).html(html);
-            $(this).removeClass('expanded');
+            $this.html(html).removeClass('expanded');
 
-            $('.expand-btn').filter('.expanded').click();
+            html = '<span class="glyphicon glyphicon-menu-down"></span> 展开配置';
+            $('table tr td a.expand-btn').filter('.expanded')
+                .html(html)
+                .removeClass('expanded');
+
+            $('table tr.expand-tr').addClass('hidden');
         } else {
             html = '<span class="glyphicon glyphicon-menu-up"></span> 收起所有';
-            $(this).html(html);
-            $(this).addClass('expanded');
+            $this.html(html).addClass('expanded');
 
-            $('.expand-btn').not('.expanded').click();
+            html = '<span class="glyphicon glyphicon-menu-up"></span> 收起配置';
+            $('table tr td a.expand-btn').not('.expanded')
+                .html(html)
+                .addClass('expanded');
+
+            $('table tr.expand-tr').removeClass('hidden');
         }
     });
 
-    $('.add-process-btn').click(function() {
-        $('html, body').animate({scrollTop: $("h3").offset().top}, 'fast');
+    $('a.add-process-btn').click(function() {
+        $('html, body').animate({scrollTop: $("#add-config").offset().top}, 'fast');
         $('.form-create input#program').focus();
     });
 
-    $('.form-create').submit(function() {
+    $('form.form-create').submit(function() {
         event.preventDefault();
 
         // https://stackoverflow.com/questions/2573979/force-page-reload-with-html-anchors-html-js
         $.post($(this).attr('action'), $(this).serialize(), function(data) {
             if (data.state) {
                 var url = window.location.pathname + window.location.search;
-                url = removeURLParameter(url, '_t');
-                url += '&_t=' + Date.now() + '#add-config';
-                window.location.href = url;
-                // window.location.reload(true);
+                // url = removeURLParameter(url, '_t');
+                // url += '&_t=' + Date.now();
+                url += '#form-create';
+                $.pjax({url: url, container: '#pjax-container'});
             } else {
                 error(data.message);
             }
         });
+    });
+
+    $('form.form-edit').submit(function() {
+        event.preventDefault();
+
+        $.post($(this).attr('action'), $(this).serialize(), function(data) {
+            if (data.state) {
+                success(data.message);
+            } else {
+                error(data.message);
+            }
+        });
+    });
+
+    $('form.form-edit .btn-delete').click(function() {
+        event.stopPropagation();
+
+        var $form = $(this).closest('form');
+
+        if (!confirm("真的要删除 " + $form.find('input#program').val() + ' 吗？')) {
+            return false;
+        }
+
+        var id = $form.find('input#id').val();
+        var url = $(this).attr('href');
+
+        $.post(url, {ids: id}, function(data) {
+            if (data.state) {
+                success(data.message);
+                $form.remove();
+            } else {
+                error(data.message);
+            }
+        });
+
+        return false;
     });
 });
 </script>
