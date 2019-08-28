@@ -22,6 +22,9 @@
     <!-- nprogress -->
     <link href="/plugins/nprogress/nprogress.css" rel="stylesheet">
 
+    <link href="http://cdn.staticfile.org/codemirror/5.48.4/codemirror.css" rel="stylesheet">
+    <link href="http://cdn.staticfile.org/codemirror/5.48.4/addon/dialog/dialog.css" rel="stylesheet">
+
     <link rel="stylesheet" href="/css/override.css">
 
     <!-- bootstrap -->
@@ -51,8 +54,9 @@
     <!-- scrollup -->
     <script src="/plugins/scrollup/jquery.scrollUp.min.js"></script>
 
-    <!-- clipboard -->
-    <script src="/plugins/clipboard/clipboard.min.js"></script>
+    <script src="http://cdn.staticfile.org/codemirror/5.48.4/codemirror.js"></script>
+    <script src="http://cdn.staticfile.org/codemirror/5.48.4/addon/dialog/dialog.js"></script>
+    <script src="https://cdn.staticfile.org/codemirror/5.48.4/mode/properties/properties.js"></script>
 
     <!-- https://github.com/jacwright/date.format -->
     <script src="/js/date.format.js"></script>

@@ -1,16 +1,6 @@
 {{ content() }}
 {{ flashSession.output() }}
 
-<link href="http://cdn.staticfile.org/codemirror/5.48.4/codemirror.css" rel="stylesheet">
-<link href="http://cdn.staticfile.org/codemirror/5.48.4/addon/dialog/dialog.css" rel="stylesheet">
-{#<link href="http://cdn.staticfile.org/codemirror/5.48.4/addon/dialog/dialog.css" rel="stylesheet">#}
-{#<link href="http://cdn.staticfile.org/codemirror/5.48.4/addon/dialog/dialog.css" rel="stylesheet">#}
-
-<script src="http://cdn.staticfile.org/codemirror/5.48.4/codemirror.js"></script>
-<script src="http://cdn.staticfile.org/codemirror/5.48.4/addon/dialog/dialog.js"></script>
-<script src="https://cdn.staticfile.org/codemirror/5.48.4/mode/properties/properties.js"></script>
-{#<script src="http://cdn.staticfile.org/codemirror/5.48.4/codemirror.js"></script>#}
-
 <ol class="breadcrumb">
     <li><a href="/server/{{ server.id }}/process?ip={{ server.ip }}&port={{ server.port }}">{{ server.ip }}:{{ server.port }}</a></li>
     <li class="active">修改配置</li>
