@@ -1,15 +1,35 @@
 {{ content() }}
 {{ flashSession.output() }}
 
+<link href="http://cdn.staticfile.org/codemirror/5.48.4/codemirror.css" rel="stylesheet">
+<link href="http://cdn.staticfile.org/codemirror/5.48.4/addon/dialog/dialog.css" rel="stylesheet">
+{#<link href="http://cdn.staticfile.org/codemirror/5.48.4/addon/dialog/dialog.css" rel="stylesheet">#}
+{#<link href="http://cdn.staticfile.org/codemirror/5.48.4/addon/dialog/dialog.css" rel="stylesheet">#}
+
+<script src="http://cdn.staticfile.org/codemirror/5.48.4/codemirror.js"></script>
+<script src="http://cdn.staticfile.org/codemirror/5.48.4/addon/dialog/dialog.js"></script>
+<script src="https://cdn.staticfile.org/codemirror/5.48.4/mode/properties/properties.js"></script>
+{#<script src="http://cdn.staticfile.org/codemirror/5.48.4/codemirror.js"></script>#}
+
 <ol class="breadcrumb">
     <li><a href="/server/{{ server.id }}/process?ip={{ server.ip }}&port={{ server.port }}">{{ server.ip }}:{{ server.port }}</a></li>
     <li class="active">修改配置</li>
 </ol>
 
-<div style="margin-bottom: 20px; float: left;">
+<div style="margin-bottom: 20px;">
     <div class="btn-group" role="group">
         <a class="btn btn-default add-process-btn">添加配置</a>
-        <a class="btn btn-default expand-all-btn"><span class="glyphicon glyphicon-menu-down"></span> 展开所有</a>
+        <a class="btn btn-default expand-all-btn"><span class="glyphicon glyphicon-menu-down"></span> 展开全部</a>
+        <div class="btn-group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                更多 <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <li><a href="/server/{{ server.id }}/config/load-config" id="load-config">INI 编辑模式</a></li>
+                <li><a href="#">从其他服务器克隆到本机</a></li>
+                <li><a href="#">从本机克隆到其他服务器</a></li>
+             </ul>
+        </div>
    </div>
 </div>
 
@@ -84,21 +104,21 @@
             <tr>
                 <th>操作</th>
                 <td>
-                    <button type="submit" class="btn btn-sm btn-success">修改</button>
+                    <button type="submit" class="btn btn-sm btn-primary">修改</button>
                     <a href="/server/{{ server.id }}/config/delete" class="btn btn-sm btn-danger btn-delete">删除</a>
-                    <button type="button" class="btn btn-sm btn-primary btn-copy">复制</button>
-                    <a class="btn btn-sm btn-link expand-btn"><span class="glyphicon glyphicon-menu-down"></span> 展开配置</a>
+                    <a type="button" class="btn btn-sm btn-link btn-copy"><span class="glyphicon glyphicon-copy"></span> 复制</a>
+                    <a class="btn btn-sm btn-link expand-btn"><span class="glyphicon glyphicon-menu-down"></span> 展开</a>
                 </td>
             </tr>
         </tbody>
     </table>
 </form>
 {% else %}
-    <div class="panel panel-default">
-        <div class="panel-body">
+    {#<div class="panel panel-default">#}
+        {#<div class="panel-body">#}
             没有任何配置信息可修改，请先 <a href="javascript:void(0);" class="add-process-btn">添加配置</a>。
-        </div>
-    </div>
+        {#</div>#}
+    {#</div>#}
 {% endfor %}
 
 <hr>
@@ -169,40 +189,86 @@
             <tr>
                 <th>操作</th>
                 <td>
-                    <button class="btn btn-success">确认添加</button>
-                    <a class="btn btn-sm btn-link expand-btn"><span class="glyphicon glyphicon-menu-down"></span> 展开配置</a>
-                    <button type="reset" class="btn btn-xs btn-link">重置</button>
+                    <button type="submit" class="btn btn-primary">提交</button>
+                    <a class="btn btn-sm btn-link btn-paste"><span class="glyphicon glyphicon-paste"></span> 粘贴</a>
+                    <button type="reset" class="btn btn-sm btn-link"><i class="fa fa-undo" aria-hidden="true"></i> 重置</button>
+                    <a class="btn btn-sm btn-link expand-btn"><span class="glyphicon glyphicon-menu-down"></span> 展开</a>
+
                 </td>
             </tr>
         </tbody>
     </table>
 </form>
 
+
+
+<!-- 模态框内容 -->
+<div id="load-config-modal-wrapper"></div>
+
 <script>
 $(function() {
+
+    // 从配置文件导入
+    $('#load-config').click(function(event) {
+        event.stopPropagation();
+        event.preventDefault();
+
+        var url = $(this).attr('href');
+        var modal = $('#load-config-modal-wrapper').load(url, function() {
+            $('#load-config-modal').modal({
+                show: true
+            });
+        });
+
+        return false;
+    });
+
+    /**
+     * https://github.com/uiwjs/react-codemirror/issues/2
+     * @type {null}
+     */
+    var editor = null;
+    $('#load-config-modal-wrapper').on('shown.bs.modal', function() {
+        editor = CodeMirror.fromTextArea(document.getElementById("code"),{
+            mode: "properties",
+            lineNumbers: true,
+            lineWrapping: true,
+            indentUnit: 0,
+            autoRefresh: true
+        });
+
+        editor.setSize('100%', '600px');
+    });
+
+//    $('#load-config-modal-wrapper').on('hide.bs.modal', function () {
+//        editor.refresh();
+//    });
+
+    //$('#load-config').click();
+
 
     // 修改表单和添加表单
     var $formEdit = $('form.form-edit');
     var $formCreate = $('form.form-create');
     var $expandAllBtn = $('.btn-group a.expand-all-btn');
 
-    // 处理页面加载时表格的展开和收起
-    var formAll = localStorage.getItem('form-all');
+    // 处理页面加载时表格的展开配置和收起配置
+    var formAll = getItem('form-all');
     if (formAll == 'open') {
-        html = '<span class="glyphicon glyphicon-menu-up"></span> 收起所有';
+        html = '<span class="glyphicon glyphicon-menu-up"></span> 收起全部';
         $expandAllBtn.html(html).addClass('expanded');
     }
 
     $formEdit.add($formCreate).each(function (index, value) {
         var id = $(this).attr('id');
 
-        var item = localStorage.getItem(id);
+        var item = getItem(id);
         if (item || formAll) {
             if (item == 'open' || (item == null && formAll == 'open')) {
                 $(this).find('table tr.expand-tr').removeClass('invisible');
 
-                var html = '<span class="glyphicon glyphicon-menu-up"></span> 收起配置';
-                $(this).find('a.expand-btn').html(html).addClass('expanded');
+                var html = '<span class="glyphicon glyphicon-menu-up"></span> 收起';
+                $(this).find('.expand-btn').html(html).addClass('expanded');
             } else {
                 $(this).find('table tr.expand-tr').addClass('hidden').removeClass('invisible');
             }
@@ -214,11 +280,10 @@ $(function() {
     // 清理　localStorage 缓存
     function clearStorage() {
         var aLength = localStorage.length;
-        console.log(aLength);
+
         for (var i = -1; i <= aLength; i++) {
             var aKeyName = localStorage.key(i);
-            console.log(aKeyName);
-            if (aKeyName && aKeyName.indexOf('form-') != -1) {
+            if (aKeyName && aKeyName.indexOf('supervisor-form-') != -1) {
                 localStorage.removeItem(aKeyName);
             }
         }
@@ -232,37 +297,37 @@ $(function() {
 
     //$('.expand-tr').removeClass('hidden');
 
-    // 展开配置和收起配置切换
-    $('a.expand-btn').click(function() {
+    // 展开配置配置和收起配置配置切换
+    $('table tr td .expand-btn').click(function() {
         var html;
         var $form;
 
-        if ($(this).hasClass('expanded')) {　// 收起
-            html = '<span class="glyphicon glyphicon-menu-down"></span> 展开配置';
+        if ($(this).hasClass('expanded')) {　// 收起配置
+            html = '<span class="glyphicon glyphicon-menu-down"></span> 展开';
             $(this).html(html).removeClass('expanded');
 
             $form = $(this).closest('form');
             $form.find('table tr.expand-tr').addClass('hidden');
 
-            localStorage.setItem($form.attr('id'), 'close');
+            setItem($form.attr('id'), 'close');
 
-            if ($('a.expand-btn').filter('.expanded').size() == 0) {
-                html = '<span class="glyphicon glyphicon-menu-down"></span> 展开所有';
+            if ($('table tr td .expand-btn').filter('.expanded').size() == 0) {
+                html = '<span class="glyphicon glyphicon-menu-down"></span> 展开全部';
                 $expandAllBtn.html(html).removeClass('expanded');
 
                 //localStorage.setItem('form-all', 'close');
             }
-        } else {　// 展开
-            html = '<span class="glyphicon glyphicon-menu-up"></span> 收起配置';
+        } else {　// 展开配置
+            html = '<span class="glyphicon glyphicon-menu-up"></span> 收起';
             $(this).html(html).addClass('expanded');
 
             $form = $(this).closest('form');
             $form.find('table tr.expand-tr').removeClass('hidden');
 
-            localStorage.setItem($form.attr('id'), 'open');
+            setItem($form.attr('id'), 'open');
 
-            if ($('a.expand-btn').not('.expanded').size() == 0) {
-                html = '<span class="glyphicon glyphicon-menu-up"></span> 收起所有';
+            if ($('table tr td .expand-btn').not('.expanded').size() == 0) {
+                html = '<span class="glyphicon glyphicon-menu-up"></span> 收起全部';
                 $expandAllBtn.html(html).addClass('expanded');
 
                 // localStorage.setItem('form-all', 'open');
@@ -270,17 +335,17 @@ $(function() {
         }
     });
 
-    // 展开所有和收起所有切换
+    // 展开配置所有和收起配置所有切换
     $expandAllBtn.click(function() {
         var html = '';
         var $this = $(this);
 
         if ($this.hasClass('expanded')) {
-            html = '<span class="glyphicon glyphicon-menu-down"></span> 展开所有';
+            html = '<span class="glyphicon glyphicon-menu-down"></span> 展开全部';
             $this.html(html).removeClass('expanded');
 
-            html = '<span class="glyphicon glyphicon-menu-down"></span> 展开配置';
-            $('table tr td a.expand-btn').filter('.expanded')
+            html = '<span class="glyphicon glyphicon-menu-down"></span> 展开';
+            $('table tr td .expand-btn').filter('.expanded')
                 .html(html)
                 .removeClass('expanded');
 
@@ -288,13 +353,13 @@ $(function() {
 
             clearStorage();
             clearStorage();
-            localStorage.setItem('form-all', 'close');
+            setItem('form-all', 'close');
         } else {
-            html = '<span class="glyphicon glyphicon-menu-up"></span> 收起所有';
+            html = '<span class="glyphicon glyphicon-menu-up"></span> 收起全部';
             $this.html(html).addClass('expanded');
 
-            html = '<span class="glyphicon glyphicon-menu-up"></span> 收起配置';
-            $('table tr td a.expand-btn').not('.expanded')
+            html = '<span class="glyphicon glyphicon-menu-up"></span> 收起';
+            $('table tr td .expand-btn').not('.expanded')
                 .html(html)
                 .addClass('expanded');
 
@@ -302,17 +367,22 @@ $(function() {
 
             clearStorage();
             clearStorage();
-            localStorage.setItem('form-all', 'open');
+            setItem('form-all', 'open');
         }
     });
 
+    // 滚动到页脚的新增配置表单
     function focusFormCreate() {
         $('html, body').animate({scrollTop: $formCreate.offset().top}, 'fast');
-        $formCreate.find('input#program').focus();
+        var $input = $formCreate.find('input#program');
+        $input.val($input.val()).focus();
     }
 
     // 添加配置事件处理
-    $('a.add-process-btn').click(focusFormCreate);
+    $('a.add-process-btn').click(function() {
+        focusFormCreate();
+        $formCreate.find('button[type=reset]').click();
+    });
 
     // 处理添加配置后页面刷新定位到页脚
     $(document).on('pjax:complete', function() {
@@ -325,13 +395,14 @@ $(function() {
                     }, 'fast'
                 );
 
-                $anchor.closest('form').find('input#program').focus();
+                var $input = $anchor.closest('form').find('input#program');
+                $input.val($input.val()).focus();
             }
         }
     });
 
     // 添加配置
-    $formCreate.submit(function() {
+    $formCreate.submit(function(event) {
         event.preventDefault();
 
         $.post($(this).attr('action'), $(this).serialize(), function(data) {
@@ -346,7 +417,7 @@ $(function() {
     });
 
     // 修改配置
-    $formEdit.submit(function() {
+    $formEdit.submit(function(event) {
         event.preventDefault();
 
         $.post($(this).attr('action'), $(this).serialize(), function(data) {
@@ -359,7 +430,7 @@ $(function() {
     });
 
     // 删除配置
-    $formEdit.find('.btn-delete').click(function() {
+    $formEdit.find('.btn-delete').click(function(event) {
         event.stopPropagation();
 
         var $form = $(this).closest('form');
@@ -383,20 +454,65 @@ $(function() {
         return false;
     });
 
+
+//    $formEdit.find('.btn-copy').click(function() {
+//        var $form = $(this).closest('form');
+//
+//        $form.find('input, select').each(function(index, value) {
+//            var $element = $(value);
+//
+//            if ($element.attr('id') == 'program') {
+//                $formCreate.find('#' + $element.attr('id')).val($element.val() + '_copy');
+//            } else {
+//                $formCreate.find('#' + $element.attr('id')).val($element.val());
+//            }
+//        });
+//
+//        focusFormCreate();
+//    });
+
     $formEdit.find('.btn-copy').click(function() {
-        var $form = $(this).closest('form');
+        setItem('config-copy', JSON.stringify($(this).closest('form').serializeArray()));
 
-        $form.find('input, select').each(function(index, value) {
-            var $element = $(value);
+        $(this).tooltip({
+            'title': '复制成功！'
+        }).tooltip('show');
+    });
 
-            if ($element.attr('id') == 'program') {
-                $formCreate.find('#' + $element.attr('id')).val($element.val() + '_copy');
-            } else {
-                $formCreate.find('#' + $element.attr('id')).val($element.val());
+    $formEdit.find('.btn-copy').mouseleave(function() {
+        $(this).tooltip('destroy');
+    });
+
+    $formCreate.find('.btn-paste').click(function() {
+        var copy = getItem('config-copy');
+        if (!copy) {
+            $(this).tooltip({
+                'title': '没有任何内容'
+            }).tooltip('show');
+
+            return false;
+        }
+
+        copy = JSON.parse(copy);
+        if (!copy) {
+            $(this).tooltip({
+                'title': '没有任何内容'
+            }).tooltip('show');
+
+            return false;
+        }
+
+        for (var i = 0; i < copy.length; i++) {
+
+            if (copy[i].name == 'id' || copy[i].name == 'server_id') {
+                continue;
             }
-        });
 
-        focusFormCreate();
+            var $element = $formCreate.find('[name=' + copy[i].name + ']');
+            if ($element) {
+                $element.val(copy[i].value);
+            }
+        }
     });
 });
 </script>

@@ -49,3 +49,15 @@ function removeURLParameter(url, parameter) {
     }
     return url;
 }
+
+function setItem(key, value) {
+    var prefix = 'supervisor-';
+
+    return localStorage.setItem(prefix + key, value);
+}
+
+function getItem(key, value) {
+    var prefix = 'supervisor-';
+
+    return localStorage.getItem(prefix + key);
+}

@@ -195,4 +195,14 @@ class SupervisorConfigController extends ControllerSupervisorBase
 
         return $this->response->setJsonContent($result);
     }
+
+    public function loadConfigAction()
+    {
+        $this->view->setRenderLevel(View::LEVEL_ACTION_VIEW);
+    }
+
+    public function loadServerAction()
+    {
+
+    }
 }

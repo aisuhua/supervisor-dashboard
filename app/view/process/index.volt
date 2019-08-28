@@ -7,7 +7,8 @@
 
 <div style="margin-bottom: 20px;">
     <div class="btn-group" role="group">
-        <a href="/server/{{ server.id }}/config?ip={{ server.ip }}&port={{ server.port }}" class="btn btn-default add_process">修改配置</a>
+        <a href="/server/{{ server.id }}/config?ip={{ server.ip }}&port={{ server.port }}#form-create" class="btn btn-default form-create">添加配置</a>
+        <a href="/server/{{ server.id }}/config?ip={{ server.ip }}&port={{ server.port }}" class="btn btn-default form-edit">修改配置</a>
         <a href="#" class="btn btn-default">更新配置</a>
         {#<a href="/server/{{ server.id }}/supervisor/readlog?ip={{ server.ip }}&port={{ server.port }}" target="_blank" class="btn btn-default read_log">服务日志</a>#}
         {#<a href="/server/{{ server.id }}/process?ip={{ server.ip }}&port={{ server.port }}" class="btn btn-default">刷新页面</a>#}

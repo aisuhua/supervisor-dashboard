@@ -118,6 +118,22 @@ $router->add(
     ]
 );
 
+$router->add(
+    '/server/{server_id:[0-9]+}/config/load-config',
+    [
+        'controller' => 'supervisor-config',
+        'action' => 'loadConfig'
+    ]
+);
+
+$router->add(
+    '/server/{server_id:[0-9]+}/config/load-server',
+    [
+        'controller' => 'supervisor-config',
+        'action' => 'loadServer'
+    ]
+);
+
 /**
  * 服務器進程管理
  */

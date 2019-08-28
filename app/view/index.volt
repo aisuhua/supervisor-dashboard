@@ -51,6 +51,9 @@
     <!-- scrollup -->
     <script src="/plugins/scrollup/jquery.scrollUp.min.js"></script>
 
+    <!-- clipboard -->
+    <script src="/plugins/clipboard/clipboard.min.js"></script>
+
     <!-- https://github.com/jacwright/date.format -->
     <script src="/js/date.format.js"></script>
     <script src="/js/function.js"></script>
