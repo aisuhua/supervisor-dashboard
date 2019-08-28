@@ -25,7 +25,7 @@
                 更多 <span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
-                <li><a href="/server/{{ server.id }}/config/load-config" id="load-config">INI 编辑模式</a></li>
+                <li><a href="/server/{{ server.id }}/config/ini-mode" id="load-config">INI 编辑模式</a></li>
                 <li><a href="#">从其他服务器克隆到本机</a></li>
                 <li><a href="#">从本机克隆到其他服务器</a></li>
              </ul>
@@ -62,6 +62,10 @@
             <tr>
                 <th>进程下标起始值</th>
                 <td>{{ form.render('numprocs_start', ['value': program.numprocs_start ]) }}</td>
+            </tr>
+            <tr class="expand-tr invisible">
+                <th>执行进程的用户</th>
+                <td>{{ form.render('user', ['value': program.user ]) }}</td>
             </tr>
             <tr class="expand-tr invisible">
                 <th>目录</th>
@@ -104,7 +108,7 @@
             <tr>
                 <th>操作</th>
                 <td>
-                    <button type="submit" class="btn btn-sm btn-primary">修改</button>
+                    <button type="submit" class="btn btn-sm btn-success">修改</button>
                     <a href="/server/{{ server.id }}/config/delete" class="btn btn-sm btn-danger btn-delete">删除</a>
                     <a type="button" class="btn btn-sm btn-link btn-copy"><span class="glyphicon glyphicon-copy"></span> 复制</a>
                     <a class="btn btn-sm btn-link expand-btn"><span class="glyphicon glyphicon-menu-down"></span> 展开</a>
@@ -149,6 +153,10 @@
                 <td>{{ form.render('numprocs_start') }}</td>
             </tr>
             <tr class="expand-tr invisible">
+                <th>执行进程的用户</th>
+                <td>{{ form.render('user') }}</td>
+            </tr>
+            <tr class="expand-tr invisible">
                 <th>目录</th>
                 <td>{{ form.render('directory') }}</td>
             </tr>
@@ -189,18 +197,15 @@
             <tr>
                 <th>操作</th>
                 <td>
-                    <button type="submit" class="btn btn-primary">提交</button>
+                    <button type="submit" class="btn btn-success">确定添加</button>
                     <a class="btn btn-sm btn-link btn-paste"><span class="glyphicon glyphicon-paste"></span> 粘贴</a>
                     <button type="reset" class="btn btn-sm btn-link"><i class="fa fa-undo" aria-hidden="true"></i> 重置</button>
                     <a class="btn btn-sm btn-link expand-btn"><span class="glyphicon glyphicon-menu-down"></span> 展开</a>
-
                 </td>
             </tr>
         </tbody>
     </table>
 </form>
-
-
 
 <!-- 模态框内容 -->
 <div id="load-config-modal-wrapper"></div>
@@ -208,13 +213,13 @@
 <script>
 $(function() {
 
-    // 从配置文件导入
+    // INI 编辑模式
     $('#load-config').click(function(event) {
         event.stopPropagation();
         event.preventDefault();
 
         var url = $(this).attr('href');
-        var modal = $('#load-config-modal-wrapper').load(url, function() {
+        $('#load-config-modal-wrapper').load(url, function() {
             $('#load-config-modal').modal({
                 show: true
             });
@@ -223,28 +228,25 @@ $(function() {
         return false;
     });
 
-    /**
-     * https://github.com/uiwjs/react-codemirror/issues/2
-     * @type {null}
-     */
-    var editor = null;
     $('#load-config-modal-wrapper').on('shown.bs.modal', function() {
-        editor = CodeMirror.fromTextArea(document.getElementById("code"),{
+        var editor = CodeMirror.fromTextArea(document.getElementById('ini-code'),{
             mode: "properties",
             lineNumbers: true,
             lineWrapping: true,
             indentUnit: 0,
             autoRefresh: true
         });
+        //editor.setSize('100%', '600px');
 
-        editor.setSize('100%', '600px');
+        $('#ini-submit').click(function() {
+            var url = $(this).attr('data-url');
+            $.post(url, {ini: editor.getValue()}, function(data) {
+                console.log(data);
+            });
+        });
     });
 
-//    $('#load-config-modal-wrapper').on('hide.bs.modal', function () {
-//        editor.refresh();
-//    });
-
-    //$('#load-config').click();
+    $('#load-config').click();
 
 
     // 修改表单和添加表单

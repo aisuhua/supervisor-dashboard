@@ -117,6 +117,17 @@ class ProgramForm extends Form
 
         $this->add($numprocs_start);
 
+        // user
+        $user = new Text('user', [
+            'class' => 'form-control',
+            'autocomplete' => 'off',
+            'value' => 'www-data'
+        ]);
+
+        $this->add($user);
+
+        $this->add($numprocs_start);
+
         // directory
         $directory = new Text('directory', [
             'class' => 'form-control',

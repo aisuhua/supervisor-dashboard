@@ -44,6 +44,7 @@ class SupervisorConfigController extends ControllerSupervisorBase
                 'process_name' => $this->request->getPost('process_name', ['trim', 'string'], ''),
                 'numprocs' => $this->request->getPost('numprocs', ['int'], 1),
                 'numprocs_start' => $this->request->getPost('numprocs_start', ['int'], 0),
+                'user' => $this->request->getPost('user', ['trim', 'string'], ''),
                 'directory' => $this->request->getPost('directory', ['trim', 'string'], '%(here)s'),
                 'autostart' => $this->request->getPost('autostart', ['trim', 'string'], 'true'),
                 'startretries' => $this->request->getPost('startretries', 'int', 20),
@@ -98,6 +99,7 @@ class SupervisorConfigController extends ControllerSupervisorBase
                 'process_name' => $this->request->getPost('process_name', ['trim', 'string'], ''),
                 'numprocs' => $this->request->getPost('numprocs', ['int'], 1),
                 'numprocs_start' => $this->request->getPost('numprocs_start', ['int'], 0),
+                'user' => $this->request->getPost('user', ['trim', 'string'], ''),
                 'directory' => $this->request->getPost('directory', ['trim', 'string'], '%(here)s'),
                 'autostart' => $this->request->getPost('autostart', ['trim', 'string'], 'true'),
                 'startretries' => $this->request->getPost('startretries', 'int', 20),
@@ -196,8 +198,46 @@ class SupervisorConfigController extends ControllerSupervisorBase
         return $this->response->setJsonContent($result);
     }
 
-    public function loadConfigAction()
+    public function iniModeAction()
     {
+        if ($this->request->isPost())
+        {
+            $ini = $this->request->getPost('ini', 'trim', '');
+            $ini_parsed = parse_ini_string($ini, true, INI_SCANNER_RAW);
+
+            
+        }
+
+        $programs = Program::find([
+            'server_id = :server_id:',
+            'bind' => [
+                'server_id' => $this->server->id
+            ],
+            'order' => 'program asc, id asc'
+        ]);
+
+        $ini = '';
+        foreach ($programs as $program)
+        {
+            /** @var Program $program */
+            $ini .= "[program:{$program->program}]" . PHP_EOL;
+            $ini .= "command={$program->command}" . PHP_EOL;
+            $ini .= "process_name={$program->process_name}" . PHP_EOL;
+            $ini .= "numprocs={$program->numprocs}" . PHP_EOL;
+            $ini .= "numprocs_start={$program->numprocs_start}" . PHP_EOL;
+            $ini .= "user={$program->user}" . PHP_EOL;
+            $ini .= "directory={$program->directory}" . PHP_EOL;
+            $ini .= "autostart={$program->autostart}" . PHP_EOL;
+            $ini .= "startretries={$program->startretries}" . PHP_EOL;
+            $ini .= "autorestart={$program->autorestart}" . PHP_EOL;
+            $ini .= "redirect_stderr={$program->redirect_stderr}" . PHP_EOL;
+            $ini .= "stdout_logfile={$program->stdout_logfile}" . PHP_EOL;
+            $ini .= "stdout_logfile_backups={$program->stdout_logfile_backups}" . PHP_EOL;
+            $ini .= "stdout_logfile_maxbytes={$program->stdout_logfile_maxbytes}" . PHP_EOL;
+        }
+
+        $this->view->programs = $programs;
+        $this->view->ini = trim($ini);
         $this->view->setRenderLevel(View::LEVEL_ACTION_VIEW);
     }
 

@@ -13,6 +13,7 @@ class Program extends Model
     public $process_name;
     public $numprocs;
     public $numprocs_start;
+    public $user;
     public $directory;
     public $autostart;
     public $startretries;

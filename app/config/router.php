@@ -119,10 +119,10 @@ $router->add(
 );
 
 $router->add(
-    '/server/{server_id:[0-9]+}/config/load-config',
+    '/server/{server_id:[0-9]+}/config/ini-mode',
     [
         'controller' => 'supervisor-config',
-        'action' => 'loadConfig'
+        'action' => 'iniMode'
     ]
 );
 
