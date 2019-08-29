@@ -1,7 +1,7 @@
 {{ content() }}
 {{ flashSession.output() }}
 
-<div class="modal" id="load-config-modal" tabindex="-1" role="dialog" aria-labelledby="load-config-label">
+<div class="modal fade" id="load-config-modal" tabindex="-1" role="dialog" aria-labelledby="load-config-label">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">

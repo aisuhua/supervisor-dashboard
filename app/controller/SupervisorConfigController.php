@@ -170,37 +170,121 @@ class SupervisorConfigController extends ControllerSupervisorBase
         if ($this->request->isPost())
         {
             $ini = $this->request->getPost('ini', 'trim', '');
-            $ini_parsed = parse_ini_string($ini, true, INI_SCANNER_RAW);
 
-            $raw = [];
+            $ini_parsed = parse_ini_string($ini, true, INI_SCANNER_RAW);
+            if ($ini_parsed === false)
+            {
+                $result['state'] = 0;
+                $result['message'] = "配置文件格式不对";
+
+                return $this->response->setJsonContent($result);
+            }
+
+            $form = new ProgramForm();
+            $filtered = [];
+
             foreach ($ini_parsed as $key => $value)
             {
                 if (!preg_match("/^program:[a-zA-Z0-9_\-]{1,255}$/", trim($key), $matches))
                 {
-                    continue;
+                    $result['state'] = 0;
+                    $result['message'] = "配置文件格式不对：{$key}";
+
+                    return $this->response->setJsonContent($result);
                 }
 
-                $program_name = explode(':', trim($key))[1];
-                $raw[] = [
-                    'server_id' => $this->server->id,
-                    'program' => $this->request->getPost('program', ['trim', 'string'], ''),
-                    'command' => $this->request->getPost('command', ['trim', 'string'], ''),
-                    'process_name' => $this->request->getPost('process_name', ['trim', 'string'], ''),
-                    'numprocs' => $this->request->getPost('numprocs', ['int'], 1),
-                    'numprocs_start' => $this->request->getPost('numprocs_start', ['int'], 0),
-                    'user' => $this->request->getPost('user', ['trim', 'string'], ''),
-                    'directory' => $this->request->getPost('directory', ['trim', 'string'], '%(here)s'),
-                    'autostart' => $this->request->getPost('autostart', ['trim', 'string'], 'true'),
-                    'startretries' => $this->request->getPost('startretries', 'int', 20),
-                    'autorestart' => $this->request->getPost('autostart', ['trim', 'string'], 'true'),
-                    'redirect_stderr' => $this->request->getPost('redirect_stderr', ['trim', 'string'], 'true'),
-                    'stdout_logfile' => $this->request->getPost('stdout_logfile', ['trim', 'string'], 'AUTO'),
-                    'stdout_logfile_backups' => $this->request->getPost('stdout_logfile_backups', 'int', 0),
-                    'stdout_logfile_maxbytes' => $this->request->getPost('stdout_logfile_maxbytes', ['trim', 'string'], '1M'),
-                ];
+                $value['program'] = explode(':', trim($key))[1];
+                $value['server_id'] = $this->server->id;
+
+                // 验证配置文件是否填写正确
+                if (!$form->isValid($value))
+                {
+                    foreach ($form->getMessages() as $message)
+                    {
+                        $result['state'] = 0;
+                        $result['message'] = "[$key] " . $message->getMessage();
+
+                        return $this->response->setJsonContent($result);
+                    }
+                }
+                $form->clear();
+
+                // 使用默认值填充配置文件没有写的字段
+                $value['process_name'] ?: $value['process_name'] = '%(program_name)s_%(process_num)s';
+                $value['numprocs'] ?: $value['numprocs'] = 1;
+                $value['numprocs_start'] ?: $value['numprocs_start'] = 0;
+                $value['user'] ?:  $value['user'] = 'www-data';
+                $value['directory'] ?: $value['directory'] = '%(here)s';
+                $value['autostart'] ?: $value['autostart'] = 'true';
+                $value['startretries'] ?: $value['startretries'] = 20;
+                $value['autorestart'] ?: $value['autorestart'] = 'true';
+                $value['redirect_stderr'] ?: $value['redirect_stderr'] = 'true';
+                $value['stdout_logfile'] ?: $value['stdout_logfile'] = 'AUTO';
+                $value['stdout_logfile_backups'] ?: $value['stdout_logfile_backups'] = 0;
+                $value['stdout_logfile_maxbytes'] ?: $value['stdout_logfile_maxbytes'] = '1M';
+
+                $filtered[] = $value;
             }
 
-            exit;
+            try
+            {
+                $this->db->begin();
+
+                $sql = "DELETE FROM program WHERE server_id = {$this->server->id}";
+                $success = $this->db->execute($sql);
+
+                if (!$success)
+                {
+                    $result['state'] = 0;
+                    $result['message'] = "配置删除失败";
+
+                    return $this->response->setJsonContent($result);
+                }
+
+                if (!empty($filtered))
+                {
+                    $placeholders = [];
+                    $values = [];
+                    $fields = array_keys($filtered[0]);
+                    $field_sql = '`' . implode('`, `', $fields) . '`';
+
+                    foreach ($filtered as $item)
+                    {
+                        $placeholders[] = '(' . substr(str_repeat('?, ', count($fields)), 0, -2) . ')';
+                        $values = array_merge($values, array_values($item));
+                    }
+
+                    $placeholder_sql = implode(',', $placeholders);
+                    $sql = "INSERT INTO `program` ({$field_sql}) VALUES {$placeholder_sql}";
+                    $success = $this->db->execute($sql, $values);
+
+                    if (!$success)
+                    {
+                        $result['state'] = 0;
+                        $result['message'] = "配置插入失败";
+
+                        return $this->response->setJsonContent($result);
+                    }
+                }
+
+                $this->db->commit();
+            }
+            catch (Exception $e)
+            {
+                $this->db->rollback();
+
+                $result['state'] = 0;
+                $result['message'] = "修改失败，原因如下：" . $e->getMessage();
+
+                return $this->response->setJsonContent($result);
+            }
+
+            $this->flashSession->success('修改成功');
+
+            $result['state'] = 1;
+            $result['message'] = "修改成功";
+
+            return $this->response->setJsonContent($result);
         }
 
         $programs = Program::find([

@@ -203,15 +203,53 @@
 <script>
 $(function() {
 
+    var editor = null;
+
     // INI 编辑模式
     $('#load-config').click(function(event) {
         event.stopPropagation();
         event.preventDefault();
-
+        
         var url = $(this).attr('href');
         $('#load-config-modal-wrapper').load(url, function() {
+
+            editor = CodeMirror.fromTextArea(document.getElementById('ini-code'),{
+                mode: "properties",
+                lineNumbers: true,
+                lineWrapping: true,
+                indentUnit: 0,
+                autoRefresh: true,
+                automaticLayout: true,
+                extraKeys: {
+                    "F11": function(cm) {
+                        cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+                    },
+                    "Esc": function(cm) {
+                        if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+                    }
+                }
+            });
+
             $('#load-config-modal').modal({
                 show: true
+            });
+
+            $('#ini-submit').click(function() {
+                var url = $(this).attr('data-url');
+                $.post(url, {ini: editor.getValue()}, function(data) {
+                    if (!data.state) {
+                        error(data.message);
+                        return false;
+                    }
+
+                    $.pjax({
+                        url: window.location.pathname + window.location.search,
+                        container: '#pjax-container',
+                        push: true
+                    });
+
+                    $('#load-config-modal').modal('hide');
+                });
             });
         });
 
@@ -219,33 +257,7 @@ $(function() {
     });
 
     $('#load-config-modal-wrapper').on('shown.bs.modal', function() {
-        var editor = CodeMirror.fromTextArea(document.getElementById('ini-code'),{
-            mode: "properties",
-            lineNumbers: true,
-            lineWrapping: true,
-            indentUnit: 0,
-            autoRefresh: true,
-            automaticLayout: true,
-            extraKeys: {
-                "F11": function(cm) {
-                    cm.setOption("fullScreen", !cm.getOption("fullScreen"));
-                },
-                "Esc": function(cm) {
-                    if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
-                }
-            }
-        });
-
-//        var height = $('#load-config-modal .modal-content').height();
-//        console.log(height);
-//        editor.setSize('100%', (height - 100) + 'px');
-
-        $('#ini-submit').click(function() {
-            var url = $(this).attr('data-url');
-            $.post(url, {ini: editor.getValue()}, function(data) {
-                console.log(data);
-            });
-        });
+        editor.refresh();
     });
 
 //    $('#load-config').click();
