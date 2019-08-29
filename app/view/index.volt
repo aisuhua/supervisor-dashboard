@@ -22,8 +22,13 @@
     <!-- nprogress -->
     <link href="/plugins/nprogress/nprogress.css" rel="stylesheet">
 
+    <!-- codemirror -->
     <link href="http://cdn.staticfile.org/codemirror/5.48.4/codemirror.css" rel="stylesheet">
     <link href="http://cdn.staticfile.org/codemirror/5.48.4/addon/dialog/dialog.css" rel="stylesheet">
+    <link href="https://cdn.staticfile.org/codemirror/5.48.4/addon/search/matchesonscrollbar.css" rel="stylesheet">
+    <link href="https://cdn.staticfile.org/codemirror/5.48.4/addon/display/fullscreen.css" rel="stylesheet">
+
+
 
     <link rel="stylesheet" href="/css/override.css">
 
@@ -54,9 +59,17 @@
     <!-- scrollup -->
     <script src="/plugins/scrollup/jquery.scrollUp.min.js"></script>
 
+    <!-- codemirror -->
     <script src="http://cdn.staticfile.org/codemirror/5.48.4/codemirror.js"></script>
     <script src="http://cdn.staticfile.org/codemirror/5.48.4/addon/dialog/dialog.js"></script>
     <script src="https://cdn.staticfile.org/codemirror/5.48.4/mode/properties/properties.js"></script>
+    <script src=" https://cdn.staticfile.org/codemirror/5.48.4/addon/search/searchcursor.js"></script>
+    <script src="https://cdn.staticfile.org/codemirror/5.48.4/addon/search/search.js"></script>
+    <script src="https://cdn.staticfile.org/codemirror/5.48.4/addon/scroll/annotatescrollbar.js"></script>
+    <script src="https://cdn.staticfile.org/codemirror/5.48.4/addon/search/matchesonscrollbar.js"></script>
+    <script src="https://cdn.staticfile.org/codemirror/5.48.4/addon/search/jump-to-line.js"></script>
+    <script src="https://cdn.staticfile.org/codemirror/5.48.4/addon/display/fullscreen.js"></script>
+
 
     <!-- https://github.com/jacwright/date.format -->
     <script src="/js/date.format.js"></script>

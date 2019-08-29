@@ -25,14 +25,27 @@ class Program extends Model
     public $update_time;
     public $create_time;
 
+    public function beforeSave()
+    {
+        $this->process_name ?: $this->process_name = '%(program_name)s_%(process_num)s';
+        $this->numprocs ?: $this->numprocs = 1;
+        $this->numprocs_start ?: $this->numprocs_start = 0;
+        $this->user ?: $this->user = 'www-data';
+        $this->directory ?: $this->directory = '%(here)s';
+        $this->autostart ?: $this->autostart = 'true';
+        $this->startretries ?: $this->startretries = 20;
+        $this->autorestart ?: $this->autorestart = 'true';
+        $this->redirect_stderr ?: $this->redirect_stderr = 'true';
+        $this->stdout_logfile ?: $this->stdout_logfile = 'AUTO';
+        $this->stdout_logfile_backups ?: $this->stdout_logfile_backups = 0;
+        $this->stdout_logfile_maxbytes ?: $this->stdout_logfile_maxbytes = '1M';
+
+        $this->update_time = time();
+    }
+
     public function beforeCreate()
     {
         $this->create_time = time();
-    }
-
-    public function beforeSave()
-    {
-        $this->update_time = time();
     }
 
 //    public function validation()

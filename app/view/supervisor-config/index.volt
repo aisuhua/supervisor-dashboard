@@ -224,9 +224,21 @@ $(function() {
             lineNumbers: true,
             lineWrapping: true,
             indentUnit: 0,
-            autoRefresh: true
+            autoRefresh: true,
+            automaticLayout: true,
+            extraKeys: {
+                "F11": function(cm) {
+                    cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+                },
+                "Esc": function(cm) {
+                    if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+                }
+            }
         });
-        //editor.setSize('100%', '600px');
+
+//        var height = $('#load-config-modal .modal-content').height();
+//        console.log(height);
+//        editor.setSize('100%', (height - 100) + 'px');
 
         $('#ini-submit').click(function() {
             var url = $(this).attr('data-url');
@@ -236,7 +248,7 @@ $(function() {
         });
     });
 
-    $('#load-config').click();
+//    $('#load-config').click();
 
 
     // 修改表单和添加表单
@@ -414,6 +426,11 @@ $(function() {
 
         $.post($(this).attr('action'), $(this).serialize(), function(data) {
             if (data.state) {
+                var tmp = data.data;
+                for (var key in tmp) {
+                    $formEdit.find('#' + key).val(tmp[key]);
+                }
+
                 success(data.message);
             } else {
                 error(data.message);

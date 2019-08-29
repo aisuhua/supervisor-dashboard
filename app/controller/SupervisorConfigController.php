@@ -26,6 +26,9 @@ class SupervisorConfigController extends ControllerSupervisorBase
 
         if ($this->request->isPost())
         {
+            $program = new Program();
+            $form->setEntity($program);
+
             if (!$form->isValid($this->request->getPost()))
             {
                 foreach ($form->getMessages() as $message)
@@ -36,24 +39,6 @@ class SupervisorConfigController extends ControllerSupervisorBase
                     return $this->response->setJsonContent($result);
                 }
             }
-
-            $program = new Program([
-                'server_id' => $this->request->getPost('server_id', ['int'], 0),
-                'program' => $this->request->getPost('program', ['trim', 'string'], ''),
-                'command' => $this->request->getPost('command', ['trim', 'string'], ''),
-                'process_name' => $this->request->getPost('process_name', ['trim', 'string'], ''),
-                'numprocs' => $this->request->getPost('numprocs', ['int'], 1),
-                'numprocs_start' => $this->request->getPost('numprocs_start', ['int'], 0),
-                'user' => $this->request->getPost('user', ['trim', 'string'], ''),
-                'directory' => $this->request->getPost('directory', ['trim', 'string'], '%(here)s'),
-                'autostart' => $this->request->getPost('autostart', ['trim', 'string'], 'true'),
-                'startretries' => $this->request->getPost('startretries', 'int', 20),
-                'autorestart' => $this->request->getPost('autorestart', ['trim', 'string'], 'true'),
-                'redirect_stderr' => $this->request->getPost('redirect_stderr', ['trim', 'string'], 'true'),
-                'stdout_logfile' => $this->request->getPost('stdout_logfile', ['trim', 'string'], 'AUTO'),
-                'stdout_logfile_backups' => $this->request->getPost('stdout_logfile_backups', 'int', 0),
-                'stdout_logfile_maxbytes' => $this->request->getPost('stdout_logfile_maxbytes', ['trim', 'string'], '1M'),
-            ]);
 
             if (!$program->create())
             {
@@ -92,24 +77,6 @@ class SupervisorConfigController extends ControllerSupervisorBase
 
         if ($this->request->isPost())
         {
-            $program->assign([
-                'server_id' => $this->request->getPost('server_id', ['int'], 0),
-                'program' => $this->request->getPost('program', ['trim', 'string'], ''),
-                'command' => $this->request->getPost('command', ['trim', 'string'], ''),
-                'process_name' => $this->request->getPost('process_name', ['trim', 'string'], ''),
-                'numprocs' => $this->request->getPost('numprocs', ['int'], 1),
-                'numprocs_start' => $this->request->getPost('numprocs_start', ['int'], 0),
-                'user' => $this->request->getPost('user', ['trim', 'string'], ''),
-                'directory' => $this->request->getPost('directory', ['trim', 'string'], '%(here)s'),
-                'autostart' => $this->request->getPost('autostart', ['trim', 'string'], 'true'),
-                'startretries' => $this->request->getPost('startretries', 'int', 20),
-                'autorestart' => $this->request->getPost('autostart', ['trim', 'string'], 'true'),
-                'redirect_stderr' => $this->request->getPost('redirect_stderr', ['trim', 'string'], 'true'),
-                'stdout_logfile' => $this->request->getPost('stdout_logfile', ['trim', 'string'], 'AUTO'),
-                'stdout_logfile_backups' => $this->request->getPost('stdout_logfile_backups', 'int', 0),
-                'stdout_logfile_maxbytes' => $this->request->getPost('stdout_logfile_maxbytes', ['trim', 'string'], '1M'),
-            ]);
-
             $form = new ProgramForm($program, [
                 'edit' => true
             ]);
@@ -205,7 +172,35 @@ class SupervisorConfigController extends ControllerSupervisorBase
             $ini = $this->request->getPost('ini', 'trim', '');
             $ini_parsed = parse_ini_string($ini, true, INI_SCANNER_RAW);
 
-            
+            $raw = [];
+            foreach ($ini_parsed as $key => $value)
+            {
+                if (!preg_match("/^program:[a-zA-Z0-9_\-]{1,255}$/", trim($key), $matches))
+                {
+                    continue;
+                }
+
+                $program_name = explode(':', trim($key))[1];
+                $raw[] = [
+                    'server_id' => $this->server->id,
+                    'program' => $this->request->getPost('program', ['trim', 'string'], ''),
+                    'command' => $this->request->getPost('command', ['trim', 'string'], ''),
+                    'process_name' => $this->request->getPost('process_name', ['trim', 'string'], ''),
+                    'numprocs' => $this->request->getPost('numprocs', ['int'], 1),
+                    'numprocs_start' => $this->request->getPost('numprocs_start', ['int'], 0),
+                    'user' => $this->request->getPost('user', ['trim', 'string'], ''),
+                    'directory' => $this->request->getPost('directory', ['trim', 'string'], '%(here)s'),
+                    'autostart' => $this->request->getPost('autostart', ['trim', 'string'], 'true'),
+                    'startretries' => $this->request->getPost('startretries', 'int', 20),
+                    'autorestart' => $this->request->getPost('autostart', ['trim', 'string'], 'true'),
+                    'redirect_stderr' => $this->request->getPost('redirect_stderr', ['trim', 'string'], 'true'),
+                    'stdout_logfile' => $this->request->getPost('stdout_logfile', ['trim', 'string'], 'AUTO'),
+                    'stdout_logfile_backups' => $this->request->getPost('stdout_logfile_backups', 'int', 0),
+                    'stdout_logfile_maxbytes' => $this->request->getPost('stdout_logfile_maxbytes', ['trim', 'string'], '1M'),
+                ];
+            }
+
+            exit;
         }
 
         $programs = Program::find([

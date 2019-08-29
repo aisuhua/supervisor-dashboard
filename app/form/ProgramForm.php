@@ -21,6 +21,10 @@ class ProgramForm extends Form
         // server_id
         $server_id = new Hidden('server_id');
 
+        $server_id->setFilters([
+            'int'
+        ]);
+
         $server_id->addValidators([
             new PresenceOf([
                 'message' => '缺少分组 ID'
@@ -34,6 +38,11 @@ class ProgramForm extends Form
             'class' => 'form-control',
             'autocomplete' => 'off',
             'value' => ''
+        ]);
+
+        $program->setFilters([
+            'string',
+            'trim'
         ]);
 
         $program->addValidators([
@@ -51,6 +60,11 @@ class ProgramForm extends Form
             'value' => ''
         ]);
 
+        $command->setFilters([
+            'string',
+            'trim'
+        ]);
+
         $command->addValidators([
             new PresenceOf([
                 'message' => '命令不能为空'
@@ -66,10 +80,9 @@ class ProgramForm extends Form
             'value' => '%(program_name)s_%(process_num)s'
         ]);
 
-        $process_name->addValidators([
-            new PresenceOf([
-                'message' => '进程名不能为空'
-            ])
+        $process_name->setFilters([
+            'string',
+            'trim'
         ]);
 
         $this->add($process_name);
@@ -81,18 +94,21 @@ class ProgramForm extends Form
             'value' => 1
         ]);
 
+        $numprocs->setFilters([
+            'int'
+        ]);
+
         $numprocs->addValidators([
-            new PresenceOf([
-                'message' => '进程数不能为空'
-            ]),
             new Numericality([
-                'message' => '进程数必须是数字'
+                'message' => '进程数必须是数字',
+                'allowEmpty' => true
             ]),
             new Between(
                 [
                     "minimum" => 1,
                     "maximum" => 256,
                     "message" => "进程数范围为1～256",
+                    'allowEmpty' => true
                 ]
             )
         ]);
@@ -106,12 +122,14 @@ class ProgramForm extends Form
             'value' => 0
         ]);
 
+        $numprocs_start->setFilters([
+            'int'
+        ]);
+
         $numprocs_start->addValidators([
-            new PresenceOf([
-                'message' => '进程下标起始值不能为空'
-            ]),
             new Numericality([
-                'message' => '进程下标起始值必须是数字'
+                'message' => '进程下标起始值必须是数字',
+                'allowEmpty' => true
             ])
         ]);
 
@@ -124,9 +142,12 @@ class ProgramForm extends Form
             'value' => 'www-data'
         ]);
 
-        $this->add($user);
+        $user->setFilters([
+            'string',
+            'trim'
+        ]);
 
-        $this->add($numprocs_start);
+        $this->add($user);
 
         // directory
         $directory = new Text('directory', [
@@ -149,10 +170,16 @@ class ProgramForm extends Form
             ]
         );
 
+        $autostart->setFilters([
+            'string',
+            'trim'
+        ]);
+
         $autostart->addValidators([
             new InclusionIn([
                 "domain"  => ['true', 'false'],
-                'message' => '自动启动的值只能是 true 或者 false'
+                'message' => '自动启动的值只能是 true 或者 false',
+                'allowEmpty' => true
             ])
         ]);
 
@@ -165,9 +192,14 @@ class ProgramForm extends Form
             'value' => 20
         ]);
 
+        $startretries->setFilters([
+            'int'
+        ]);
+
         $startretries->addValidators([
             new Numericality([
-                'message' => '启动重试次数必须是数字'
+                'message' => '启动重试次数必须是数字',
+                'allowEmpty' => true
             ])
         ]);
 
@@ -185,10 +217,16 @@ class ProgramForm extends Form
             ]
         );
 
+        $autorestart->setFilters([
+            'string',
+            'trim'
+        ]);
+
         $autorestart->addValidators([
             new InclusionIn([
                 "domain"  => ['true', 'false'],
-                'message' => '自动重启的值只能是 true 或者 false'
+                'message' => '自动重启的值只能是 true 或者 false',
+                'allowEmpty' => true
             ])
         ]);
 
@@ -206,10 +244,16 @@ class ProgramForm extends Form
             ]
         );
 
+        $redirect_stderr->setFilters([
+            'string',
+            'trim'
+        ]);
+
         $redirect_stderr->addValidators([
             new InclusionIn([
                 "domain"  => ['true', 'false'],
-                'message' => '错误重定向的值只能是 true 或者 false'
+                'message' => '错误重定向的值只能是 true 或者 false',
+                'allowEmpty' => true
             ])
         ]);
 
@@ -222,6 +266,11 @@ class ProgramForm extends Form
             'value' => 'AUTO'
         ]);
 
+        $stdout_logfile->setFilters([
+            'string',
+            'trim'
+        ]);
+
         $this->add($stdout_logfile);
 
         // stdout_logfile_backups
@@ -231,26 +280,37 @@ class ProgramForm extends Form
             'value' => 0
         ]);
 
+        $stdout_logfile_backups->setFilters([
+            'int'
+        ]);
+
         $stdout_logfile_backups->addValidators([
             new Numericality([
-                'message' => '标准输出日志备份数量必须是数字'
+                'message' => '标准输出日志备份数量必须是数字',
+                'allowEmpty' => true
             ]),
             new Between(
                 [
                     "minimum" => 0,
                     "maximum" => 256,
                     "message" => "准输出日志备份数量范围为1～256",
+                    'allowEmpty' => true
                 ]
             )
         ]);
 
         $this->add($stdout_logfile_backups);
 
-        // program
+        // stdout_logfile_maxbytes
         $stdout_logfile_maxbytes = new Text('stdout_logfile_maxbytes', [
             'class' => 'form-control',
             'autocomplete' => 'off',
             'value' => '1M'
+        ]);
+
+        $stdout_logfile_backups->setFilters([
+            'string',
+            'trim'
         ]);
 
         $this->add($stdout_logfile_maxbytes);
