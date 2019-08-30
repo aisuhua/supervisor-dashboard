@@ -98,7 +98,7 @@
             <tr>
                 <th>操作</th>
                 <td>
-                    <button type="submit" class="btn btn-sm btn-success">修改</button>
+                    <button type="submit" class="btn btn-sm btn-primary">修改</button>
                     <a href="/server/{{ server.id }}/config/delete" class="btn btn-sm btn-danger btn-delete">删除</a>
                     <a type="button" class="btn btn-sm btn-link btn-copy"><span class="glyphicon glyphicon-copy"></span> 复制</a>
                     <a class="btn btn-sm btn-link expand-btn"><span class="glyphicon glyphicon-menu-down"></span> 展开</a>
@@ -187,7 +187,7 @@
             <tr>
                 <th>操作</th>
                 <td>
-                    <button type="submit" class="btn btn-success">确定添加</button>
+                    <button type="submit" class="btn btn-primary">确定添加</button>
                     <a class="btn btn-sm btn-link btn-paste"><span class="glyphicon glyphicon-paste"></span> 粘贴</a>
                     <button type="reset" class="btn btn-sm btn-link"><i class="fa fa-undo" aria-hidden="true"></i> 重置</button>
                     <a class="btn btn-sm btn-link expand-btn"><span class="glyphicon glyphicon-menu-down"></span> 展开</a>
@@ -202,66 +202,6 @@
 
 <script>
 $(function() {
-
-    var editor = null;
-
-    // INI 编辑模式
-    $('#load-config').click(function(event) {
-        event.stopPropagation();
-        event.preventDefault();
-        
-        var url = $(this).attr('href');
-        $('#load-config-modal-wrapper').load(url, function() {
-
-            editor = CodeMirror.fromTextArea(document.getElementById('ini-code'),{
-                mode: "properties",
-                lineNumbers: true,
-                lineWrapping: true,
-                indentUnit: 0,
-                autoRefresh: true,
-                automaticLayout: true,
-                extraKeys: {
-                    "F11": function(cm) {
-                        cm.setOption("fullScreen", !cm.getOption("fullScreen"));
-                    },
-                    "Esc": function(cm) {
-                        if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
-                    }
-                }
-            });
-
-            $('#load-config-modal').modal({
-                show: true
-            });
-
-            $('#ini-submit').click(function() {
-                var url = $(this).attr('data-url');
-                $.post(url, {ini: editor.getValue()}, function(data) {
-                    if (!data.state) {
-                        error(data.message);
-                        return false;
-                    }
-
-                    $.pjax({
-                        url: window.location.pathname + window.location.search,
-                        container: '#pjax-container',
-                        push: true
-                    });
-
-                    $('#load-config-modal').modal('hide');
-                });
-            });
-        });
-
-        return false;
-    });
-
-    $('#load-config-modal-wrapper').on('shown.bs.modal', function() {
-        editor.refresh();
-    });
-
-//    $('#load-config').click();
-
 
     // 修改表单和添加表单
     var $formEdit = $('form.form-edit');
@@ -475,23 +415,6 @@ $(function() {
         return false;
     });
 
-
-//    $formEdit.find('.btn-copy').click(function() {
-//        var $form = $(this).closest('form');
-//
-//        $form.find('input, select').each(function(index, value) {
-//            var $element = $(value);
-//
-//            if ($element.attr('id') == 'program') {
-//                $formCreate.find('#' + $element.attr('id')).val($element.val() + '_copy');
-//            } else {
-//                $formCreate.find('#' + $element.attr('id')).val($element.val());
-//            }
-//        });
-//
-//        focusFormCreate();
-//    });
-
     $formEdit.find('.btn-copy').click(function() {
         setItem('config-copy', JSON.stringify($(this).closest('form').serializeArray()));
 
@@ -534,6 +457,70 @@ $(function() {
                 $element.val(copy[i].value);
             }
         }
+    });
+
+
+    // INI 编辑模式
+    var editor = null;
+    var modal = null;
+
+    $('#load-config').click(function(event) {
+        event.stopPropagation();
+        event.preventDefault();
+
+        var url = $(this).attr('href');
+        $('#load-config-modal-wrapper').load(url, function() {
+
+            var modal = $('#load-config-modal').modal({
+                show: true
+            });
+
+            editor = CodeMirror.fromTextArea(document.getElementById('ini-code'),{
+                mode: "properties",
+                lineNumbers: true,
+                lineWrapping: true,
+                indentUnit: 0,
+                autoRefresh: true,
+                automaticLayout: true,
+                extraKeys: {
+                    "F11": function(cm) {
+                        cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+                    },
+                    "Esc": function(cm) {
+                        if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+                    }
+                }
+            });
+
+            modal.on('shown.bs.modal', function() {
+                // editor.refresh();
+            });
+
+            $('#ini-submit').click(function() {
+
+                if (!confirm("确定要修改吗？")) {
+                    return false;
+                }
+
+                var url = $(this).attr('data-url');
+                $.post(url, {ini: editor.getValue()}, function(data) {
+                    if (!data.state) {
+                        error(data.message);
+                        return false;
+                    }
+
+                    modal.modal('hide');
+
+                    $.pjax({
+                        url: window.location.pathname + window.location.search,
+                        container: '#pjax-container',
+                        push: true
+                    });
+                });
+            });
+        });
+
+        return false;
     });
 });
 </script>
