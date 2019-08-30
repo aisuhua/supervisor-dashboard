@@ -58,6 +58,7 @@
         <label for="sync_conf_port" class="col-sm-2 control-label">sync_conf 端口</label>
         <div class="col-sm-10">
             {{ form.render('sync_conf_port') }}
+            <span id="helpBlock" class="help-block">该端口只用于更新远程主机的 Supervisor 配置。</span>
         </div>
     </div>
     <div class="form-group">

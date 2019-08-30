@@ -19,14 +19,6 @@ class ServerForm extends Form
         {
             $id = new Hidden('id');
             $this->add($id);
-
-            $username_placeholder = '留空则不修改';
-            $password_placeholder = '留空则不修改';
-        }
-        else
-        {
-            $username_placeholder = '留空则使用默认用户名';
-            $password_placeholder = '留空则使用默认密码';
         }
 
         // server_group_id
@@ -81,6 +73,9 @@ class ServerForm extends Form
         ]);
 
         $port->addValidators([
+            new PresenceOf([
+                'message' => 'Supervisor 端口不能为空'
+            ]),
             new Numericality(
                 [
                     "message" => "Supervisor 端口必须是数字",
@@ -98,11 +93,16 @@ class ServerForm extends Form
         $this->add($port);
 
         // username
-
         $username = new Text('username', [
             'class' => 'form-control',
             'autocomplete' => 'off',
-            'placeholder' => $username_placeholder
+            'value' => 'worker'
+        ]);
+
+        $username->addValidators([
+            new PresenceOf([
+                'message' => '用户名不能为空'
+            ])
         ]);
 
         $this->add($username);
@@ -111,7 +111,13 @@ class ServerForm extends Form
         $password = new Password('password', [
             'class' => 'form-control',
             'autocomplete' => 'off',
-            'placeholder' => $password_placeholder
+            'value' => 111111
+        ]);
+
+        $password->addValidators([
+            new PresenceOf([
+                'message' => '密码不能为空'
+            ])
         ]);
 
         $this->add($password);

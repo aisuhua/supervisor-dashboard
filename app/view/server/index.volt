@@ -32,6 +32,8 @@
         <th></th>
         <th>IP 地址</th>
         <th>Supervisor 端口</th>
+        <th>账号</th>
+        <th>密码</th>
         <th>sync_conf 端口</th>
         <th>配置文件路径</th>
         <th>排序字段</th>
@@ -89,23 +91,33 @@
                     orderable: false
                 },
                 {
-                    data: 'sync_conf_port',
+                    data: 'username',
                     targets: 3,
                     orderable: false
                 },
                 {
-                    data: 'conf_path',
+                    data: 'password',
                     targets: 4,
                     orderable: false
                 },
                 {
-                    data: 'sort',
+                    data: 'sync_conf_port',
                     targets: 5,
                     orderable: false
                 },
                 {
-                    data: 'update_time',
+                    data: 'conf_path',
                     targets: 6,
+                    orderable: false
+                },
+                {
+                    data: 'sort',
+                    targets: 7,
+                    orderable: false
+                },
+                {
+                    data: 'update_time',
+                    targets: 8,
                     orderable: false,
                     render: function (data, type, full, meta) {
                         var myDate = new Date(data * 1000);
@@ -114,7 +126,7 @@
                 },
                 {
                     data: 'server_group_id',
-                    targets: 7,
+                    targets: 9,
                     orderable: false,
                     visible: server_group_id <= 0,
                     render: function (data, type, full, meta) {
@@ -122,11 +134,11 @@
                     }
                 },
                 {
-                    targets: 8,
+                    targets: 10,
                     data: 'id',
                     orderable: false,
                     render: function (data, type, full, meta) {
-                        var html = '<a href="/server/'+ data +'/program" target="_blank">控制台</a> | ';
+                        var html = '<a href="/server/'+ data +'/process?ip='+ full.ip +'&port='+ full.port +'" target="_blank">控制台</a> | ';
 
                         var edit_html = '<a href="/server/edit/'+ data +'">修改</a>  | ';
                         if (server_group_id > 0)
