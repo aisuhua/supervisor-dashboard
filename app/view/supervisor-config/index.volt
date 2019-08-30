@@ -187,7 +187,7 @@
             <tr>
                 <th>操作</th>
                 <td>
-                    <button type="submit" class="btn btn-primary">确定添加</button>
+                    <button type="submit" class="btn btn-primary">添加</button>
                     <a class="btn btn-sm btn-link btn-paste"><span class="glyphicon glyphicon-paste"></span> 粘贴</a>
                     <button type="reset" class="btn btn-sm btn-link"><i class="fa fa-undo" aria-hidden="true"></i> 重置</button>
                     <a class="btn btn-sm btn-link expand-btn"><span class="glyphicon glyphicon-menu-down"></span> 展开</a>

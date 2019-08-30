@@ -235,6 +235,8 @@ class SupervisorConfigController extends ControllerSupervisorBase
 
                 if (!$success)
                 {
+                    $this->db->rollback();
+
                     $result['state'] = 0;
                     $result['message'] = "配置删除失败";
 
@@ -260,6 +262,8 @@ class SupervisorConfigController extends ControllerSupervisorBase
 
                     if (!$success)
                     {
+                        $this->db->rollback();
+
                         $result['state'] = 0;
                         $result['message'] = "配置插入失败";
 

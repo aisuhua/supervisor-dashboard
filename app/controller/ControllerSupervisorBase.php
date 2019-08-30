@@ -38,8 +38,8 @@ class ControllerSupervisorBase extends ControllerBase
             $supervisor = new Supervisor(
                 $server->id,
                 $server->ip,
-                $server->username ? $server->username : 'worker',
-                $server->password ? $server->password : '111111',
+                $server->username,
+                $server->password,
                 $server->port
             );
 
