@@ -180,7 +180,7 @@ $router->add(
 );
 
 $router->add(
-    '/server/{server_id:[0-9]+}/process/{name:\w+:\w+}/stop',
+    '/server/{server_id:[0-9]+}/process/{name:[^:]+:[^:]+}/stop',
     [
         'controller' => 'process',
         'action' => 'stop'
@@ -188,7 +188,7 @@ $router->add(
 );
 
 $router->add(
-    '/server/{server_id:[0-9]+}/process/{name:\w+:\w+}/start',
+    '/server/{server_id:[0-9]+}/process/{name:[^:]+:[^:]+}/start',
     [
         'controller' => 'process',
         'action' => 'start'
@@ -196,7 +196,7 @@ $router->add(
 );
 
 $router->add(
-    '/server/{server_id:[0-9]+}/process/{name:\w+:\w+}/restart',
+    '/server/{server_id:[0-9]+}/process/{name:[^:]+:[^:]+}/restart',
     [
         'controller' => 'process',
         'action' => 'restart'
@@ -204,7 +204,7 @@ $router->add(
 );
 
 $router->add(
-    '/server/{server_id:[0-9]+}/process/{name:\w+:\w+}/taillog',
+    '/server/{server_id:[0-9]+}/process/{name:[^:]+:[^:]+}/taillog',
     [
         'controller' => 'process',
         'action' => 'tailLog'
@@ -212,7 +212,7 @@ $router->add(
 );
 
 $router->add(
-    '/server/{server_id:[0-9]+}/process/{name:\w+:\w+}/clearlog',
+    '/server/{server_id:[0-9]+}/process/{name:[^:]+:[^:]+}/clearlog',
     [
         'controller' => 'process',
         'action' => 'clearLog'

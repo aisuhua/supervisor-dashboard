@@ -48,7 +48,13 @@ class ProgramForm extends Form
         $program->addValidators([
             new PresenceOf([
                 'message' => '程序名不能为空'
-            ])
+            ]),
+            new Regex(
+                [
+                    "pattern" => '/^[0-9A-Za-z\.\-_]+$/',
+                    "message" => "程序名只能包含数字、字母、下划线、英文句号 . 和 - 横杆字符"
+                ]
+            )
         ]);
 
         $this->add($program);
