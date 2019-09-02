@@ -63,4 +63,29 @@ class Program extends Model
 
         return $this->validate($validator);
     }
+
+    public static function formatIniConfig($programs)
+    {
+        $ini = '';
+        foreach ($programs as $program)
+        {
+            /** @var Program $program */
+            $ini .= "[program:{$program->program}]" . PHP_EOL;
+            $ini .= "command={$program->command}" . PHP_EOL;
+            $ini .= "process_name={$program->process_name}" . PHP_EOL;
+            $ini .= "numprocs={$program->numprocs}" . PHP_EOL;
+            $ini .= "numprocs_start={$program->numprocs_start}" . PHP_EOL;
+            $ini .= "user={$program->user}" . PHP_EOL;
+            $ini .= "directory={$program->directory}" . PHP_EOL;
+            $ini .= "autostart={$program->autostart}" . PHP_EOL;
+            $ini .= "startretries={$program->startretries}" . PHP_EOL;
+            $ini .= "autorestart={$program->autorestart}" . PHP_EOL;
+            $ini .= "redirect_stderr={$program->redirect_stderr}" . PHP_EOL;
+            $ini .= "stdout_logfile={$program->stdout_logfile}" . PHP_EOL;
+            $ini .= "stdout_logfile_backups={$program->stdout_logfile_backups}" . PHP_EOL;
+            $ini .= "stdout_logfile_maxbytes={$program->stdout_logfile_maxbytes}" . PHP_EOL;
+        }
+
+        return $ini;
+    }
 }

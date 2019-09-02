@@ -86,7 +86,7 @@ class ProgramForm extends Form
         }, $cmd);
 
         $cmd_str = implode('|', $cmd);
-        $pattern = "/(^({$cmd_str})\s+[a-zA-Z\._\-\s]{1,255}$)|(^\/bin\/cat$)/";
+        $pattern = "/(^({$cmd_str})\s+[0-9a-zA-Z\._\-\s=\/]{1,255}$)|(^\/bin\/cat$)/";
 
         $command->addValidators([
             new PresenceOf([
@@ -334,7 +334,7 @@ class ProgramForm extends Form
         $stdout_logfile_maxbytes = new Text('stdout_logfile_maxbytes', [
             'class' => 'form-control',
             'autocomplete' => 'off',
-            'value' => '1M'
+            'value' => '1MB'
         ]);
 
         $stdout_logfile_backups->setFilters([

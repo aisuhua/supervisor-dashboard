@@ -155,11 +155,12 @@ class ProcessController extends ControllerSupervisorBase
         $callback = function() use ($name)
         {
             // 只看前面 1M 的日志
+            // 注意这里应开启 strip_ansi = true，否则当日志含有 ansi 字符时讲无法查看日志
             $log = $this->supervisor->tailProcessStdoutLog($name, 0, 1 * 1024 * 1024);
             $this->view->log = $log;
         };
         $this->setCallback($callback);
-        $this->invoke();
+        $this->invoke(30);
 
         $this->view->disableLevel([
             View::LEVEL_LAYOUT => true,
@@ -277,6 +278,131 @@ class ProcessController extends ControllerSupervisorBase
                 View::LEVEL_NO_RENDER
             );
         }
+    }
+
+    public function reloadConfigAction($server_id)
+    {
+        $result = [];
+
+        $programs = Program::find([
+            'server_id = :server_id:',
+            'bind' => [
+                'server_id' => $server_id
+            ],
+            'order' => 'program asc, id asc'
+        ]);
+
+        $ini = Program::formatIniConfig($programs);
+
+        $url = "http://{$this->server->ip}:{$this->server->sync_conf_port}/write";
+        $post_data = [];
+        $post_data['file_path'] = $this->server->conf_path;
+        $post_data['content'] = $ini;
+        $post_data['timestamp'] = (string) time();
+
+        $auth_key = 'Mx#d7Xp%ks7m3R1g&XmoUw%9qQ74ehor';
+        $post_data['token'] = strtoupper(md5(
+            $post_data['file_path'] . ':' . $post_data['content'] . ':' . $post_data['timestamp'] . ':' . $auth_key
+        ));
+
+        $ret = curl_post($url, json_encode($post_data));
+        $ret = json_decode($ret, true);
+
+        if (!$ret['state'])
+        {
+            $result['state'] = 0;
+            $result['message'] = $ret['message'];
+
+            return $this->response->setJsonContent($result);
+        }
+
+        $added = [];
+        $changed = [];
+        $removed = [];
+
+        $callback = function() use (&$added, &$changed, &$removed)
+        {
+            list($added, $changed, $removed) = $this->supervisor->reloadConfig()[0];
+        };
+        $this->setCallback($callback);
+        $this->invoke();
+
+        $messages = [];
+        if (!empty($added))
+        {
+            foreach ($added as $key => $item)
+            {
+                $messages[] = "{$item} 正在添加";
+            }
+        }
+
+        if (!empty($removed))
+        {
+            foreach ($removed as $key => $item)
+            {
+                $messages[] = "{$item} 正在删除";
+            }
+        }
+
+        if (!empty($changed))
+        {
+            foreach ($changed as $key => $item)
+            {
+                $messages[] = "{$item} 正在更新";
+            }
+        }
+
+        if (empty($messages))
+        {
+            $result['state'] = 2;
+            $result['message'] = "没有配置需要更新";
+        }
+        else
+        {
+            $result['state'] = 1;
+            $result['message'] = $this->formatMessage(implode("\n", $messages));
+        }
+
+        $this->response->setJsonContent($result)->send();
+
+        fastcgi_finish_request();
+
+        foreach ($added as $group)
+        {
+            $callback = function() use ($group)
+            {
+                $this->supervisor->addProcessGroup($group);
+            };
+            $this->setCallback($callback);
+            $this->invoke();
+        }
+
+        foreach ($changed as $group)
+        {
+            $callback = function() use ($group)
+            {
+                $this->supervisor->stopProcessGroup($group);
+                $this->supervisor->removeProcessGroup($group);
+                $this->supervisor->addProcessGroup($group);
+            };
+            $this->setCallback($callback);
+            $this->invoke();
+        }
+
+        foreach ($removed as $group)
+        {
+            $callback = function() use ($group)
+            {
+                $this->supervisor->stopProcessGroup($group);
+                $this->supervisor->removeProcessGroup($group);
+            };
+            $this->setCallback($callback);
+            $this->invoke();
+        }
+
+        $this->view->setRenderLevel(
+            View::LEVEL_NO_RENDER
+        );
     }
 }
 

@@ -42,4 +42,19 @@ class Supervisor extends SupervisorBase
     {
         return $this->rpcClient->call('supervisor.restart');
     }
+
+    public function reloadConfig()
+    {
+        return $this->rpcClient->call('supervisor.reloadConfig');
+    }
+
+    public function addProcessGroup($name)
+    {
+        return $this->rpcClient->call('supervisor.addProcessGroup', array($name));
+    }
+
+    public function removeProcessGroup($name)
+    {
+        return $this->rpcClient->call('supervisor.removeProcessGroup', array($name));
+    }
 }

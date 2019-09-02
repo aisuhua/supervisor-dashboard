@@ -68,7 +68,7 @@ function success(message, options = {}) {
     clearSuccess();
 
     options.text = message;
-    options.delay = 1500;
+    // options.delay = 1500;
     options = applyDefault(options);
     PNotify.success(options);
 }

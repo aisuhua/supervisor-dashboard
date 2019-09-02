@@ -1,4 +1,13 @@
 <?php
+/**
+ * Include vendor
+ */
+include BASE_PATH . '/vendor/autoload.php';
+
+/**
+ * Other library
+ */
+include APP_PATH . '/library/function.php';
 
 $loader = new \Phalcon\Loader();
 

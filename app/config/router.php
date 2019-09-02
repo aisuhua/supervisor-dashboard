@@ -245,5 +245,13 @@ $router->add(
     ]
 );
 
+$router->add(
+    '/server/{server_id:[0-9]+}/process/reload-config',
+    [
+        'controller' => 'process',
+        'action' => 'reloadConfig'
+    ]
+);
+
 
 $router->handle();

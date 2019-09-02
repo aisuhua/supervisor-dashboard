@@ -37,11 +37,6 @@ define('APP_PATH', BASE_PATH . '/app');
     include APP_PATH . '/config/loader.php';
 
     /**
-     * Include vendor
-     */
-    include BASE_PATH . '/vendor/autoload.php';
-
-    /**
      * Handle the request
      */
     $application = new \Phalcon\Mvc\Application($di);

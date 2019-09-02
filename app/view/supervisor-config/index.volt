@@ -380,7 +380,7 @@ $(function() {
             if (data.state) {
                 var tmp = data.data;
                 for (var key in tmp) {
-                    $formEdit.find('#' + key).val(tmp[key]);
+                    $(this).find('#' + key).val(tmp[key]);
                 }
 
                 success(data.message);
@@ -492,8 +492,12 @@ $(function() {
                 }
             });
 
-            modal.on('shown.bs.modal', function() {
-                // editor.refresh();
+            modal.on('hidden.bs.modal', function() {
+                $.pjax({
+                    url: window.location.pathname + window.location.search,
+                    container: '#pjax-container',
+                    push: true
+                });
             });
 
             $('#ini-submit').click(function() {
@@ -509,13 +513,8 @@ $(function() {
                         return false;
                     }
 
-                    modal.modal('hide');
-
-                    $.pjax({
-                        url: window.location.pathname + window.location.search,
-                        container: '#pjax-container',
-                        push: true
-                    });
+                    // modal.modal('hide');
+                    success(data.message);
                 });
             });
         });

@@ -58,10 +58,10 @@ class ControllerSupervisorBase extends ControllerBase
         $this->callback = $callback;
     }
 
-    protected function invoke()
+    protected function invoke($timeout = 300)
     {
         $exception = null;
-        for ($i = 1; $i <= 3600; $i++)
+        for ($i = 1; $i <= $timeout * 2; $i++)
         {
             try
             {

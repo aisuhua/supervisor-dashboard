@@ -9,7 +9,7 @@
     <div class="btn-group" role="group">
         {#<a href="/server/{{ server.id }}/config?ip={{ server.ip }}&port={{ server.port }}#form-create" class="btn btn-default form-create">添加配置</a>#}
         <a href="/server/{{ server.id }}/config?ip={{ server.ip }}&port={{ server.port }}" class="btn btn-default form-edit">修改配置</a>
-        <a href="#" class="btn btn-default">更新配置</a>
+        <a href="/server/{{ server.id }}/process/reload-config?ip={{ server.ip }}&port={{ server.port }}" class="btn btn-default update-config">更新配置</a>
         {#<a href="/server/{{ server.id }}/supervisor/readlog?ip={{ server.ip }}&port={{ server.port }}" target="_blank" class="btn btn-default read_log">服务日志</a>#}
         {#<a href="/server/{{ server.id }}/process?ip={{ server.ip }}&port={{ server.port }}" class="btn btn-default">刷新页面</a>#}
         <div class="btn-group">
@@ -169,7 +169,7 @@ $(function () {
         return false;
     });
 
-    var $links = $('.start, .restart, .stop, .clear_log').unbind();
+    var $links = $('.start, .restart, .stop, .clear_log, .update-config').unbind();
     $links.click(function(event) {
         event.stopPropagation();
 
@@ -183,5 +183,28 @@ $(function () {
         });
         return false;
     });
+
+//    $('.update-config').click(function() {
+//        event.stopPropagation();
+//
+//        var url = $(this).attr('href');
+//        $.get(url, function(data) {
+//            if (data.state == 1) {
+//                success(data.message);
+////                $.pjax({
+////                    url: window.location.pathname + window.location.search,
+////                    container: '#pjax-container',
+////                    push: true
+////                });
+//                window.locationre
+//            } else if (data.state == 2) {
+//                success(data.message);
+//            } else {
+//                error(data.message);
+//            }
+//        });
+//
+//        return false;
+//    });
 });
 </script>

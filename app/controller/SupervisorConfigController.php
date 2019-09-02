@@ -165,7 +165,7 @@ class SupervisorConfigController extends ControllerSupervisorBase
         return $this->response->setJsonContent($result);
     }
 
-    public function iniModeAction()
+    public function iniModeAction($server_id)
     {
         if ($this->request->isPost())
         {
@@ -182,19 +182,29 @@ class SupervisorConfigController extends ControllerSupervisorBase
 
             $form = new ProgramForm();
             $filtered = [];
+            $duplicate_name = [];
 
             foreach ($ini_parsed as $key => $value)
             {
                 if (!preg_match("/^program:[a-zA-Z0-9_\-]{1,255}$/", trim($key), $matches))
                 {
                     $result['state'] = 0;
-                    $result['message'] = "配置文件格式不对：{$key}";
+                    $result['message'] = "{$key} 配置格式不对";
 
                     return $this->response->setJsonContent($result);
                 }
 
                 $value['program'] = explode(':', trim($key))[1];
                 $value['server_id'] = $this->server->id;
+
+                if (in_array($value['program'], $duplicate_name))
+                {
+                    $result['state'] = 0;
+                    $result['message'] = "{$value['program']} 程序名不能重复";
+
+                    return $this->response->setJsonContent($result);
+                }
+                $duplicate_name[] = $value['program'];
 
                 // 验证配置文件是否填写正确
                 if (!$form->isValid($value))
@@ -230,7 +240,7 @@ class SupervisorConfigController extends ControllerSupervisorBase
             {
                 $this->db->begin();
 
-                $sql = "DELETE FROM program WHERE server_id = {$this->server->id}";
+                $sql = "DELETE FROM program WHERE server_id = {$server_id}";
                 $success = $this->db->execute($sql);
 
                 if (!$success)
@@ -283,8 +293,6 @@ class SupervisorConfigController extends ControllerSupervisorBase
                 return $this->response->setJsonContent($result);
             }
 
-            $this->flashSession->success('修改成功');
-
             $result['state'] = 1;
             $result['message'] = "修改成功";
 
@@ -299,33 +307,10 @@ class SupervisorConfigController extends ControllerSupervisorBase
             'order' => 'program asc, id asc'
         ]);
 
-        $ini = '';
-        foreach ($programs as $program)
-        {
-            /** @var Program $program */
-            $ini .= "[program:{$program->program}]" . PHP_EOL;
-            $ini .= "command={$program->command}" . PHP_EOL;
-            $ini .= "process_name={$program->process_name}" . PHP_EOL;
-            $ini .= "numprocs={$program->numprocs}" . PHP_EOL;
-            $ini .= "numprocs_start={$program->numprocs_start}" . PHP_EOL;
-            $ini .= "user={$program->user}" . PHP_EOL;
-            $ini .= "directory={$program->directory}" . PHP_EOL;
-            $ini .= "autostart={$program->autostart}" . PHP_EOL;
-            $ini .= "startretries={$program->startretries}" . PHP_EOL;
-            $ini .= "autorestart={$program->autorestart}" . PHP_EOL;
-            $ini .= "redirect_stderr={$program->redirect_stderr}" . PHP_EOL;
-            $ini .= "stdout_logfile={$program->stdout_logfile}" . PHP_EOL;
-            $ini .= "stdout_logfile_backups={$program->stdout_logfile_backups}" . PHP_EOL;
-            $ini .= "stdout_logfile_maxbytes={$program->stdout_logfile_maxbytes}" . PHP_EOL;
-        }
+        $ini = Program::formatIniConfig($programs);
 
         $this->view->programs = $programs;
-        $this->view->ini = trim($ini);
+        $this->view->ini = $ini;
         $this->view->setRenderLevel(View::LEVEL_ACTION_VIEW);
-    }
-
-    public function loadServerAction()
-    {
-
     }
 }
