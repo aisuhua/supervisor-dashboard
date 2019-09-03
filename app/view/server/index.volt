@@ -32,10 +32,10 @@
         <th></th>
         <th>IP 地址</th>
         <th>Supervisor 端口</th>
-        <th>账号</th>
-        <th>密码</th>
-        <th>sync_conf 端口</th>
-        <th>配置文件路径</th>
+        <th>Supervisor 用户名</th>
+        <th>Supervisor 密码</th>
+        <th>sync 端口</th>
+        <th>sync 配置文件路径</th>
         <th>排序字段</th>
         <th>更新时间</th>
         <th>所属分组</th>

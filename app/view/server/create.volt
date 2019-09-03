@@ -43,26 +43,26 @@
         </div>
     </div>
     <div class="form-group">
-        <label for="username" class="col-sm-2 control-label">用户名</label>
+        <label for="username" class="col-sm-2 control-label">Supervisor 用户名</label>
         <div class="col-sm-10">
             {{ form.render('username') }}
         </div>
     </div>
     <div class="form-group">
-        <label for="password" class="col-sm-2 control-label">密码</label>
+        <label for="password" class="col-sm-2 control-label">Supervisor 密码</label>
         <div class="col-sm-10">
             {{ form.render('password') }}
         </div>
     </div>
     <div class="form-group">
-        <label for="sync_conf_port" class="col-sm-2 control-label">sync_conf 端口</label>
+        <label for="sync_conf_port" class="col-sm-2 control-label">sync 端口</label>
         <div class="col-sm-10">
             {{ form.render('sync_conf_port') }}
             <span id="helpBlock" class="help-block">该端口只用于更新远程主机的 Supervisor 配置。</span>
         </div>
     </div>
     <div class="form-group">
-        <label for="conf_path" class="col-sm-2 control-label">配置文件路径</label>
+        <label for="conf_path" class="col-sm-2 control-label">sync 配置文件路径</label>
         <div class="col-sm-10">
             {{ form.render('conf_path') }}
         </div>

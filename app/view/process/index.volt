@@ -91,7 +91,7 @@
             <a class="btn btn-xs btn-warning restart" href="/server/{{ server.id }}/process/{{ processGroup }}/restart">重启</a>&nbsp;
             <a class="btn btn-xs btn-warning start" href="/server/{{ server.id }}/process/{{ processGroup }}/start">启动</a>&nbsp;
             <a class="btn btn-xs btn-warning stop" href="/server/{{ server.id }}/process/{{ processGroup }}/stop">停止</a>&nbsp;
-            <a class="btn btn-xs btn-warning" href="/server/{{ server.id }}/config?ip={{ server.ip }}&port={{ server.port }}#{{ processGroup }}">修改</a>&nbsp;
+            {#<a class="btn btn-xs btn-warning" href="/server/{{ server.id }}/config?ip={{ server.ip }}&port={{ server.port }}#{{ processGroup }}">修改</a>&nbsp;#}
             {#<a class="btn btn-xs btn-warning">复制</a>&nbsp;#}
             {#<a class="btn btn-xs btn-warning">删除</a>#}
         </th>

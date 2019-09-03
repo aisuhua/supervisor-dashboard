@@ -46,7 +46,7 @@ class ServerController extends ControllerBase
             'bind' => $bind,
             'limit' => $limit,
             'offset' => $offset,
-            'order' => 'sort desc'
+            'order' => 'sort desc, ip asc'
         ]);
 
         $total = Server::count();
