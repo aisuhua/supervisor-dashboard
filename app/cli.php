@@ -15,30 +15,50 @@ include APP_PATH . '/config/services.php';
 $config = $di->getConfig();
 include APP_PATH . '/config/loader.php';
 
+$loader->registerDirs(
+    [
+        APP_PATH . '/task',
+        APP_PATH . '/cron',
+    ]
+);
+
 $console = new ConsoleApp();
 $console->setDI($di);
 
 $arguments = [];
 
-foreach ($argv as $k => $arg) {
-    if ($k === 1) {
+foreach ($argv as $k => $arg)
+{
+    if ($k === 1)
+    {
         $arguments['task'] = $arg;
-    } elseif ($k === 2) {
+    }
+    elseif ($k === 2)
+    {
         $arguments['action'] = $arg;
-    } elseif ($k >= 3) {
+    }
+    elseif ($k >= 3)
+    {
         $arguments['params'][] = $arg;
     }
 }
 
-try {
+try
+{
     $console->handle($arguments);
-} catch (\Phalcon\Exception $e) {
+}
+catch (\Phalcon\Exception $e)
+{
     fwrite(STDERR, $e->getMessage() . PHP_EOL);
     exit(1);
-} catch (\Throwable $throwable) {
+}
+catch (\Throwable $throwable)
+{
     fwrite(STDERR, $throwable->getMessage() . PHP_EOL);
     exit(1);
-} catch (\Exception $exception) {
+}
+catch (\Exception $exception)
+{
     fwrite(STDERR, $exception->getMessage() . PHP_EOL);
     exit(1);
 }
