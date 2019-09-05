@@ -9,7 +9,8 @@
         {% set index_class = 'active' %}
     {% elseif dispatcher.getActionName() == 'create' or
         dispatcher.getActionName() == 'edit' or
-        dispatcher.getActionName() == 'createIni'
+        dispatcher.getActionName() == 'createIni' or
+        dispatcher.getActionName() == 'editIni'
     %}
         {% set create_class = 'active' %}
     {% elseif dispatcher.getActionName() == 'ini' %}

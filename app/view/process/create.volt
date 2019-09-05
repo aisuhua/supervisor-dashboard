@@ -15,7 +15,7 @@
 {% set simple_class = '' %}
 {% set advanced_class = '' %}
 
-{% if create_ini is not empty %}
+{% if mode is not empty %}
     {% set advanced_class = 'active' %}
 {% else %}
     {% set simple_class = 'active' %}
@@ -88,7 +88,7 @@
                 <label for="stdout_logfile_maxbytes">标准输出日志的最大字节数</label>
                 {{ form.render('stdout_logfile_maxbytes') }}
             </div>
-            <button type="submit" class="btn btn-primary">提交</button>
+            <button type="submit" class="btn btn-primary">确认添加</button>
         </form>
     </div>
 
@@ -100,7 +100,7 @@
             <div class="form-group">
                 <textarea id="ini" name="ini">{{ ini }}</textarea>
             </div>
-            <button type="submit" class="btn btn-primary">提交</button>
+            <button type="submit" class="btn btn-primary">确认添加</button>
         </form>
     </div>
 </div>

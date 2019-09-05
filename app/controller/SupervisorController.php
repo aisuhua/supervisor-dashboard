@@ -46,45 +46,12 @@ class SupervisorController extends ControllerSupervisorBase
 
     public function restartAction()
     {
-        $wait = (bool)$this->request->get('wait', 'int', 1);
-
         $callback1 = function ()
         {
             $this->supervisor->restart();
         };
         $this->setCallback($callback1);
         $this->invoke();
-
-        if ($wait)
-        {
-            $timeout = 10;
-            $start_time = time();
-            $has_starting = true;
-
-            // 10 秒内如果还有启动中的脚本则不再检测
-            while (time() - $start_time < $timeout && $has_starting)
-            {
-                $has_starting = false;
-
-                $callback2 = function () use (&$has_starting)
-                {
-                    $allProcessInfo = $this->supervisor->getAllProcessInfo();
-                    foreach ($allProcessInfo as $processInfo)
-                    {
-                        if ($processInfo['statename'] == 'STARTING')
-                        {
-                            $has_starting = true;
-                            break;
-                        }
-                    }
-                };
-                $this->setCallback($callback2);
-                $this->invoke();
-            }
-
-            $this->flashSession->success("Supervisor 重启完成");
-            return $this->redirectToIndex();
-        }
 
         $result = [];
         $result['state'] = 1;

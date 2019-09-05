@@ -99,7 +99,7 @@ function notice(message, options = {}) {
 
 function flash() {
     // 先关闭已有的提示窗
-    // PNotify.closeAll();
+    PNotify.closeAll();
     // clearSuccess();
 
     var $pnotify = $('.pnotify');

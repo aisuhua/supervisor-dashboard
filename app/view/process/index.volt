@@ -10,25 +10,22 @@
     <div class="btn-group btn-group-sm" role="group">
         {#<a href="/server/{{ server.id }}/config?ip={{ server.ip }}&port={{ server.port }}#form-create" class="btn btn-default form-create">添加配置</a>#}
         {#<a href="/server/{{ server.id }}/config?ip={{ server.ip }}&port={{ server.port }}" class="btn btn-default form-edit">修改配置</a>#}
-        <a href="/process/reloadConfig?server_id={{ server.id }}&ip={{ server.ip }}&port={{ server.port }}" class="btn btn-default update-config">同步配置</a>
-        <a href="/process/restartall?server_id={{ server.id }}" class="btn btn-default restartall" data-confirm="真的要重启所有进程吗？">重启所有</a>
-        <a href="/process/stopall?server_id={{ server.id }}" class="btn btn-default stopall" data-confirm="真的要停止所有进程吗？">停止所有</a>
-        <a href="/supervisor/restart?server_id={{ server.id }}" class="btn btn-default restart_supervisor" data-confirm="真的要重启 Supervisor 服务吗？">重启服务</a>
+
         <a href="/supervisor/readLog?server_id={{ server.id }}&ip={{ server.ip }}&port={{ server.port }}" target="_blank" class="btn btn-default read_log">服务日志</a>
         {#<a href="/server/{{ server.id }}/supervisor/readlog?ip={{ server.ip }}&port={{ server.port }}" target="_blank" class="btn btn-default read_log">服务日志</a>#}
         {#<a href="/server/{{ server.id }}/process?ip={{ server.ip }}&port={{ server.port }}" class="btn btn-default">刷新页面</a>#}
-        {#<div class="btn-group btn-group-sm">#}
-            {#<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">#}
-                {#更多 <span class="caret"></span>#}
-            {#</button>#}
-            {#<ul class="dropdown-menu">#}
-                {#<li><a href="/server/{{ server.id }}/process/restartall" class="restartall">重启所有进程</a></li>#}
-                {#<li><a href="/server/{{ server.id }}/process/stopall" class="stopall">停止所有进程</a></li>#}
-                {#<li><a href="/server/{{ server.id }}/supervisor/restart" class="restart_supervisor">重启 Supervisor</a></li>#}
-                {#<li><a href="/server/{{ server.id }}/supervisor/readlog?ip={{ server.ip }}&port={{ server.port }}" target="_blank" class="read_log">查看 Supervisor 日志</a></li>#}
+        <div class="btn-group btn-group-sm">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                更多 <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <li><a href="/process/reloadConfig?server_id={{ server.id }}&ip={{ server.ip }}&port={{ server.port }}" class="update-config" title="">同步配置</a></li>
+                <li><a href="/process/restartAll?server_id={{ server.id }}" class="restartall" data-confirm="真的要重启所有进程吗？">重启所有进程</a></li>
+                <li><a href="/process/stopAll?server_id={{ server.id }}" class="stopall" data-confirm="真的要停止所有进程吗？">停止所有进程</a></li>
+                <li><a href="/supervisor/restart?server_id={{ server.id }}" class="restart_supervisor" data-confirm="真的要重启 Supervisor 服务吗？">重启 Supervisor 服务</a></li>
                 {#<li><a href="/server/{{ server.id }}/supervisor/shutdown">停止服务</a></li>#}
-            {#</ul>#}
-        {#</div>#}
+            </ul>
+        </div>
     </div>
 </div>
 
@@ -86,23 +83,23 @@
     </thead>
     <tbody>
 
-    {% for processGroup in processGroups %}
+    {% for group in process_groups %}
     <tr>
         <th colspan="4">
-            <span class="label label-info" style="font-size:14px">{{ processGroup }}</span>&nbsp;
+            <span class="label label-info" style="font-size:14px">{{ group['program'] }}</span>&nbsp;
             {#<span class="process-group-tip">(没有负责人，请<a href="#">设置</a>)</span>#}
         </th>
         <th>
-            <a class="btn btn-xs btn-warning restart" href="/process/restartGroup?server_id={{ server.id }}&group={{ processGroup }}">重启</a>&nbsp;
-            <a class="btn btn-xs btn-warning start" href="/process/startGroup?server_id={{ server.id }}&group={{ processGroup }}">启动</a>&nbsp;
-            <a class="btn btn-xs btn-warning stop" href="/process/stopGroup?server_id={{ server.id }}&group={{ processGroup }}">停止</a>&nbsp;
-            <a class="btn btn-xs btn-warning" href="#">修改</a>&nbsp;
+            <a class="btn btn-xs btn-warning restart" href="/process/restartGroup?server_id={{ server.id }}&group={{ group['program'] }}">重启</a>&nbsp;
+            <a class="btn btn-xs btn-warning start" href="/process/startGroup?server_id={{ server.id }}&group={{ group['program'] }}">启动</a>&nbsp;
+            <a class="btn btn-xs btn-warning stop" href="/process/stopGroup?server_id={{ server.id }}&group={{ group['program'] }}">停止</a>&nbsp;
+            <a class="btn btn-xs btn-warning" href="/process/edit/{{ group['id'] }}?server_id={{ server.id }}&ip={{ server.ip }}&port={{ server.port }}">修改</a>&nbsp;
             <a class="btn btn-xs btn-warning" href="#">复制</a>&nbsp;
-            <a class="btn btn-xs btn-warning delete" href="/process/delete?server_id={{ server.id }}&group={{ processGroup }}" data-confirm="真的要删除 {{ processGroup }} 吗？">删除</a>
+            <a class="btn btn-xs btn-warning delete" href="/process/delete/{{ group['id'] }}?server_id={{ server.id }}" data-confirm="真的要删除 {{ group['program'] }} 吗？">删除</a>
         </th>
     </tr>
         {% for process in processes %}
-            {% if process['group'] == processGroup %}
+            {% if process['group'] == group['program'] %}
             <tr>
                 <td>{{ process['pid'] }}</td>
                 <td>{{ process['name'] }}</td>

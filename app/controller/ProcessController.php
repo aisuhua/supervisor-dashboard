@@ -5,21 +5,39 @@ class ProcessController extends ControllerSupervisorBase
 {
     public function indexAction()
     {
-        $callback = function ()
+        $processes = [];
+        $callback = function () use (&$processes)
         {
             $processes = $this->supervisor->getAllProcessInfo();
-            $processGroups = array_unique(array_column($processes, 'group'));
-            $process_warnings = array_filter($processes, function($process) {
-                return $process['statename'] != 'RUNNING';
-            });
-
-            $this->view->processes = $processes;
-            $this->view->processGroups = $processGroups;
-            $this->view->process_warnings = $process_warnings;
         };
 
         $this->setCallback($callback);
         $this->invoke();
+
+        $process_groups = array_unique(array_column($processes, 'group'));
+        $process_warnings = array_filter($processes, function($process) {
+            return $process['statename'] != 'RUNNING';
+        });
+
+        $local_processes = Process::find([
+            "server_id = {$this->server->id}"
+        ])->toArray();
+
+        $key_parts = array_column($local_processes, null, 'program');
+
+        $process_group_merge = [];
+        foreach ($process_groups as $key => $process_group)
+        {
+            $process_group_merge[$key] = ['program' => $process_group];
+            if (isset($key_parts[$process_group]))
+            {
+                $process_group_merge[$key] += $key_parts[$process_group];
+            }
+        }
+
+        $this->view->processes = $processes;
+        $this->view->process_groups = $process_group_merge;
+        $this->view->process_warnings = $process_warnings;
     }
 
     public function stopAction()
@@ -384,15 +402,22 @@ class ProcessController extends ControllerSupervisorBase
         );
     }
 
-    public function editAction()
+    public function editAction($id)
     {
-        $result = [];
-        $id = $this->request->get('id', 'int', 0);
-
+        /** @var Process $process */
         $process = Process::findFirst($id);
 
         if ($this->request->isPost())
         {
+            if ($this->request->getPost('mode') == 'ini')
+            {
+                $this->dispatcher->forward([
+                    'action' => 'editIni'
+                ]);
+
+                return;
+            }
+
             $form = new ProcessForm($process, [
                 'edit' => true
             ]);
@@ -401,32 +426,102 @@ class ProcessController extends ControllerSupervisorBase
             {
                 foreach ($form->getMessages() as $message)
                 {
-                    $result['state'] = 0;
-                    $result['message'] = $message->getMessage();
-
-                    return $this->response->setJsonContent($result);
+                    $this->flash->error($message->getMessage());
                 }
             }
-
-            if (!$process->save())
+            else
             {
-                foreach ($process->getMessages() as $message)
+                if (!$process->update())
                 {
-                    $result['state'] = 0;
-                    $result['message'] = $message->getMessage();
-
-                    return $this->response->setJsonContent($result);
+                    $this->flash->error($process->getMessages());
+                }
+                else
+                {
+                    $this->flash->success("修改成功");
+                    $form->clear();
+                    $this->view->reload_config = true;
                 }
             }
-
-            $this->flashSession->success("修改成功");
-            $form->clear();
         }
 
-//        $this->view->process = $process;
-//        $this->view->form = new ProcessForm($process, [
-//            'edit' => true
-//        ]);
+        $this->view->process = $process;
+        $this->view->form = new ProcessForm($process, [
+            'edit' => true
+        ]);
+        $this->view->ini = $process->getIni();
+    }
+
+    public function editIniAction($id)
+    {
+        /** @var Process $process */
+        $process = Process::findFirst($id);
+
+        if ($this->request->isPost())
+        {
+            $server_id = $this->request->getPost('server_id', 'int');
+            $ini = $this->request->getPost('ini');
+
+            $parsed = parse_ini_string($ini, true, INI_SCANNER_RAW);
+            if (empty($parsed))
+            {
+                $this->flash->error('配置解析错误');
+            }
+            else
+            {
+                $key = trim(key($parsed));
+                $value = current($parsed);
+
+                if (!preg_match("/^program:[a-zA-Z0-9_\-]{1,255}$/", $key, $matches))
+                {
+                    $this->flash->error('配置解析错误');
+                }
+                else
+                {
+                    $value['program'] = explode(':', $key)[1];
+                    $value['server_id'] = $server_id;
+                    // Process::applyDefaultValue($value);
+
+                    $form = new ProcessForm($process, [
+                        'edit' => true
+                    ]);
+                    //$form->bind($value, $process);
+
+                    if (!$form->isValid($value))
+                    {
+                        foreach ($form->getMessages() as $message)
+                        {
+                            $this->flash->error($message->getMessage());
+                        }
+                    }
+                    else
+                    {
+                        if (!$process->update())
+                        {
+                            $this->flash->error($process->getMessages());
+                        }
+                        else
+                        {
+                            unset($ini);
+                            $form->clear();
+                            $this->flash->success("修改成功");
+                            $this->view->reload_config = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        $this->view->pick('process/edit');
+        $this->view->mode = 'ini';
+
+        // 重新查询一次防止更新失败被污染
+        $process = Process::findFirst($id);
+        $this->view->process = $process;
+        $this->view->form = new ProcessForm($process, [
+            'edit' => true
+        ]);
+        $this->view->ini = isset($ini) ? $ini : $process->getIni();
+
     }
 
     public function createAction()
@@ -437,9 +532,11 @@ class ProcessController extends ControllerSupervisorBase
         {
             if ($this->request->getPost('mode') == 'ini')
             {
-                return $this->dispatcher->forward([
+                $this->dispatcher->forward([
                     'action' => 'createIni'
                 ]);
+
+                return;
             }
 
             $process = new Process();
@@ -498,7 +595,7 @@ class ProcessController extends ControllerSupervisorBase
                 {
                     $value['program'] = explode(':', $key)[1];
                     $value['server_id'] = $server_id;
-                    Process::applyDefaultValue($value);
+                    // Process::applyDefaultValue($value);
 
                     $process = new Process();
                     $form->bind($value, $process);
@@ -523,30 +620,23 @@ class ProcessController extends ControllerSupervisorBase
                             $this->view->reload_config = true;
                         }
                     }
-
-                    $form->clear();
                 }
             }
+
+            $form->clear();
         }
 
         $this->view->pick('process/create');
-        $this->view->create_ini = true;
+        $this->view->mode = 'ini';
         $this->view->form = $form;
         $this->view->ini = isset($ini) ? $ini : Process::getIniTemplate();
     }
 
-    public function deleteAction()
+    public function deleteAction($id)
     {
         $result = [];
-        $program = $this->request->get('group', 'string');
 
-        $process = Process::findFirst([
-            'server_id = :server_id: AND program = :program:',
-            'bind' => [
-                'server_id' => $this->server->id,
-                'program' => $program
-            ]
-        ]);
+        $process = Process::findFirst($id);
 
         if (!$process)
         {
@@ -568,7 +658,7 @@ class ProcessController extends ControllerSupervisorBase
         }
 
         $result['state'] = 1;
-        $result['message'] = self::formatMessage($program . ' 正在删除');
+        $result['message'] = self::formatMessage($process->program . ' 正在删除');
         $result['reload_config'] = true;
 
         return $this->response->setJsonContent($result);
