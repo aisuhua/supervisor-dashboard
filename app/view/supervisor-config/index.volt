@@ -3,25 +3,25 @@
 
 <ol class="breadcrumb">
     <li><a href="/server/{{ server.id }}/process?ip={{ server.ip }}&port={{ server.port }}">{{ server.ip }}:{{ server.port }}</a></li>
-    <li class="active">修改配置</li>
+    <li class="active">配置列表</li>
 </ol>
 
-<div style="margin-bottom: 20px;">
-    <div class="btn-group" role="group">
-        <a class="btn btn-default add-process-btn">添加配置</a>
-        <a class="btn btn-default expand-all-btn"><span class="glyphicon glyphicon-menu-down"></span> 展开全部</a>
-        <div class="btn-group">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                更多 <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu">
-                <li><a href="/server/{{ server.id }}/config/ini-mode" id="load-config">INI 编辑模式</a></li>
-                <li><a href="#">从其他服务器克隆到本机</a></li>
-                <li><a href="#">从本机克隆到其他服务器</a></li>
-             </ul>
-        </div>
-   </div>
-</div>
+{#<div style="margin-bottom: 20px;">#}
+    {#<div class="btn-group" role="group">#}
+        {#<a class="btn btn-default add-process-btn">添加配置</a>#}
+        {#<a class="btn btn-default expand-all-btn"><span class="glyphicon glyphicon-menu-down"></span> 展开全部</a>#}
+        {#<div class="btn-group">#}
+            {#<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">#}
+                {#更多 <span class="caret"></span>#}
+            {#</button>#}
+            {#<ul class="dropdown-menu">#}
+                {#<li><a href="/server/{{ server.id }}/config/ini-mode" id="load-config">INI 编辑模式</a></li>#}
+                {#<li><a href="#">从其他服务器克隆到本机</a></li>#}
+                {#<li><a href="#">从本机克隆到其他服务器</a></li>#}
+             {#</ul>#}
+        {#</div>#}
+   {#</div>#}
+{#</div>#}
 
 {% for index, program in programs %}
 <form method="post" action="/server/{{ server.id }}/config/edit/{{ program.id }}" class="form-edit" id="form-{{ program.id }}">
@@ -464,7 +464,7 @@ $(function() {
     var editor = null;
     var modal = null;
 
-    $('#load-config').click(function(event) {
+    $('#load-config111').click(function(event) {
         event.stopPropagation();
         event.preventDefault();
 

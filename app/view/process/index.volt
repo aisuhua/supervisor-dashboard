@@ -1,29 +1,34 @@
 {{ content() }}
 {{ flashSession.output() }}
+{% include 'partials/processNav.volt' %}
 
-<ol class="breadcrumb">
-    <li class="active">{{ server.ip }}:{{ server.port }}</li>
-</ol>
+{#<ol class="breadcrumb">#}
+    {#<li class="active">{{ server.ip }}:{{ server.port }}</li>#}
+{#</ol>#}
 
 <div style="margin-bottom: 20px;">
-    <div class="btn-group" role="group">
+    <div class="btn-group btn-group-sm" role="group">
         {#<a href="/server/{{ server.id }}/config?ip={{ server.ip }}&port={{ server.port }}#form-create" class="btn btn-default form-create">添加配置</a>#}
-        <a href="/server/{{ server.id }}/config?ip={{ server.ip }}&port={{ server.port }}" class="btn btn-default form-edit">修改配置</a>
-        <a href="/server/{{ server.id }}/process/reload-config?ip={{ server.ip }}&port={{ server.port }}" class="btn btn-default update-config">更新配置</a>
+        {#<a href="/server/{{ server.id }}/config?ip={{ server.ip }}&port={{ server.port }}" class="btn btn-default form-edit">修改配置</a>#}
+        <a href="/process/reloadConfig?server_id={{ server.id }}&ip={{ server.ip }}&port={{ server.port }}" class="btn btn-default update-config">同步配置</a>
+        <a href="/process/restartall?server_id={{ server.id }}" class="btn btn-default restartall" data-confirm="真的要重启所有进程吗？">重启所有</a>
+        <a href="/process/stopall?server_id={{ server.id }}" class="btn btn-default stopall" data-confirm="真的要停止所有进程吗？">停止所有</a>
+        <a href="/supervisor/restart?server_id={{ server.id }}" class="btn btn-default restart_supervisor" data-confirm="真的要重启 Supervisor 服务吗？">重启服务</a>
+        <a href="/supervisor/readLog?server_id={{ server.id }}&ip={{ server.ip }}&port={{ server.port }}" target="_blank" class="btn btn-default read_log">服务日志</a>
         {#<a href="/server/{{ server.id }}/supervisor/readlog?ip={{ server.ip }}&port={{ server.port }}" target="_blank" class="btn btn-default read_log">服务日志</a>#}
         {#<a href="/server/{{ server.id }}/process?ip={{ server.ip }}&port={{ server.port }}" class="btn btn-default">刷新页面</a>#}
-        <div class="btn-group">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                更多 <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu">
-                <li><a href="/server/{{ server.id }}/process/restartall" class="restartall">重启所有进程</a></li>
-                <li><a href="/server/{{ server.id }}/process/stopall" class="stopall">停止所有进程</a></li>
-                <li><a href="/server/{{ server.id }}/supervisor/restart" class="restart_supervisor">重启 Supervisor</a></li>
-                <li><a href="/server/{{ server.id }}/supervisor/readlog?ip={{ server.ip }}&port={{ server.port }}" target="_blank" class="read_log">查看 Supervisor 日志</a></li>
+        {#<div class="btn-group btn-group-sm">#}
+            {#<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">#}
+                {#更多 <span class="caret"></span>#}
+            {#</button>#}
+            {#<ul class="dropdown-menu">#}
+                {#<li><a href="/server/{{ server.id }}/process/restartall" class="restartall">重启所有进程</a></li>#}
+                {#<li><a href="/server/{{ server.id }}/process/stopall" class="stopall">停止所有进程</a></li>#}
+                {#<li><a href="/server/{{ server.id }}/supervisor/restart" class="restart_supervisor">重启 Supervisor</a></li>#}
+                {#<li><a href="/server/{{ server.id }}/supervisor/readlog?ip={{ server.ip }}&port={{ server.port }}" target="_blank" class="read_log">查看 Supervisor 日志</a></li>#}
                 {#<li><a href="/server/{{ server.id }}/supervisor/shutdown">停止服务</a></li>#}
-            </ul>
-        </div>
+            {#</ul>#}
+        {#</div>#}
     </div>
 </div>
 
@@ -60,8 +65,8 @@
             <span class="label label-{{ label_name }}">{{ process['statename'] }}</span>
         </td>
         <td>
-            <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/start" class="start">启动</a>&nbsp;
-            <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/taillog?ip={{ server.ip }}&port={{ server.port }}" target="_blank" class="tail_log">查看日志</a>
+            <a href="/process/start?server_id={{ server.id }}&group={{ process['group'] }}&name={{ process['name'] }}" class="start">启动</a>&nbsp;
+            <a href="/process/tailLog?server_id={{ server.id }}&group={{ process['group'] }}&name={{ process['name'] }}&ip={{ server.ip }}&port={{ server.port }}" target="_blank" class="tail_log">查看日志</a>
         </td>
     </tr>
 {% endfor %}
@@ -88,12 +93,12 @@
             {#<span class="process-group-tip">(没有负责人，请<a href="#">设置</a>)</span>#}
         </th>
         <th>
-            <a class="btn btn-xs btn-warning restart" href="/server/{{ server.id }}/process/{{ processGroup }}/restart">重启</a>&nbsp;
-            <a class="btn btn-xs btn-warning start" href="/server/{{ server.id }}/process/{{ processGroup }}/start">启动</a>&nbsp;
-            <a class="btn btn-xs btn-warning stop" href="/server/{{ server.id }}/process/{{ processGroup }}/stop">停止</a>&nbsp;
-            {#<a class="btn btn-xs btn-warning" href="/server/{{ server.id }}/config?ip={{ server.ip }}&port={{ server.port }}#{{ processGroup }}">修改</a>&nbsp;#}
-            {#<a class="btn btn-xs btn-warning">复制</a>&nbsp;#}
-            {#<a class="btn btn-xs btn-warning">删除</a>#}
+            <a class="btn btn-xs btn-warning restart" href="/process/restartGroup?server_id={{ server.id }}&group={{ processGroup }}">重启</a>&nbsp;
+            <a class="btn btn-xs btn-warning start" href="/process/startGroup?server_id={{ server.id }}&group={{ processGroup }}">启动</a>&nbsp;
+            <a class="btn btn-xs btn-warning stop" href="/process/stopGroup?server_id={{ server.id }}&group={{ processGroup }}">停止</a>&nbsp;
+            <a class="btn btn-xs btn-warning" href="#">修改</a>&nbsp;
+            <a class="btn btn-xs btn-warning" href="#">复制</a>&nbsp;
+            <a class="btn btn-xs btn-warning delete" href="/process/delete?server_id={{ server.id }}&group={{ processGroup }}" data-confirm="真的要删除 {{ processGroup }} 吗？">删除</a>
         </th>
     </tr>
         {% for process in processes %}
@@ -115,11 +120,11 @@
                     <span class="label label-{{ label_name }}">{{ process['statename'] }}</span>
                 </td>
                 <td>
-                    <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/restart" class="restart">重启</a>&nbsp;
-                    <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/start" class="start">启动</a>&nbsp;
-                    <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/stop" class="stop">停止</a>&nbsp;
-                    <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/clearlog" class="clear_log">清理日志</a>&nbsp;
-                    <a href="/server/{{ server.id }}/process/{{ process['group'] }}:{{ process['name'] }}/taillog?ip={{ server.ip }}&port={{ server.port }}" target="_blank" class="tail_log">查看日志</a>
+                    <a href="/process/restart?server_id={{ server.id }}&group={{ process['group'] }}&name={{ process['name'] }}" class="restart">重启</a>&nbsp;
+                    <a href="/process/start?server_id={{ server.id }}&group={{ process['group'] }}&name={{ process['name'] }}" class="start">启动</a>&nbsp;
+                    <a href="/process/stop?server_id={{ server.id }}&group={{ process['group'] }}&name={{ process['name'] }}" class="stop">停止</a>&nbsp;
+                    <a href="/process/clearLog?server_id={{ server.id }}&group={{ process['group'] }}&name={{ process['name'] }}" class="clear_log">清理日志</a>&nbsp;
+                    <a href="/process/tailLog?server_id={{ server.id }}&group={{ process['group'] }}&name={{ process['name'] }}&ip={{ server.ip }}&port={{ server.port }}" target="_blank" class="tail_log">查看日志</a>
                 </td>
             </tr>
             {% endif %}
@@ -137,39 +142,36 @@ $(function () {
         event.stopPropagation();
     });
 
-    // 超过 50 个进程，则采用异步重启方式
-    $('.restartall, .stopall, .restart_supervisor').click(function() {
+    $('.restartall, .stopall, .restart_supervisor, .delete').click(function() {
         event.stopPropagation();
 
-        if (!confirm("真的要" + $(this).text() + '吗？')) {
+        if (!confirm($(this).attr('data-confirm'))) {
             event.stopPropagation();
             return false;
         }
 
         var url = $(this).attr('href');
 
-        var size = $('table.table-striped tr:not(:has(th))').size();
-        if (size > 0) {
-            url += '?wait=0';
-            $.get(url, function(data) {
-                if (data.state) {
-                    success(data.message);
-                } else {
-                    error(data.message);
+        $.get(url, function(data) {
+            if (data.state) {
+                success(data.message);
+
+                if (typeof data.reload_config != 'undefined') {
+                    $.ajax({
+                        url: '/process/reloadConfig?server_id={{ server.id }}',
+                        success: function(data) {},
+                        timeout: 10000
+                    });
                 }
-            });
-        } else {
-            $.pjax({
-                url: url,
-                container: '#pjax-container',
-                push: false
-            });
-        }
+            } else {
+                error(data.message);
+            }
+        });
 
         return false;
     });
 
-    var $links = $('.start, .restart, .stop, .clear_log, .update-config').unbind();
+    var $links = $('.start, .restart, .stop, .clear_log, .update-config');
     $links.click(function(event) {
         event.stopPropagation();
 
@@ -181,6 +183,7 @@ $(function () {
                 error(data.message);
             }
         });
+
         return false;
     });
 

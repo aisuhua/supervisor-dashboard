@@ -10,7 +10,7 @@ use Phalcon\Validation\Validator\Regex;
 use Phalcon\Validation\Validator\Numericality;
 use Phalcon\Validation\Validator\InclusionIn;
 
-class ProgramForm extends Form
+class ProcessForm extends Form
 {
     public function initialize($entity = null, $options = null)
     {
@@ -346,6 +346,16 @@ class ProgramForm extends Form
         $stdout_logfile_backups->setFilters([
             'string',
             'trim'
+        ]);
+
+        $stdout_logfile_backups->addValidators([
+            new Regex(
+                [
+                    "pattern" => '/^\d+MB$/',
+                    "message" => "标准输出日志的最大字节数不正确",
+                    'allowEmpty' => true
+                ]
+            )
         ]);
 
         $this->add($stdout_logfile_maxbytes);

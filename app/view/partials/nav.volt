@@ -17,8 +17,8 @@
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ name }} <span class="caret"></span></a>
                     <ul class="dropdown-menu">
                         {% if menu_servers[id] is not empty %}
-                            {% for server in menu_servers[id] %}
-                                <li><a href="/server/{{ server['id'] }}/process?ip={{ server['ip'] }}&port={{ server['port'] }}">{{ server['ip'] }}:{{ server['port'] }}</a></li>
+                            {% for menu_server in menu_servers[id] %}
+                                <li><a href="/process?server_id={{ menu_server['id'] }}&ip={{ menu_server['ip'] }}&port={{ menu_server['port'] }}">{{ menu_server['ip'] }}:{{ menu_server['port'] }}</a></li>
                             {% endfor %}
 
                             <li role="separator" class="divider"></li>

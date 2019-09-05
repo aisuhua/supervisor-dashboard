@@ -100,7 +100,7 @@ function notice(message, options = {}) {
 function flash() {
     // 先关闭已有的提示窗
     // PNotify.closeAll();
-    clearSuccess();
+    // clearSuccess();
 
     var $pnotify = $('.pnotify');
 
@@ -112,10 +112,10 @@ function flash() {
         var $that = $(this);
 
         // 只显示最后一条提醒
-        if ($(this)[0] !== $pnotify.last()[0]) {
-            $that.remove();
-            return true;
-        }
+        // if ($(this)[0] !== $pnotify.last()[0]) {
+        //     $that.remove();
+        //     return true;
+        // }
 
         var message = $that.html();
 
@@ -183,6 +183,11 @@ $(document).on('ajaxStop', function() {
 
 $(function () {
     flash();
+
+    // $('.my-tabs1 li').click(function (e) {
+    //     $(this).addClass('active');
+    //     $(this).siblings('li').removeClass('active');
+    // })
 });
 
 

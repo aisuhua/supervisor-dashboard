@@ -21,7 +21,8 @@ class ControllerSupervisorBase extends ControllerBase
 
     public function initialize()
     {
-        $server_id = $this->dispatcher->getParam('server_id', 'int');
+        // $server_id = $this->dispatcher->getParam('server_id', 'int');
+        $server_id = $this->request->get('server_id', 'int', 0);
 
         if ($server_id)
         {
@@ -58,7 +59,7 @@ class ControllerSupervisorBase extends ControllerBase
         $this->callback = $callback;
     }
 
-    protected function invoke($timeout = 300)
+    protected function invoke($timeout = 180)
     {
         $exception = null;
         for ($i = 1; $i <= $timeout * 2; $i++)

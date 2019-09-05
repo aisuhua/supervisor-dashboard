@@ -24,6 +24,8 @@ class SupervisorController extends ControllerSupervisorBase
         {
             $this->view->setRenderLevel(View::LEVEL_ACTION_VIEW);
         }
+
+        echo 'sdfsf';
     }
 
     public function clearLogAction()

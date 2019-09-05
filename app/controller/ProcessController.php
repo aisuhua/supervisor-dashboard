@@ -25,80 +25,16 @@ class ProcessController extends ControllerSupervisorBase
     public function stopAction()
     {
         $result = [];
-        $name = $this->dispatcher->getParam('name', 'string');
+        $group = $this->request->get('group', 'string');
+        $name = $this->request->get('name', 'string');
+        $process_name = $group . ':' . $name;
 
-        $callback = function () use ($name) {
-            $process = $this->supervisor->getProcessInfo($name);
+        $callback = function () use ($process_name) {
+            $process = $this->supervisor->getProcessInfo($process_name);
             if ($process['statename'] == 'RUNNING')
             {
-                $this->supervisor->stopProcess($name, false);
+                $this->supervisor->stopProcess($process_name, false);
             }
-        };
-        $this->setCallback($callback);
-        $this->invoke();
-
-        $result['state'] = 1;
-        $result['message'] = self::formatMessage(Tool::shortName($name) . " 正在停止");
-
-        return $this->response->setJsonContent($result);
-    }
-
-    public function startAction()
-    {
-        $result = [];
-        $name = $this->dispatcher->getParam('name', 'string');
-
-        $callback = function() use ($name)
-        {
-            $process = $this->supervisor->getProcessInfo($name);
-            if ($process['statename'] != 'RUNNING')
-            {
-                $this->supervisor->startProcess($name, false);
-            }
-        };
-        $this->setCallback($callback);
-        $this->invoke();
-
-        $result['state'] = 1;
-        $result['message'] = self::formatMessage(Tool::shortName($name) . " 正在启动");
-
-        return $this->response->setJsonContent($result);
-    }
-
-    public function restartAction()
-    {
-        $result = [];
-        $name = $this->dispatcher->getParam('name', 'string');
-
-        $result['state'] = 1;
-        $result['message'] = self::formatMessage(Tool::shortName($name) . " 正在重启");
-
-        $this->response->setJsonContent($result)->send();
-
-        fastcgi_finish_request();
-
-        $callback = function() use ($name)
-        {
-            $process = $this->supervisor->getProcessInfo($name);
-            if ($process['statename'] == 'RUNNING')
-            {
-                $this->supervisor->stopProcess($name, true);
-            }
-
-            $this->supervisor->startProcess($name, false);
-        };
-        $this->setCallback($callback);
-        $this->invoke();
-    }
-
-    public function stopGroupAction()
-    {
-        $result = [];
-        $name = $this->dispatcher->getParam('name', 'string');
-
-        $callback = function() use($name)
-        {
-            $this->supervisor->stopProcessGroup($name, false);
         };
         $this->setCallback($callback);
         $this->invoke();
@@ -109,14 +45,20 @@ class ProcessController extends ControllerSupervisorBase
         return $this->response->setJsonContent($result);
     }
 
-    public function startGroupAction()
+    public function startAction()
     {
         $result = [];
-        $name = $this->dispatcher->getParam('name', 'string');
+        $group = $this->request->get('group', 'string');
+        $name = $this->request->get('name', 'string');
+        $process_name = $group . ':' . $name;
 
-        $callback = function() use ($name)
+        $callback = function() use ($process_name)
         {
-            $this->supervisor->startProcessGroup($name, false);
+            $process = $this->supervisor->getProcessInfo($process_name);
+            if ($process['statename'] != 'RUNNING')
+            {
+                $this->supervisor->startProcess($process_name, false);
+            }
         };
         $this->setCallback($callback);
         $this->invoke();
@@ -127,10 +69,12 @@ class ProcessController extends ControllerSupervisorBase
         return $this->response->setJsonContent($result);
     }
 
-    public function restartGroupAction()
+    public function restartAction()
     {
         $result = [];
-        $name = $this->dispatcher->getParam('name', 'string');
+        $group = $this->request->get('group', 'string');
+        $name = $this->request->get('name', 'string');
+        $process_name = $group . ':' . $name;
 
         $result['state'] = 1;
         $result['message'] = self::formatMessage($name . " 正在重启");
@@ -139,10 +83,72 @@ class ProcessController extends ControllerSupervisorBase
 
         fastcgi_finish_request();
 
-        $callback = function() use ($name)
+        $callback = function() use ($process_name)
         {
-            $this->supervisor->stopProcessGroup($name, true);
-            $this->supervisor->startProcessGroup($name, false);
+            $process = $this->supervisor->getProcessInfo($process_name);
+            if ($process['statename'] == 'RUNNING')
+            {
+                $this->supervisor->stopProcess($process_name, true);
+            }
+
+            $this->supervisor->startProcess($process_name, false);
+        };
+        $this->setCallback($callback);
+        $this->invoke();
+    }
+
+    public function stopGroupAction()
+    {
+        $result = [];
+        $group = $this->request->get('group', 'string');
+
+        $callback = function() use($group)
+        {
+            $this->supervisor->stopProcessGroup($group, false);
+        };
+        $this->setCallback($callback);
+        $this->invoke();
+
+        $result['state'] = 1;
+        $result['message'] = self::formatMessage($group . " 正在停止");
+
+        return $this->response->setJsonContent($result);
+    }
+
+    public function startGroupAction()
+    {
+        $result = [];
+        $group = $this->request->get('group', 'string');
+
+        $callback = function() use ($group)
+        {
+            $this->supervisor->startProcessGroup($group, false);
+        };
+        $this->setCallback($callback);
+        $this->invoke();
+
+        $result['state'] = 1;
+        $result['message'] = self::formatMessage($group . " 正在启动");
+
+        return $this->response->setJsonContent($result);
+    }
+
+    public function restartGroupAction()
+    {
+        $result = [];
+        $group = $this->request->get('group', 'string');
+
+        $result['state'] = 1;
+        $result['message'] = self::formatMessage($group . " 正在重启");
+
+        $this->response->setJsonContent($result)->send();
+
+        fastcgi_finish_request();
+
+        $callback = function() use ($group)
+        {
+            $this->supervisor->stopProcessGroup($group, true);
+            $this->supervisor->startProcessGroup($group, false);
         };
         $this->setCallback($callback);
         $this->invoke();
@@ -150,13 +156,15 @@ class ProcessController extends ControllerSupervisorBase
 
     public function tailLogAction()
     {
-        $name = $this->dispatcher->getParam('name', 'string');
+        $group = $this->request->get('group', 'string');
+        $name = $this->request->get('name', 'string');
+        $process_name = $group . ':' . $name;
 
-        $callback = function() use ($name)
+        $callback = function() use ($process_name)
         {
             // 只看前面 1M 的日志
             // 注意这里应开启 strip_ansi = true，否则当日志含有 ansi 字符时讲无法查看日志
-            $log = $this->supervisor->tailProcessStdoutLog($name, 0, 1 * 1024 * 1024);
+            $log = $this->supervisor->tailProcessStdoutLog($process_name, 0, 1 * 1024 * 1024);
             $this->view->log = $log;
         };
         $this->setCallback($callback);
@@ -173,126 +181,97 @@ class ProcessController extends ControllerSupervisorBase
             $this->view->setRenderLevel(View::LEVEL_ACTION_VIEW);
         }
 
-        $exploded = explode(':', $name);
-
-        $this->view->group = $exploded[0];
-        $this->view->name = $exploded[1];
+        $this->view->group = $group;
+        $this->view->name = $name;
     }
 
     public function clearLogAction()
     {
         $result = [];
-        $name = $this->dispatcher->getParam('name', 'string');
+        $group = $this->request->get('group', 'string');
+        $name = $this->request->get('name', 'string');
+        $process_name = $group . ':' . $name;
 
-        $callback = function() use ($name)
+        $callback = function() use ($process_name)
         {
-            $this->supervisor->clearProcessLogs($name);
+            $this->supervisor->clearProcessLogs($process_name);
         };
         $this->setCallback($callback);
         $this->invoke();
 
         $result['state'] = 1;
-        $result['message'] = Tool::shortName($name) . " 日志清理完成";
+        $result['message'] = $name . " 日志清理完成";
 
         return $this->response->setJsonContent($result);
     }
 
     public function stopAllAction()
     {
-        $wait = (bool) $this->request->get('wait', 'int', 1);
+        $result = [];
+        $result['state'] = 1;
+        $result['message'] = self::formatMessage("正在停止所有进程");
+        $this->response->setJsonContent($result)->send();
 
-        if ($wait)
+        fastcgi_finish_request();
+
+        $callback = function()
         {
-            $callback = function()
-            {
-                $this->supervisor->stopAllProcesses(true);
-            };
-            $this->setCallback($callback);
-            $this->invoke();
+            $this->supervisor->stopAllProcesses(false);
+        };
+        $this->setCallback($callback);
+        $this->invoke();
 
-            $this->flashSession->success("已停止所有进程");
+        $this->flashSession->success("已停止所有进程");
 
-            return $this->redirectToIndex();
-        }
-        else
-        {
-            $result = [];
-            $result['state'] = 1;
-            $result['message'] = self::formatMessage("正在停止所有进程");
-            $this->response->setJsonContent($result)->send();
-
-            fastcgi_finish_request();
-
-            $callback = function()
-            {
-                $this->supervisor->stopAllProcesses(false);
-            };
-            $this->setCallback($callback);
-            $this->invoke();
-
-            $this->flashSession->success("已停止所有进程");
-
-            $this->view->setRenderLevel(
-                View::LEVEL_NO_RENDER
-            );
-        }
+        $this->view->setRenderLevel(
+            View::LEVEL_NO_RENDER
+        );
     }
 
     public function restartAllAction()
     {
-        $wait = (bool) $this->request->get('wait', 'int', 1);
+        $result = [];
+        $result['state'] = 1;
+        $result['message'] = self::formatMessage("正在重启所有进程");
+        $this->response->setJsonContent($result)->send();
 
-        if ($wait)
+        fastcgi_finish_request();
+
+        $callback = function()
         {
-            $callback = function() use ($wait)
-            {
-                $this->supervisor->stopAllProcesses(true);
-                $this->supervisor->startAllProcesses(true);
-            };
-            $this->setCallback($callback);
-            $this->invoke();
+            $this->supervisor->stopAllProcesses(true);
+            $this->supervisor->startAllProcesses(false);
+        };
+        $this->setCallback($callback);
+        $this->invoke();
 
-            $this->flashSession->success("已重启所有进程");
-            return $this->redirectToIndex();
-        }
-        else
-        {
-            $result = [];
-            $result['state'] = 1;
-            $result['message'] = self::formatMessage("正在重启所有进程");
-            $this->response->setJsonContent($result)->send();
+        $this->flashSession->success("已重启所有进程");
 
-            fastcgi_finish_request();
-
-            $callback = function() use ($wait)
-            {
-                $this->supervisor->stopAllProcesses(true);
-                $this->supervisor->startAllProcesses(false);
-            };
-            $this->setCallback($callback);
-            $this->invoke();
-
-            $this->flashSession->success("已重启所有进程");
-
-            $this->view->setRenderLevel(
-                View::LEVEL_NO_RENDER
-            );
-        }
+        $this->view->setRenderLevel(
+            View::LEVEL_NO_RENDER
+        );
     }
 
-    public function reloadConfigAction($server_id)
+    public function reloadConfigAction()
     {
         $result = [];
 
-        $programs = Program::find([
+        $processes = Process::find([
             'server_id = :server_id:',
             'bind' => [
-                'server_id' => $server_id
+                'server_id' => $this->server->id
             ],
             'order' => 'program asc, id asc'
         ]);
 
-        $ini = Program::formatIniConfig($programs);
+        $ini_arr = [];
+        foreach ($processes as $process)
+        {
+            /** @var Process $process */
+            $ini_arr[] = $process->getIni();
+        }
+
+        $ini = implode(PHP_EOL, $ini_arr);
 
         $url = "http://{$this->server->ip}:{$this->server->sync_conf_port}/write";
         $post_data = [];
@@ -403,6 +382,196 @@ class ProcessController extends ControllerSupervisorBase
         $this->view->setRenderLevel(
             View::LEVEL_NO_RENDER
         );
+    }
+
+    public function editAction()
+    {
+        $result = [];
+        $id = $this->request->get('id', 'int', 0);
+
+        $process = Process::findFirst($id);
+
+        if ($this->request->isPost())
+        {
+            $form = new ProcessForm($process, [
+                'edit' => true
+            ]);
+
+            if (!$form->isValid($this->request->getPost()))
+            {
+                foreach ($form->getMessages() as $message)
+                {
+                    $result['state'] = 0;
+                    $result['message'] = $message->getMessage();
+
+                    return $this->response->setJsonContent($result);
+                }
+            }
+
+            if (!$process->save())
+            {
+                foreach ($process->getMessages() as $message)
+                {
+                    $result['state'] = 0;
+                    $result['message'] = $message->getMessage();
+
+                    return $this->response->setJsonContent($result);
+                }
+            }
+
+            $this->flashSession->success("修改成功");
+            $form->clear();
+        }
+
+//        $this->view->process = $process;
+//        $this->view->form = new ProcessForm($process, [
+//            'edit' => true
+//        ]);
+    }
+
+    public function createAction()
+    {
+        $form = new ProcessForm(null);
+
+        if ($this->request->isPost())
+        {
+            if ($this->request->getPost('mode') == 'ini')
+            {
+                return $this->dispatcher->forward([
+                    'action' => 'createIni'
+                ]);
+            }
+
+            $process = new Process();
+            $form->bind($this->request->getPost(), $process);
+
+            if (!$form->isValid())
+            {
+                foreach ($form->getMessages() as $message)
+                {
+                    $this->flash->error($message->getMessage());
+                }
+            }
+            else
+            {
+                if (!$process->create())
+                {
+                    $this->flash->error($process->getMessages());
+                }
+                else
+                {
+                    $form->clear();
+                    $this->flash->success("添加成功");
+                    $this->view->reload_config = true;
+                }
+            }
+        }
+
+        $this->view->form = $form;
+        $this->view->ini = Process::getIniTemplate();
+    }
+
+    public function createIniAction()
+    {
+        $form = new ProcessForm(null);
+
+        if ($this->request->isPost())
+        {
+            $server_id = $this->request->getPost('server_id', 'int');
+            $ini = $this->request->getPost('ini');
+
+            $parsed = parse_ini_string($ini, true, INI_SCANNER_RAW);
+            if (empty($parsed))
+            {
+                $this->flash->error('配置解析错误');
+            }
+            else
+            {
+                $key = trim(key($parsed));
+                $value = current($parsed);
+
+                if (!preg_match("/^program:[a-zA-Z0-9_\-]{1,255}$/", $key, $matches))
+                {
+                    $this->flash->error('配置解析错误');
+                }
+                else
+                {
+                    $value['program'] = explode(':', $key)[1];
+                    $value['server_id'] = $server_id;
+                    Process::applyDefaultValue($value);
+
+                    $process = new Process();
+                    $form->bind($value, $process);
+
+                    if (!$form->isValid())
+                    {
+                        foreach ($form->getMessages() as $message)
+                        {
+                            $this->flash->error($message->getMessage());
+                        }
+                    }
+                    else
+                    {
+                        if (!$process->create())
+                        {
+                            $this->flash->error($process->getMessages());
+                        }
+                        else
+                        {
+                            unset($ini);
+                            $this->flash->success("添加成功");
+                            $this->view->reload_config = true;
+                        }
+                    }
+
+                    $form->clear();
+                }
+            }
+        }
+
+        $this->view->pick('process/create');
+        $this->view->create_ini = true;
+        $this->view->form = $form;
+        $this->view->ini = isset($ini) ? $ini : Process::getIniTemplate();
+    }
+
+    public function deleteAction()
+    {
+        $result = [];
+        $program = $this->request->get('group', 'string');
+
+        $process = Process::findFirst([
+            'server_id = :server_id: AND program = :program:',
+            'bind' => [
+                'server_id' => $this->server->id,
+                'program' => $program
+            ]
+        ]);
+
+        if (!$process)
+        {
+            $result['state'] = 0;
+            $result['message'] = '不存在该进程配置';
+
+            return $this->response->setJsonContent($result);
+        }
+
+        if(!$process->delete())
+        {
+            foreach ($process->getMessages() as $message)
+            {
+                $result['state'] = 0;
+                $result['message'] = $message->getMessage();
+
+                return $this->response->setJsonContent($result);
+            }
+        }
+
+        $result['state'] = 1;
+        $result['message'] = self::formatMessage($program . ' 正在删除');
+        $result['reload_config'] = true;
+
+        return $this->response->setJsonContent($result);
     }
 }
 

@@ -311,6 +311,6 @@ class SupervisorConfigController extends ControllerSupervisorBase
 
         $this->view->programs = $programs;
         $this->view->ini = $ini;
-        $this->view->setRenderLevel(View::LEVEL_ACTION_VIEW);
+        // $this->view->setRenderLevel(View::LEVEL_ACTION_VIEW);
     }
 }
