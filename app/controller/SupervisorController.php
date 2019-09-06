@@ -24,8 +24,6 @@ class SupervisorController extends ControllerSupervisorBase
         {
             $this->view->setRenderLevel(View::LEVEL_ACTION_VIEW);
         }
-
-        echo 'sdfsf';
     }
 
     public function clearLogAction()
@@ -46,18 +44,20 @@ class SupervisorController extends ControllerSupervisorBase
 
     public function restartAction()
     {
-        $callback1 = function ()
-        {
-            $this->supervisor->restart();
-        };
-        $this->setCallback($callback1);
-        $this->invoke();
-
         $result = [];
         $result['state'] = 1;
         $result['message'] = self::formatMessage("Supervisor 正在重启");
 
-        return $this->response->setJsonContent($result);
+        $this->response->setJsonContent($result)->send();
+
+        fastcgi_finish_request();
+
+        $callback = function ()
+        {
+            $this->supervisor->restart();
+        };
+        $this->setCallback($callback);
+        $this->invoke();
     }
 }
 

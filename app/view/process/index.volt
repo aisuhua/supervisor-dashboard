@@ -1,6 +1,6 @@
 {{ content() }}
 {{ flashSession.output() }}
-{% include 'partials/processNav.volt' %}
+{% include 'process/nav.volt' %}
 
 {#<ol class="breadcrumb">#}
     {#<li class="active">{{ server.ip }}:{{ server.port }}</li>#}
@@ -84,18 +84,24 @@
     <tbody>
 
     {% for group in process_groups %}
+        {% if group['id'] is not empty %}
+            {% set btn_class = '' %}
+        {% else %}
+            {% set btn_class = 'disabled' %}
+        {% endif %}
     <tr>
         <th colspan="4">
             <span class="label label-info" style="font-size:14px">{{ group['program'] }}</span>&nbsp;
-            {#<span class="process-group-tip">(没有负责人，请<a href="#">设置</a>)</span>#}
         </th>
         <th>
             <a class="btn btn-xs btn-warning restart" href="/process/restartGroup?server_id={{ server.id }}&group={{ group['program'] }}">重启</a>&nbsp;
             <a class="btn btn-xs btn-warning start" href="/process/startGroup?server_id={{ server.id }}&group={{ group['program'] }}">启动</a>&nbsp;
             <a class="btn btn-xs btn-warning stop" href="/process/stopGroup?server_id={{ server.id }}&group={{ group['program'] }}">停止</a>&nbsp;
-            <a class="btn btn-xs btn-warning" href="/process/edit/{{ group['id'] }}?server_id={{ server.id }}&ip={{ server.ip }}&port={{ server.port }}">修改</a>&nbsp;
-            <a class="btn btn-xs btn-warning" href="#">复制</a>&nbsp;
-            <a class="btn btn-xs btn-warning delete" href="/process/delete/{{ group['id'] }}?server_id={{ server.id }}" data-confirm="真的要删除 {{ group['program'] }} 吗？">删除</a>
+            {% if group['id'] is not empty %}
+            {% endif %}
+            <a class="btn btn-xs btn-warning {{ btn_class }}" href="/process/edit/{{ group['id'] }}?server_id={{ server.id }}&ip={{ server.ip }}&port={{ server.port }}">修改</a>&nbsp;
+            {#<a class="btn btn-xs btn-warning {{ btn_class }}" href="#">复制</a>&nbsp;#}
+            <a class="btn btn-xs btn-warning delete {{ btn_class }}" href="/process/delete/{{ group['id'] }}?server_id={{ server.id }}" data-confirm="真的要删除 {{ group['program'] }} 吗？">删除</a>
         </th>
     </tr>
         {% for process in processes %}
@@ -148,17 +154,12 @@ $(function () {
         }
 
         var url = $(this).attr('href');
-
         $.get(url, function(data) {
             if (data.state) {
                 success(data.message);
 
                 if (typeof data.reload_config != 'undefined') {
-                    $.ajax({
-                        url: '/process/reloadConfig?server_id={{ server.id }}',
-                        success: function(data) {},
-                        timeout: 10000
-                    });
+                    reloadConfig();
                 }
             } else {
                 error(data.message);
@@ -183,28 +184,5 @@ $(function () {
 
         return false;
     });
-
-//    $('.update-config').click(function() {
-//        event.stopPropagation();
-//
-//        var url = $(this).attr('href');
-//        $.get(url, function(data) {
-//            if (data.state == 1) {
-//                success(data.message);
-////                $.pjax({
-////                    url: window.location.pathname + window.location.search,
-////                    container: '#pjax-container',
-////                    push: true
-////                });
-//                window.locationre
-//            } else if (data.state == 2) {
-//                success(data.message);
-//            } else {
-//                error(data.message);
-//            }
-//        });
-//
-//        return false;
-//    });
 });
 </script>

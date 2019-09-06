@@ -1,16 +1,6 @@
 {{ content() }}
 {{ flashSession.output() }}
-{% include 'partials/processNav.volt' %}
-
-{% if reload_config is not empty %}
-<script>
-    $.ajax({
-        url: '/process/reloadConfig?server_id={{ server.id }}',
-        success: function(data) {},
-        timeout: 10000
-    });
-</script>
-{% endif %}
+{% include 'process/nav.volt' %}
 
 {% set simple_class = '' %}
 {% set advanced_class = '' %}
@@ -104,35 +94,3 @@
         </form>
     </div>
 </div>
-
-<script>
-$(function() {
-
-    // code editor
-    var editor = CodeMirror.fromTextArea(document.getElementById('ini'), {
-        mode: "properties",
-        lineNumbers: true,
-        lineWrapping: true,
-        indentUnit: 0,
-        autoRefresh: true,
-        automaticLayout: true,
-        extraKeys: {
-            "F11": function(cm) {
-                cm.setOption("fullScreen", !cm.getOption("fullScreen"));
-            },
-            "Esc": function(cm) {
-                if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
-            }
-        }
-    });
-
-    editor.setSize('100%', '100%');
-
-    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-        editor.refresh();
-    });
-});
-
-
-
-</script>

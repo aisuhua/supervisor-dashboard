@@ -21,14 +21,11 @@ class ControllerSupervisorBase extends ControllerBase
 
     public function initialize()
     {
-        // $server_id = $this->dispatcher->getParam('server_id', 'int');
         $server_id = $this->request->get('server_id', 'int', 0);
 
         if ($server_id)
         {
-            /**
-             * @var Server $server
-             */
+            /** @var Server $server */
             $server = Server::findFirst($server_id);
             if (!$server)
             {

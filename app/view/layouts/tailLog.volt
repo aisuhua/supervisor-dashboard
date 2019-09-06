@@ -10,10 +10,10 @@
             <a class="navbar-brand" href="">{{ name }} - 进程日志</a>
         </div>
         <div class="collapse navbar-collapse navbar-right">
-            <a class="btn btn-primary navbar-btn refresh" href="/server/{{ server.id }}/process/{{ group }}:{{ name }}/taillog?ip={{ server.ip }}&port={{ server.port }}">
+            <a class="btn btn-primary navbar-btn refresh" href="/process/tailLog?server_id={{ server.id }}&group={{ group }}&name={{ name }}&ip={{ server.ip }}&port={{ server.port }}">
                 自动刷新
             </a>
-            <a class="btn btn-default navbar-btn clear_log" href="/server/{{ server.id }}/process/{{ group }}:{{ name }}/clearlog">
+            <a class="btn btn-default navbar-btn clear_log" href="/process/clearLog?server_id={{ server.id }}&group={{ group }}&name={{ name }}">
                 清理日志
             </a>
         </div>

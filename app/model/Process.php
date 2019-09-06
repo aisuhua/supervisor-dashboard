@@ -24,7 +24,6 @@ class Process extends Model
     public $stdout_logfile_maxbytes;
     public $update_time;
     public $create_time;
-    public $status;
 
     public function beforeUpdate()
     {
@@ -70,22 +69,6 @@ class Process extends Model
         return $this->validate($validator);
     }
 
-//    public static function applyDefaultValue(&$value)
-//    {
-//        !empty($value['process_name']) ?: $value['process_name'] = '%(program_name)s_%(process_num)s';
-//        !empty($value['numprocs']) ?: $value['numprocs'] = 1;
-//        !empty($value['numprocs_start']) ?: $value['numprocs_start'] = 0;
-//        !empty($value['user']) ?: $value['user'] = 'www-data';
-//        !empty($value['directory']) ?: $value['directory'] = '%(here)s';
-//        !empty($value['autostart']) ?: $value['autostart'] = 'true';
-//        !empty($value['startretries']) ?: $value['startretries'] = 20;
-//        !empty($value['autorestart']) ?: $value['autorestart'] = 'true';
-//        !empty($value['redirect_stderr']) ?: $value['redirect_stderr'] = 'true';
-//        !empty($value['stdout_logfile']) ?: $value['stdout_logfile'] = 'AUTO';
-//        !empty($value['stdout_logfile_backups']) ?: $value['stdout_logfile_backups'] = 0;
-//        !empty($value['stdout_logfile_maxbytes']) ?: $value['stdout_logfile_maxbytes'] = '1MB';
-//    }
-
     public function getIni()
     {
         $ini = '';
@@ -105,6 +88,22 @@ class Process extends Model
         $ini .= "stdout_logfile_maxbytes={$this->stdout_logfile_maxbytes}";
 
         return $ini;
+    }
+
+    public static function applyDefaultValue(&$value)
+    {
+        !empty($value['process_name']) ?: $value['process_name'] = '%(program_name)s_%(process_num)s';
+        !empty($value['numprocs']) ?: $value['numprocs'] = 1;
+        !empty($value['numprocs_start']) ?: $value['numprocs_start'] = 0;
+        !empty($value['user']) ?: $value['user'] = 'www-data';
+        !empty($value['directory']) ?: $value['directory'] = '%(here)s';
+        !empty($value['autostart']) ?: $value['autostart'] = 'true';
+        !empty($value['startretries']) ?: $value['startretries'] = 20;
+        !empty($value['autorestart']) ?: $value['autorestart'] = 'true';
+        !empty($value['redirect_stderr']) ?: $value['redirect_stderr'] = 'true';
+        !empty($value['stdout_logfile']) ?: $value['stdout_logfile'] = 'AUTO';
+        !empty($value['stdout_logfile_backups']) ?: $value['stdout_logfile_backups'] = 0;
+        !empty($value['stdout_logfile_maxbytes']) ?: $value['stdout_logfile_maxbytes'] = '1MB';
     }
 
     public static function getIniTemplate()
