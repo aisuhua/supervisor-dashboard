@@ -71,36 +71,13 @@ class ProcessForm extends Form
             'trim'
         ]);
 
-        $cmd = [
-            'php',
-            '/usr/bin/php',
-            'node',
-            '/usr/bin/node',
-            'python',
-            'python3',
-            '/usr/bin/python',
-            'bash',
-            '/bin/bash',
-            'java',
-            '/usr/bin/java',
-            'aria2c',
-            '/usr/bin/aria2c'
-        ];
-
-        $cmd = array_map(function($item) {
-            return str_replace('/', '\/', $item);
-        }, $cmd);
-
-        $cmd_str = implode('|', $cmd);
-        $pattern = "/(^({$cmd_str})\s+[0-9a-zA-Z\._\-\s=\/]{1,255}$)|(^\/bin\/cat$)/";
-
         $command->addValidators([
             new PresenceOf([
                 'message' => '命令不能为空'
             ]),
             new Regex(
                 [
-                    "pattern" => $pattern,
+                    "pattern" => Tool::commandPattern(),
                     "message" => "命令格式不正确"
                 ]
             )

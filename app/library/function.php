@@ -56,3 +56,8 @@ function curl_get($url, $fields, $timeout = 1)
 
     return $data;
 }
+
+function print_cli(...$args)
+{
+    echo date('Y-m-d H:i:s'), ">> " . implode('', $args), PHP_EOL;
+}

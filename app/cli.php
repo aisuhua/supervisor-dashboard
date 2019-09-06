@@ -15,13 +15,6 @@ include APP_PATH . '/config/services.php';
 $config = $di->getConfig();
 include APP_PATH . '/config/loader.php';
 
-$loader->registerDirs(
-    [
-        APP_PATH . '/task',
-        APP_PATH . '/cron',
-    ]
-);
-
 $console = new ConsoleApp();
 $console->setDI($di);
 

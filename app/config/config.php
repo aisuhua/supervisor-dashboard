@@ -18,6 +18,7 @@ return new Config([
         'formDir' => APP_PATH . '/form/',
         'libraryDir' => APP_PATH . '/library/',
         'taskDir' => APP_PATH . '/task/',
+        'cronDir' => APP_PATH . '/cron/',
         'baseUri' => '/'
     ],
     'volt' => [

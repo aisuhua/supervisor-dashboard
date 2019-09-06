@@ -1,0 +1,71 @@
+{{ content() }}
+{{ flashSession.output() }}
+{% include 'process/nav.volt' %}
+
+<form method="post" action="/cron/create?server_id={{ server.id }}&ip={{ server.ip }}&port={{ server.port }}" data-pjax>
+    <div class="col-lg-6">
+        <div class="form-group">
+            <label for="command">命令</label>
+            {{ form.render('command') }}
+        </div>
+        <div class="form-group">
+            <label for="status">状态</label>
+            {{ form.render('status') }}
+        </div>
+        <div class="form-group">
+            <label for="description">说明</label>
+            {{ form.render('description') }}
+        </div>
+        <button type="submit" class="btn btn-primary">确认添加</button>
+    </div>
+    <div class="col-lg-6">
+        <div class="form-group">
+            <label for="times">预定义执行周期</label>
+            {{ form.render('times') }}
+        </div>
+        <div class="form-group">
+            <label for="time">执行时间</label>
+            {{ form.render('time') }}
+        </div>
+        <pre>
+*    *    *    *    *
+-    -    -    -    -
+|    |    |    |    |
+|    |    |    |    |
+|    |    |    |    +----- 星期 (0 - 7) (星期日 = 0 或 7)
+|    |    |    +---------- 月 (1 - 12)
+|    |    +--------------- 日 (1 - 31)
+|    +-------------------- 小时 (0 - 23)
++------------------------- 分钟 (0 - 59)
+        </pre>
+        <h4>下次运行时间</h4>
+        <div id="date-list" data-url="/public/getRunDates"></div>
+    </div>
+</form>
+
+<script>
+$(function() {
+    function getRunDates() {
+        var $dateList = $('#date-list');
+
+        $.get($dateList.attr('data-url'), {time: $('#time').val()}, function (data) {
+            $dateList.html(data);
+        });
+    }
+
+    $('#times').change(function() {
+        $('#time').val($(this).val());
+        getRunDates();
+    });
+
+    var $time = $('#time');
+
+    $time.change(function() {
+        getRunDates();
+    });
+
+    if($time.length) {
+        getRunDates();
+    }
+});
+</script>

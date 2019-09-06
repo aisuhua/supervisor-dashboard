@@ -18,5 +18,6 @@ $loader->registerDirs(
         $config->application->formDir,
         $config->application->libraryDir,
         $config->application->taskDir,
+        $config->application->cronDir,
     ]
 )->register();
