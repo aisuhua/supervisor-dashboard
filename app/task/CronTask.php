@@ -14,8 +14,6 @@ class CronTask extends Task
                 continue;
             }
 
-            print_cli('');
-
             $start_time = time();
 
             /** @var Cron $cron */
@@ -28,16 +26,13 @@ class CronTask extends Task
                     $current_time = $cronExpression->getNextRunDate($cronExpression->getPreviousRunDate())->format('U');
                     $next_time = $cronExpression->getNextRunDate()->format('U');
 
-                    echo date('Y-m-d H:i:s'), PHP_EOL;
-                    echo date('Y-m-d H:i', $last_time), PHP_EOL;
-                    echo date('Y-m-d H:i', $current_time), PHP_EOL;
-                    echo date('Y-m-d H:i', $next_time), PHP_EOL;
-//
-//                    var_dump($cronExpression->isDue());
-//                    exit;
+//                    echo date('Y-m-d H:i:s'), PHP_EOL;
+//                    echo date('Y-m-d H:i', $last_time), PHP_EOL;
+//                    echo date('Y-m-d H:i', $current_time), PHP_EOL;
+//                    echo date('Y-m-d H:i', $next_time), PHP_EOL;
 
                     //
-                    if (($cron->last_time > 0 && $cron->last_time >= $current_time))
+                    if ((!$cronExpression->isDue() && $cron->last_time >= $last_time) || ($cronExpression->isDue() && $cron->last_time > $last_time))
                     {
                         continue;
                     }
