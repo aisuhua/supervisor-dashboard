@@ -141,7 +141,10 @@ function flash() {
 $.pjax.defaults.maxCacheLength = 0;
 $.pjax.defaults.timeout = 180000;
 
-$(document).pjax('a', '#pjax-container');
+$(document).pjax('a:not([data-nopush], [data-nopjax])', '#pjax-container');
+$(document).pjax('a[data-nopush]', '#pjax-container', {
+    push: false
+});
 
 $(document).on('submit', 'form[data-pjax]', function(event) {
     $.pjax.submit(event, '#pjax-container');

@@ -122,7 +122,7 @@ class Process extends Model
         $ini .= "redirect_stderr=true" . PHP_EOL;
         $ini .= "stdout_logfile=AUTO" . PHP_EOL;
         $ini .= "stdout_logfile_backups=0" . PHP_EOL;
-        $ini .= "stdout_logfile_maxbytes=1MB" . PHP_EOL;
+        $ini .= "stdout_logfile_maxbytes=1MB";
 
         return $ini;
     }

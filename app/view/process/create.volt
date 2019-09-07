@@ -20,7 +20,7 @@
 <!-- Tab panes -->
 <div class="tab-content">
     <div role="tabpanel" class="tab-pane {{ simple_class }}" id="simple">
-        <form method="post" action="/process/create?server_id={{ server.id }}&ip={{ server.ip }}&port={{ server.port }}" data-pjax>
+        <form method="post" action="/process/create?server_id={{ server.id }}" data-pjax>
             {{ form.render('server_id', ['value': server.id]) }}
             <div class="form-group">
                 <label for="program">程序名</label>
@@ -78,19 +78,19 @@
                 <label for="stdout_logfile_maxbytes">标准输出日志的最大字节数</label>
                 {{ form.render('stdout_logfile_maxbytes') }}
             </div>
-            <button type="submit" class="btn btn-primary">确认添加</button>
+            <button type="submit" class="btn btn-primary">保存</button>
         </form>
     </div>
 
     <div role="tabpanel" class="tab-pane {{ advanced_class }}" id="advanced">
-        <form method="post" action="/process/create?server_id={{ server.id }}&ip={{ server.ip }}&port={{ server.port }}" data-pjax>
+        <form method="post" action="/process/create?server_id={{ server.id }}" data-pjax>
             {{ form.render('server_id', ['value': server.id]) }}
             <input type="hidden" name="mode" value="ini" />
 
             <div class="form-group">
                 <textarea id="ini" name="ini">{{ ini }}</textarea>
             </div>
-            <button type="submit" class="btn btn-primary">确认添加</button>
+            <button type="submit" class="btn btn-primary">保存</button>
         </form>
     </div>
 </div>

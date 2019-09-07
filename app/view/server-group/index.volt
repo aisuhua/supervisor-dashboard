@@ -104,7 +104,7 @@
                     }
                 },
                 {
-                    text: '批量删除',
+                    text: '删除',
                     className: 'btn btn-default',
                     action: function () {
                         var ids = '';

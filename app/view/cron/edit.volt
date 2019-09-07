@@ -2,7 +2,7 @@
 {{ flashSession.output() }}
 {% include 'process/nav.volt' %}
 
-<form method="post" action="/cron/create?server_id={{ server.id }}" data-pjax>
+<form method="post" action="/cron/edit/{{ cron.id }}?server_id={{ server.id }}" data-pjax>
     {{ form.render('server_id', ['value': server.id]) }}
     <div class="col-lg-6">
         <div class="form-group">

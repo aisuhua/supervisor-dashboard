@@ -27,6 +27,20 @@ class CronForm extends Form
 
         $this->add($server_id);
 
+        $user = new Text('user', [
+            'class' => 'form-control',
+            'autocomplete' => 'off',
+            'value' => 'www-data'
+        ]);
+
+        $user->addValidators([
+            new PresenceOf([
+                'message' => '用户不能为空'
+            ])
+        ]);
+
+        $this->add($user);
+
         // command
         $command = new Text('command', [
             'class' => 'form-control',
@@ -56,7 +70,7 @@ class CronForm extends Form
 
         $time->addValidators([
             new PresenceOf([
-                'message' => '执行时间不能为空'
+                'message' => '时间不能为空'
             ])
         ]);
 
@@ -65,7 +79,7 @@ class CronForm extends Form
         $status = new Select(
             'status',
             [
-                Cron::STATUS_ACTIVE => '正常',
+                Cron::STATUS_ACTIVE => '启用',
                 Cron::STATE_INACTIVE => '停用',
             ],
             [
@@ -87,7 +101,7 @@ class CronForm extends Form
         $times = new Select(
             'times',
             [
-                '' => '自定义',
+                '' => '',
                 '* * * * *' => '每分钟',
                 '0 * * * *' => '每小时',
                 '0 0 * * *' => '每天',

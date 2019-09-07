@@ -38,6 +38,7 @@ class ProcessController extends ControllerSupervisorBase
         $this->view->processes = $processes;
         $this->view->process_groups = $process_group_merge;
         $this->view->process_warnings = $process_warnings;
+
     }
 
     public function stopAction()
@@ -290,20 +291,9 @@ class ProcessController extends ControllerSupervisorBase
         }
 
         $ini = implode(PHP_EOL, $ini_arr);
+        $uri = "http://{$this->server->ip}:{$this->server->sync_conf_port}";
 
-        $url = "http://{$this->server->ip}:{$this->server->sync_conf_port}/write";
-        $post_data = [];
-        $post_data['file_path'] = $this->server->conf_path;
-        $post_data['content'] = $ini;
-        $post_data['timestamp'] = (string) time();
-
-        $auth_key = 'Mx#d7Xp%ks7m3R1g&XmoUw%9qQ74ehor';
-        $post_data['token'] = strtoupper(md5(
-            $post_data['file_path'] . ':' . $post_data['content'] . ':' . $post_data['timestamp'] . ':' . $auth_key
-        ));
-
-        $ret = curl_post($url, json_encode($post_data));
-        $ret = json_decode($ret, true);
+        $ret = SupervisorSyncConf::write($uri, $this->server->conf_path, $ini);
 
         if (!$ret['state'])
         {

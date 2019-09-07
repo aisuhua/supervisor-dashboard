@@ -1,4 +1,4 @@
-<nav class="navbar navbar-default navbar-fixed-top">
+<nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
     <div class="container-fluid">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
@@ -18,7 +18,7 @@
                     <ul class="dropdown-menu">
                         {% if menu_servers[id] is not empty %}
                             {% for menu_server in menu_servers[id] %}
-                                <li><a href="/process?server_id={{ menu_server['id'] }}&ip={{ menu_server['ip'] }}&port={{ menu_server['port'] }}">{{ menu_server['ip'] }}:{{ menu_server['port'] }}</a></li>
+                                <li><a href="/process?server_id={{ menu_server['id'] }}">{{ menu_server['ip'] }}:{{ menu_server['port'] }}</a></li>
                             {% endfor %}
 
                             <li role="separator" class="divider"></li>

@@ -4,6 +4,8 @@ use Phalcon\Mvc\View;
 
 class ControllerSupervisorBase extends ControllerBase
 {
+    protected $server_id;
+
     /**
      * @var Server $server
      */
@@ -41,6 +43,7 @@ class ControllerSupervisorBase extends ControllerBase
                 $server->port
             );
 
+            $this->server_id = $server_id;
             $this->server = $server;
             $this->supervisor = $supervisor;
             $this->view->server = $server;

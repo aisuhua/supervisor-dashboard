@@ -5,133 +5,56 @@
 <table id="cron-list" class="table table-bordered table-hover table-striped">
     <thead>
     <tr>
-        <th></th>
         <th>ID</th>
+        <th>用户</th>
         <th>时间</th>
         <th>命令</th>
+        <th>备注</th>
         <th>状态</th>
-        <th>说明</th>
         <th>下次执行时间</th>
         <th>上次执行时间</th>
-        <th></th>
+        {#<th>更新时间</th>#}
+        <th>操作</th>
     </tr>
     </thead>
+    <tbody>
+        {% for cron in cron_arr %}
+        <tr>
+            <td>{{ cron['id'] }}</td>
+            <td><code>{{ cron['user'] }}</code></td>
+            <td><code>{{ cron['time'] }}</code></td>
+            <td><code>{{ cron['command'] }}</code></td>
+            <td>{{ cron['description'] }}</td>
+            <td>
+                {% if cron['status'] == 1 %}
+                    启用
+                {% else %}
+                    <span class="text-danger">停用</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if cron['status'] == 1 %}
+                    {{ date ('Y-m-d H:i', cron['next_time']) }}
+                {% else %}
+                    0
+                {% endif %}
+            </td>
+            <td>
+                {% if cron['last_time'] %}
+                    {{ date ('Y-m-d H:i', cron['last_time']) }}
+                {% else %}
+                    {{ cron['last_time'] }}
+                {% endif %}
+            </td>
+            {#<td>{{ date ('Y-m-d H:i', cron['update_time']) }}</td>#}
+            <td>
+                <a href="/cron/edit/{{ cron['id'] }}?server_id={{ server.id }}">修改</a> <span class="text-muted">|</span>
+                <a href="/cron/log?server_id={{ server.id }}&cron_id={{ cron['id'] }}">日志</a> <span class="text-muted">|</span>
+                <a href="/cron/delete/{{ cron['id'] }}?server_id={{ server.id }}" onclick="return confirm('真的要删除吗？');" data-nopush class="delete">删除</a>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="text-center">暂无数据</td></tr>
+        {% endfor %}
+    </tbody>
 </table>
-
-<script>
-
-    $(document).ready(function() {
-
-        var dataTable = $('#cron-list').DataTable({
-            processing: true,
-            pageLength: 100,
-            lengthChange: true,
-            searching: true,
-            serverSide: false,
-            stateSave: true,
-            ajax: '/cron/list',
-            searchHighlight: true,
-            order: [
-                [1, 'asc']
-            ],
-            columnDefs: [
-                {
-                    data: null,
-                    defaultContent: '',
-                    targets: 0,
-                    orderable: false,
-                    className: 'select-checkbox'
-                },
-                {
-                    data: 'id',
-                    targets: 1,
-                    orderable: false,
-                    render: function (data, type, full, meta) {
-                        return data;
-                    }
-                },
-                {
-                    data: 'time',
-                    targets: 2,
-                    orderable: false,
-                    render: function (data, type, full, meta) {
-                        return data;
-                    }
-                },
-                {
-                    data: 'command',
-                    targets: 3,
-                    orderable: false
-                },
-                {
-                    data: 'status',
-                    targets: 4,
-                    orderable: false
-                },
-                {
-                    data: 'description',
-                    targets: 5,
-                    orderable: false
-                },
-                {
-                    data: 'last_time',
-                    targets: 6,
-                    orderable: false,
-                    render: function (data, type, full, meta) {
-                        if (data > 0) {
-                            return new Date(data * 1000).format('Y-m-d H:i');
-                        }
-
-                        return '-';
-                    }
-                },
-                {
-                    data: 'last_time',
-                    targets: 7,
-                    orderable: false,
-                    render: function (data, type, full, meta) {
-                        if (data > 0) {
-                            return new Date(data * 1000).format('Y-m-d H:i');
-                        }
-
-                        return '-';
-                    }
-                },
-                {
-                    targets: 8,
-                    data: 'id',
-                    orderable: false,
-                    render: function (data, type, full, meta) {
-                        var html = '<a href="/server-group/edit/'+ data +'">修改</a> | ';
-                        html += '<a href="javascript: void(0);">查看日志</a> | ';
-                        html += '<a href="/cron/active/'+ data +'" class="active">激活</a> | ';
-                        html += '<a href="/cron/delete/'+ data +'" class="delete">删除</a>';
-
-                        return html;
-                    }
-                }
-            ]
-        });
-
-        $('#cron-list tbody').on('click', 'td a.delete', function () {
-            event.stopPropagation();
-
-            var row = dataTable.row($(this).closest('tr'));
-            var data = row.data();
-
-            if (!confirm('真的要删除 ID 为 '+ data.id +' 的记录吗？')) {
-                return false;
-            }
-
-            $.pjax({
-                url: $(this).attr('href'),
-                container: '#pjax-container',
-                type: 'POST',
-                push: false
-            });
-
-            return false;
-        });
-
-    });
-</script>

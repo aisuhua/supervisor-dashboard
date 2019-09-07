@@ -36,7 +36,7 @@ function curl_post($url, $fields, $timeout = 1)
  * @throws Exception
  * @return string
  */
-function curl_get($url, $fields, $timeout = 1)
+function curl_get($url, $fields = [], $timeout = 1)
 {
     $ch = curl_init();
     if (!empty($fields))

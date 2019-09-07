@@ -1,14 +1,5 @@
 {{ content() }}
-
 {{ flashSession.output() }}
-
-<div class="page-header">
-    {% if serverGroup is empty %}
-        <h1>服务器列表</h1>
-    {% else %}
-        <h1>{{ serverGroup.name }}的服务器列表</h1>
-    {% endif %}
-</div>
 
 <ol class="breadcrumb">
     {% if serverGroup is empty %}
@@ -138,7 +129,7 @@
                     data: 'id',
                     orderable: false,
                     render: function (data, type, full, meta) {
-                        var html = '<a href="/server/'+ data +'/process?ip='+ full.ip +'&port='+ full.port +'" target="_blank">控制台</a> | ';
+                        var html = '<a href="/process?server_id='+ full.id +'&ip='+ full.ip +'&port='+ full.port +'" target="_blank">控制台</a> | ';
 
                         var edit_html = '<a href="/server/edit/'+ data +'">修改</a>  | ';
                         if (server_group_id > 0)
@@ -170,7 +161,7 @@
                     }
                 },
                 {
-                    text: '批量删除',
+                    text: '删除',
                     className: 'btn btn-default',
                     action: function () {
                         var ids = '';

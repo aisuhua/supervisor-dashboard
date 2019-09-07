@@ -5,30 +5,20 @@ class CronController extends ControllerSupervisorBase
 {
     public function indexAction()
     {
-
-    }
-
-    public function listAction()
-    {
-        $draw = $this->request->get('draw', 'int', 0);
-        $offset = $this->request->get('start', 'int', 0);
-        $limit = $this->request->get('length', 'int', 25);
-
-        $cron = Cron::find([
-            'limit' => $limit,
-            'offset' => $offset,
+        $cron_arr = Cron::find([
             'order' => 'id asc'
-        ]);
+        ])->toArray();
 
         $total = Cron::count();
 
-        $data = [];
-        $data['draw'] = $draw + 1;
-        $data['recordsTotal'] = $total;
-        $data['recordsFiltered'] = $total;
-        $data['data'] = $cron->toArray();
+        foreach ($cron_arr as &$cron)
+        {
+            $cronExpress = Cron\CronExpression::factory($cron['time']);
+            $cron['next_time'] = $cronExpress->getNextRunDate()->format('U');
+        }
 
-        return $this->response->setJsonContent($data);
+        $this->view->cron_arr = $cron_arr;
+        $this->view->total = $total;
     }
 
     public function createAction()
@@ -63,5 +53,88 @@ class CronController extends ControllerSupervisorBase
         }
 
         $this->view->form = $form;
+    }
+
+    public function editAction($id)
+    {
+        $cron = Cron::findFirst($id);
+        if (!$cron)
+        {
+            $this->flash->error("不存在该定时任务");
+
+            $this->dispatcher->forward([
+                'action' => 'index',
+                'params' => [
+                    'server_id' => $this->server_id
+                ]
+            ]);
+            return false;
+        }
+
+        if ($this->request->isPost())
+        {
+            $form = new CronForm($cron, [
+                'edit' => true
+            ]);
+
+            if (!$form->isValid($this->request->getPost()))
+            {
+                foreach ($form->getMessages() as $message)
+                {
+                    $this->flash->error($message);
+                }
+            }
+            else
+            {
+                if (!$cron->save())
+                {
+                    $this->flash->error($cron->getMessages());
+                }
+                else
+                {
+                    $this->flash->success("修改成功");
+                    $form->clear();
+                }
+            }
+        }
+
+        $this->view->cron = $cron;
+        $this->view->form = new CronForm($cron, [
+            'edit' => true
+        ]);
+    }
+
+    public function deleteAction($id)
+    {
+        $cron = Cron::findFirst($id);
+
+        if (!$cron)
+        {
+            $this->flash->error('不存在该定时任务');
+        }
+        else
+        {
+            if(!$cron->delete())
+            {
+                $this->flash->error($cron->getMessages());
+            }
+            else
+            {
+                $this->flash->success('删除成功');
+            }
+        }
+
+        $this->dispatcher->forward([
+            'action' => 'index',
+            'params' => [
+                'server_id' => $this->server_id
+            ]
+        ]);
+        return true;
+    }
+
+    public function logAction()
+    {
+
     }
 }
