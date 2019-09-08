@@ -31,8 +31,23 @@ class CronTask extends Task
 //                    echo date('Y-m-d H:i', $current_time), PHP_EOL;
 //                    echo date('Y-m-d H:i', $next_time), PHP_EOL;
 
-                    //
-                    if ((!$cronExpression->isDue() && $cron->last_time >= $last_time) || ($cronExpression->isDue() && $cron->last_time > $last_time))
+                    // 针对从来没有运行过的
+//                    $pre_time = Cron\CronExpression::factory($cron->time)
+//                        ->getPreviousRunDate()
+//                        ->format('U');
+//                    $create_time = strtotime(date('Y-m-d H:i'));
+
+//                    if (($cron->last_time > 0 && !$cronExpression->isDue() && $cron->last_time >= $last_time) ||
+//                        ($cron->last_time > 0 && $cronExpression->isDue() && $cron->last_time > $last_time) ||
+//                        ($cron->last_time == 0 && $pre_time <= $create_time)
+//                    )
+//                    {
+//                        continue;
+//                    }
+
+                    if (($cron->last_time > 0 && !$cronExpression->isDue() && $cron->last_time >= $last_time) ||
+                        ($cron->last_time > 0 && $cronExpression->isDue() && $cron->last_time > $last_time)
+                    )
                     {
                         continue;
                     }
