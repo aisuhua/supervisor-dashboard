@@ -57,6 +57,7 @@ class CronController extends ControllerSupervisorBase
 
     public function editAction($id)
     {
+        /** @var Cron $cron */
         $cron = Cron::findFirst($id);
         if (!$cron)
         {
@@ -86,6 +87,11 @@ class CronController extends ControllerSupervisorBase
             }
             else
             {
+                if ($cron->hasChanged('command') || $cron->hasChanged('user'))
+                {
+                    $cron->last_time = 0;
+                }
+
                 if (!$cron->save())
                 {
                     $this->flash->error($cron->getMessages());

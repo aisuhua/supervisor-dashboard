@@ -27,6 +27,8 @@ class Cron extends Model
 
     public function initialize()
     {
+        $this->keepSnapshots(true);
+
         $this->belongsTo('server_id', 'Server', 'id', [
             'alias' => 'server',
             'reusable' => true

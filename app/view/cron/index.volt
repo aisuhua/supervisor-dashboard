@@ -36,14 +36,14 @@
                 {% if cron['status'] == 1 %}
                     {{ date ('Y-m-d H:i', cron['next_time']) }}
                 {% else %}
-                    0
+                    无
                 {% endif %}
             </td>
             <td>
                 {% if cron['last_time'] %}
                     {{ date ('Y-m-d H:i', cron['last_time']) }}
                 {% else %}
-                    {{ cron['last_time'] }}
+                    无
                 {% endif %}
             </td>
             {#<td>{{ date ('Y-m-d H:i', cron['update_time']) }}</td>#}

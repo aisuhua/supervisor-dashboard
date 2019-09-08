@@ -15,6 +15,9 @@ class CronTask extends Task
             }
 
             $start_time = time();
+            $now = new DateTime();
+            $current_datetime = $now->format('YmdHi');
+            $current_time = $now->format('U');
 
             /** @var Cron $cron */
             foreach ($cron_list as $cron)
@@ -22,43 +25,12 @@ class CronTask extends Task
                 try
                 {
                     $cronExpression = Cron\CronExpression::factory($cron->time);
-                    $last_time = $cronExpression->getPreviousRunDate()->format('U');
-                    $current_time = $cronExpression->getNextRunDate($cronExpression->getPreviousRunDate())->format('U');
-                    $next_time = $cronExpression->getNextRunDate()->format('U');
 
-//                    echo date('Y-m-d H:i:s'), PHP_EOL;
-//                    echo date('Y-m-d H:i', $last_time), PHP_EOL;
-//                    echo date('Y-m-d H:i', $current_time), PHP_EOL;
-//                    echo date('Y-m-d H:i', $next_time), PHP_EOL;
-
-                    // 针对从来没有运行过的
-//                    $pre_time = Cron\CronExpression::factory($cron->time)
-//                        ->getPreviousRunDate()
-//                        ->format('U');
-//                    $create_time = strtotime(date('Y-m-d H:i'));
-
-//                    if (($cron->last_time > 0 && !$cronExpression->isDue() && $cron->last_time >= $last_time) ||
-//                        ($cron->last_time > 0 && $cronExpression->isDue() && $cron->last_time > $last_time) ||
-//                        ($cron->last_time == 0 && $pre_time <= $create_time)
-//                    )
-//                    {
-//                        continue;
-//                    }
-
-                    if (($cron->last_time > 0 && !$cronExpression->isDue() && $cron->last_time >= $last_time) ||
-                        ($cron->last_time > 0 && $cronExpression->isDue() && $cron->last_time > $last_time)
-                    )
+                    // 如果时间没有到或者已经执行过则跳过  21 22 23
+                    if (!$cronExpression->isDue($now))
                     {
                         continue;
                     }
-
-                    // 如果时间没有到或者已经执行过则跳过  21 22 23
-//                    if (!$cronExpression->isDue() &&
-//                        ($cron->last_time > 0 && $cron->last_time > $last_time)
-//                    )
-//                    {
-//                        continue;
-//                    }
 
                     $server = $cron->getServer();
                     $supervisor = new Supervisor(
@@ -69,9 +41,7 @@ class CronTask extends Task
                         $server->port
                     );
 
-                    $now = time();
-                    $datetime = date('YmdHi', $now);
-                    $program = 'sys_cron_' . $cron->id . '_' . $datetime;
+                    $program = 'sys_cron_' . $cron->id . '_' . $current_datetime;
 
                     print_cli("{$program} is starting");
 
@@ -118,7 +88,7 @@ class CronTask extends Task
                     $supervisor->startProcessGroup($program, false);
 
                     // 更新执行时间
-                    $cron->last_time = strtotime(date('Y-m-d H:i'));
+                    $cron->last_time = $current_time;
                     $cron->save();
 
                     // 写日志记录
@@ -137,9 +107,9 @@ class CronTask extends Task
             }
 
             $cost_time = $start_time - time();
-            if ($cost_time < 15)
+            if ($cost_time < 60)
             {
-                sleep(15 - $cost_time);
+                sleep(60 - $cost_time + 1);
             }
         }
     }
