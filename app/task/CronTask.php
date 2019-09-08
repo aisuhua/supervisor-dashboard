@@ -36,21 +36,7 @@ class CronTask extends Task
 
                     print_cli("{$program} is starting");
 
-                    $ini = '';
-                    $ini .= "[program:{$program}]" . PHP_EOL;
-                    $ini .= "command={$cron->command}" . PHP_EOL;
-                    $ini .= "process_name=%(program_name)s_%(process_num)s" . PHP_EOL;
-                    $ini .= "numprocs=1" . PHP_EOL;
-                    $ini .= "numprocs_start=0" . PHP_EOL;
-                    $ini .= "user={$cron->user}" . PHP_EOL;
-                    $ini .= "directory=%(here)s" . PHP_EOL;
-                    $ini .= "autostart=false" . PHP_EOL;
-                    $ini .= "startretries=0" . PHP_EOL;
-                    $ini .= "autorestart=false" . PHP_EOL;
-                    $ini .= "redirect_stderr=true" . PHP_EOL;
-                    $ini .= "stdout_logfile=AUTO" . PHP_EOL;
-                    $ini .= "stdout_logfile_backups=0" . PHP_EOL;
-                    $ini .= "stdout_logfile_maxbytes=50MB" . PHP_EOL;
+                    $ini = $this->makeIni($program, $cron->command, $cron->user);
 
                     if (!$this->addCron($server, $program, $ini))
                     {
@@ -133,21 +119,7 @@ class CronTask extends Task
                 print_cli("{$program} is starting");
 
                 // 同步配置
-                $ini = '';
-                $ini .= "[program:{$program}]" . PHP_EOL;
-                $ini .= "command={$cron->command}" . PHP_EOL;
-                $ini .= "process_name=%(program_name)s_%(process_num)s" . PHP_EOL;
-                $ini .= "numprocs=1" . PHP_EOL;
-                $ini .= "numprocs_start=0" . PHP_EOL;
-                $ini .= "user={$cron->user}" . PHP_EOL;
-                $ini .= "directory=%(here)s" . PHP_EOL;
-                $ini .= "autostart=false" . PHP_EOL;
-                $ini .= "startretries=0" . PHP_EOL;
-                $ini .= "autorestart=false" . PHP_EOL;
-                $ini .= "redirect_stderr=true" . PHP_EOL;
-                $ini .= "stdout_logfile=AUTO" . PHP_EOL;
-                $ini .= "stdout_logfile_backups=0" . PHP_EOL;
-                $ini .= "stdout_logfile_maxbytes=50MB" . PHP_EOL;
+                $ini = $this->makeIni($program, $cron->command, $cron->user);
 
                 if (!$this->addCron($server, $program, $ini))
                 {
@@ -178,6 +150,27 @@ class CronTask extends Task
     public function checkRunStateAction()
     {
 
+    }
+
+    private function makeIni($program, $command, $user)
+    {
+        $ini = '';
+        $ini .= "[program:{$program}]" . PHP_EOL;
+        $ini .= "command={$command}" . PHP_EOL;
+        $ini .= "process_name=%(program_name)s_%(process_num)s" . PHP_EOL;
+        $ini .= "numprocs=1" . PHP_EOL;
+        $ini .= "numprocs_start=0" . PHP_EOL;
+        $ini .= "user={$user}" . PHP_EOL;
+        $ini .= "directory=%(here)s" . PHP_EOL;
+        $ini .= "autostart=false" . PHP_EOL;
+        $ini .= "startretries=0" . PHP_EOL;
+        $ini .= "autorestart=false" . PHP_EOL;
+        $ini .= "redirect_stderr=true" . PHP_EOL;
+        $ini .= "stdout_logfile=AUTO" . PHP_EOL;
+        $ini .= "stdout_logfile_backups=0" . PHP_EOL;
+        $ini .= "stdout_logfile_maxbytes=50MB" . PHP_EOL;
+
+        return $ini;
     }
 
     private function addCron(Server $server, $program, $ini)
