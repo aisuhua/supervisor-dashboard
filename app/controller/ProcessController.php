@@ -3,6 +3,13 @@ use Phalcon\Mvc\View;
 
 class ProcessController extends ControllerSupervisorBase
 {
+    public function testAction()
+    {
+        $processes = $this->supervisor->getProcessInfo('sys_cron_27_201909081319:sys_cron_27_201909081319_0');
+
+        var_dump($processes);exit;
+    }
+
     public function indexAction()
     {
         $processes = [];

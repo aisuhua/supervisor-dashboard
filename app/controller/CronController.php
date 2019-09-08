@@ -6,6 +6,10 @@ class CronController extends ControllerSupervisorBase
     public function indexAction()
     {
         $cron_arr = Cron::find([
+            'server_id = :server_id:',
+            'bind' => [
+                'server_id' => $this->server_id
+            ],
             'order' => 'id asc'
         ])->toArray();
 
@@ -87,7 +91,11 @@ class CronController extends ControllerSupervisorBase
             }
             else
             {
-                if ($cron->hasChanged('command') || $cron->hasChanged('user'))
+                if ($cron->hasChanged('command') ||
+                    $cron->hasChanged('user') ||
+                    $cron->hasChanged('status') ||
+                    $cron->hasChanged('time')
+                )
                 {
                     $cron->last_time = 0;
                 }

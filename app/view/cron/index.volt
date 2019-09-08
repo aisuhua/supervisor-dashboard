@@ -13,7 +13,7 @@
         <th>状态</th>
         <th>下次执行时间</th>
         <th>上次执行时间</th>
-        {#<th>更新时间</th>#}
+        <th>更新时间</th>
         <th>操作</th>
     </tr>
     </thead>
@@ -34,19 +34,19 @@
             </td>
             <td>
                 {% if cron['status'] == 1 %}
-                    {{ date ('Y-m-d H:i', cron['next_time']) }}
+                    {{ date ('Y-m-d H:i:s', cron['next_time']) }}
                 {% else %}
                     无
                 {% endif %}
             </td>
             <td>
                 {% if cron['last_time'] %}
-                    {{ date ('Y-m-d H:i', cron['last_time']) }}
+                    {{ date ('Y-m-d H:i:s', cron['last_time']) }}
                 {% else %}
                     无
                 {% endif %}
             </td>
-            {#<td>{{ date ('Y-m-d H:i', cron['update_time']) }}</td>#}
+            <td>{{ date ('Y-m-d H:i', cron['update_time']) }}</td>
             <td>
                 <a href="/cron/edit/{{ cron['id'] }}?server_id={{ server.id }}">修改</a> <span class="text-muted">|</span>
                 <a href="/cron/log?server_id={{ server.id }}&cron_id={{ cron['id'] }}">日志</a> <span class="text-muted">|</span>
@@ -54,7 +54,7 @@
             </td>
         </tr>
         {% else %}
-        <tr><td colspan="8" class="text-center">暂无数据</td></tr>
+        <tr><td colspan="9" class="text-center">暂无数据</td></tr>
         {% endfor %}
     </tbody>
 </table>

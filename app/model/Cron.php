@@ -19,6 +19,7 @@ class Cron extends Model
     public $description;
     public $status;
     public $last_time;
+    public $prev_time;
     public $update_time;
     public $create_time;
 
