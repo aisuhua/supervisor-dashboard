@@ -31,40 +31,10 @@ class CronTask extends Task
                         continue;
                     }
 
-//                    $last_time = $cronExpression->getPreviousRunDate()->format('U');
-//                    $next_time = $cronExpression->getNextRunDate($cronExpression->getPreviousRunDate())
-//                        ->format('U');
-//                    if (($cron->last_time > 0 && $current_time - $cron->last_time < $next_time - $last_time) ||
-//                        ($cron->last_time == 0 && $current_time - $cron->update_time < $next_time - $last_time))
-//                    {
-//                        continue;
-//                    }
-
                     $server = $cron->getServer();
-                    $supervisor = new Supervisor(
-                        $server->id,
-                        $server->ip,
-                        $server->username,
-                        $server->password,
-                        $server->port
-                    );
-
                     $program = 'sys_cron_' . $cron->id . '_' . $current_datetime;
 
                     print_cli("{$program} is starting");
-
-                    // 同步配置
-                    $conf_path = '/etc/supervisor/conf.d/cron.conf';
-                    $uri = "http://{$server->ip}:{$server->sync_conf_port}";
-
-                    $read = SupervisorSyncConf::read($uri, $conf_path);
-                    $is_empty_file = strpos($read['message'], 'no such file or directory');
-
-                    if (!$read['state'] && !$is_empty_file)
-                    {
-                        print_cli("配置读取出错：{$read['message']}");
-                        continue;
-                    }
 
                     $ini = '';
                     $ini .= "[program:{$program}]" . PHP_EOL;
@@ -82,18 +52,11 @@ class CronTask extends Task
                     $ini .= "stdout_logfile_backups=0" . PHP_EOL;
                     $ini .= "stdout_logfile_maxbytes=50MB" . PHP_EOL;
 
-                    $ini = trim($read['content']) . PHP_EOL . $ini;
-
-                    $write = SupervisorSyncConf::write($uri, $conf_path, $ini);
-                    if (!$write['state'])
+                    if (!$this->addCron($server, $program, $ini))
                     {
-                        print_cli("配置写入出错：{$write['message']}");
+                        print_cli("{$program} 配置添加失败");
                         continue;
                     }
-
-                    $supervisor->reloadConfig();
-                    $supervisor->addProcessGroup($program);
-                    $supervisor->startProcessGroup($program, false);
 
                     // 更新执行时间
                     $cron->last_time = $current_time;
@@ -210,6 +173,11 @@ class CronTask extends Task
                 );
             }
          }
+    }
+
+    public function checkRunStateAction()
+    {
+
     }
 
     private function addCron(Server $server, $program, $ini)

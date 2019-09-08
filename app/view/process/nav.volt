@@ -62,15 +62,7 @@ $(function() {
             lineWrapping: true,
             indentUnit: 0,
             autoRefresh: true,
-            automaticLayout: true,
-            extraKeys: {
-                "F11": function(cm) {
-                    cm.setOption("fullScreen", !cm.getOption("fullScreen"));
-                },
-                "Esc": function(cm) {
-                    if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
-                }
-            }
+            automaticLayout: true
         });
 
         editor.setSize('100%', '100%');
