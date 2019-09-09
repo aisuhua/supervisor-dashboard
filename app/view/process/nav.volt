@@ -31,7 +31,9 @@
             dispatcher.getActionName() == 'edit'
         %}
             {% set cron_create_class = 'active' %}
-        {% elseif dispatcher.getActionName() == 'log' %}
+        {% endif %}
+    {% elseif dispatcher.getControllerName() == 'cron-log' %}
+        {% if dispatcher.getActionName() == 'index' %}
             {% set cron_log_class = 'active' %}
         {% endif %}
     {% endif %}
@@ -41,7 +43,7 @@
     <li role="presentation" class="{{ ini_class }}"><a href="/process/ini?server_id={{ server.id }}">进程配置</a></li>
     <li role="presentation" class="{{ cron_class }}"><a href="/cron?server_id={{ server.id }}">定时任务</a></li>
     <li role="presentation" class="{{ cron_create_class }}"><a href="/cron/create?server_id={{ server.id }}">添加/修改任务</a></li>
-    <li role="presentation" class="{{ cron_log_class }}"><a href="/cron/log?server_id={{ server.id }}">任务日志</a></li>
+    <li role="presentation" class="{{ cron_log_class }}"><a href="/cron-log/?server_id={{ server.id }}">执行日志</a></li>
     {#<li role="presentation" class="{{ clone_class }}"><a href="#">克隆配置</a></li>#}
 </ul>
 

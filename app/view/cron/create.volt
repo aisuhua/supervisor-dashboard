@@ -14,12 +14,12 @@
             {{ form.render('command') }}
         </div>
         <div class="form-group">
-            <label for="description">备注</label>
-            {{ form.render('description') }}
-        </div>
-        <div class="form-group">
             <label for="status">状态</label>
             {{ form.render('status') }}
+        </div>
+        <div class="form-group">
+            <label for="description">备注</label>
+            {{ form.render('description') }}
         </div>
         <button type="submit" class="btn btn-primary">保存</button>
     </div>
