@@ -23,10 +23,11 @@ class CronLog extends Model
     public $update_time;
     public $create_time;
 
-    const STATUS_INI = 0;
-    const STATUS_STARTED = 1;
-    const STATUS_FINISHED = 2;
-    const STATUS_FAILED = -1;
+    const STATUS_INI = 0; // 初始化状态
+    const STATUS_STARTED = 1; // 已启动
+    const STATUS_FINISHED = 2; // 已正常完成
+    const STATUS_FAILED = -1; // 没有正常退出
+    const STATUS_UNKNOWN = -2; // 无法确定进程的执行状态
 
     public function initialize()
     {

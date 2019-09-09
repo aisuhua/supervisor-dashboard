@@ -6,12 +6,12 @@
     {{ form.render('server_id', ['value': server.id]) }}
     <div class="col-lg-6">
         <div class="form-group">
-            <label for="user">用户</label>
-            {{ form.render('user') }}
-        </div>
-        <div class="form-group">
             <label for="command">命令</label>
             {{ form.render('command') }}
+        </div>
+        <div class="form-group">
+            <label for="user">用户</label>
+            {{ form.render('user') }}
         </div>
         <div class="form-group">
             <label for="status">状态</label>

@@ -9,7 +9,7 @@
         <th>ID</th>
         <th>任务 ID</th>
         <th>命令</th>
-        <th>状态</th>
+        <th>执行状态</th>
         <th>耗时</th>
         <th>启动时间</th>
         <th>操作</th>
@@ -21,7 +21,7 @@
 $(function() {
     var dataTable = $('#cron-log-table').DataTable({
         processing: true,
-        pageLength: 10,
+        pageLength: 25,
         lengthChange: false,
         searching: true,
         serverSide: false,
@@ -72,13 +72,15 @@ $(function() {
                 orderable: false,
                 render: function (data, type, full, meta) {
                     if (data == 0) {
-                        return '<span class="">正在执行</span>';
+                        return '<span class="">运行中</span>';
                     } else if (data == 1) {
-                        return '<span class="">正在执行</span>';
+                        return '<span class="">运行中</span>';
                     } else if (data == 2) {
-                        return '<span class="text-">已完成</span>';
+                        return '<span class="text-success">已完成</span>';
+                    } else if (data == -2) {
+                        return '<span class="text-warning">无法确定</span>';
                     } else {
-                        return '<span class="text-danger">执行失败</span>';
+                        return '<span class="text-danger">失败</span>';
                     }
                 }
             },

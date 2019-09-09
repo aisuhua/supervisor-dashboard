@@ -67,12 +67,7 @@ class CronTask extends Task
                 }
                 catch (Exception $e)
                 {
-                    print_cli(
-                        get_class($e), ': ', $e->getMessage(),
-                        ' in File:', $e->getFile(),
-                        ' on Line: ', $e->getLine(),
-                        "\n Trace: ", $e->getTraceAsString()
-                    );
+                    print_cli($e->getMessage());
                 }
             }
 
@@ -89,11 +84,6 @@ class CronTask extends Task
             {
                 sleep(1);
             }
-
-//            if ($cost_time < 60)
-//            {
-//                sleep(60 - $cost_time + 1);
-//            }
         }
     }
 
@@ -122,7 +112,7 @@ class CronTask extends Task
                     continue;
                 }
 
-                // 只启动那些因关机等原因
+                // 只启动那些因关机等原因导致没有在约定时间启动的任务，类似 anacron 的功能
                 $delay = (int) $next_time - (int) $last_time + 3600;
                 if (($cron->last_time > 0 && $current_time - $cron->last_time < $delay) ||
                     ($cron->last_time == 0 && $current_time - $cron->update_time < $delay) ||
@@ -154,14 +144,9 @@ class CronTask extends Task
             }
             catch (Exception $e)
             {
-                print_cli(
-                    get_class($e), ': ', $e->getMessage(),
-                    ' in File:', $e->getFile(),
-                    ' on Line: ', $e->getLine(),
-                    "\n Trace: ", $e->getTraceAsString()
-                );
+                print_cli($e->getMessage());
             }
-         }
+        }
     }
 
     public function checkRunStateAction()
@@ -181,54 +166,79 @@ class CronTask extends Task
             /** @var CronLog $cronLog */
             foreach ($cronLogs as $cronLog)
             {
-                $server = $cronLog->getServer();
-                $supervisor = new Supervisor(
-                    $server->id,
-                    $server->ip,
-                    $server->username,
-                    $server->password,
-                    $server->port
-                );
-
                 try
                 {
+                    $server = $cronLog->getServer();
+                    $supervisor = new Supervisor(
+                        $server->id,
+                        $server->ip,
+                        $server->username,
+                        $server->password,
+                        $server->port
+                    );
+
                     $process_name = $cronLog->program . ':' . $cronLog->program . '_0';
-                    $info = $supervisor->getProcessInfo($process_name);
+
+                    try
+                    {
+                        // 极端的情况下，定时任务所对应的进程不存在
+                        $info = $supervisor->getProcessInfo($process_name);
+                    }
+                    catch (Exception $e)
+                    {
+                        print_cli($e->getMessage());
+
+                        // 若定时任务所对应的进程不存在，则将该任务标志为不确定
+                        if ($e instanceof Zend\XmlRpc\Client\Exception\FaultException &&
+                            strpos($e->getMessage(), 'BAD_NAME:') !== false
+                        )
+                        {
+                            $cronLog->status = CronLog::STATUS_UNKNOWN;
+                            $cronLog->save();
+
+                            continue;
+                        }
+
+                        throw $e;
+                    }
+
+                    if (in_array($info['statename'], ['STARTING', 'RUNNING', 'STOPPING']))
+                    {
+                        // 已启动，正在运行，则跳过
+                        $cronLog->status = CronLog::STATUS_STARTED;
+                        $cronLog->save();
+
+                        continue;
+                    }
 
                     if ($info['statename'] == 'EXITED')
                     {
                         $cronLog->status = CronLog::STATUS_FINISHED;
-                        $cronLog->end_time = $info['stop'];
-                    }
-                    elseif (in_array($info['statename'], ['STARTING', 'RUNNING', 'STOPPING']))
-                    {
-                        $cronLog->status = CronLog::STATUS_STARTED;
                     }
                     elseif (in_array($info['statename'], ['BACKOFF', 'FATAL', 'UNKNOWN', 'STOPPED']))
                     {
                         $cronLog->status = CronLog::STATUS_FAILED;
-                        $cronLog->end_time = $info['stop'];
                     }
 
-                    // 将日志写到数据库
-                    if ($info['stop'] > 0)
-                    {
-                        $cronLog->log = $supervisor->tailProcessStdoutLog($process_name, 0, 16 * 1024 * 1024)[0];
-                    }
-
+                    // 进程退出时间
+                    $cronLog->end_time = $info['stop'];
+                    // 读取进程日志并写入数据库
+                    $cronLog->log = $supervisor->tailProcessStdoutLog($process_name, 0, 16 * 1024 * 1024)[0];
                     $cronLog->save();
 
-                    if ($info['stop'] > 0)
-                    {
-                        // 删除进程
-                        $this->removeCron($server, $cronLog->program);
+                    // 清理进程日志，以释放该任务所占用的日志文件
+                    $result = $supervisor->clearProcessLogs($process_name);
+                    $result = $supervisor->clearProcessLogs($process_name);
+                    var_dump($result);
 
-                        print_r($info);
-                    }
+                    // 删除进程
+                    $this->removeCron($server, $cronLog->program);
+
+                    print_cli("{$cronLog->program} 已执行完成");
                 }
                 catch (Exception $e)
                 {
-
+                    print_cli($e->getMessage());
                 }
             }
 
@@ -250,13 +260,20 @@ class CronTask extends Task
         $ini .= "startretries=0" . PHP_EOL;
         $ini .= "autorestart=false" . PHP_EOL;
         $ini .= "redirect_stderr=true" . PHP_EOL;
-        $ini .= "stdout_logfile=AUTO" . PHP_EOL;
+        $ini .= "stdout_logfile=/var/log/supervisor/demo.log" . PHP_EOL;
         $ini .= "stdout_logfile_backups=0" . PHP_EOL;
         $ini .= "stdout_logfile_maxbytes=512MB" . PHP_EOL;
 
         return $ini;
     }
 
+    /**
+     * 删除定时任务
+     *
+     * @param Server $server
+     * @param $program
+     * @return bool
+     */
     private function removeCron(Server $server, $program)
     {
         $supervisor = new Supervisor(
@@ -282,7 +299,7 @@ class CronTask extends Task
             $read = SupervisorSyncConf::read($uri, $conf_path);
             $is_empty_file = strpos($read['message'], 'no such file or directory');
 
-            if (!$read['state'] && !$is_empty_file)
+            if (!$read['state'] && $is_empty_file === false)
             {
                 print_cli("配置读取出错：{$read['message']}");
                 return false;
@@ -301,8 +318,6 @@ class CronTask extends Task
                 return false;
             }
 
-            // print_r($parsed);
-
             $key = "program:{$program}";
 
             if (!isset($parsed[$key]))
@@ -312,17 +327,7 @@ class CronTask extends Task
             }
 
             unset($parsed[$key]);
-
-            $ini = '';
-            foreach ($parsed as $key => $item)
-            {
-                $ini .= '[' . $key . ']' . PHP_EOL;
-
-                foreach ($item as $k => $v)
-                {
-                    $ini .= $k . '=' . $v . PHP_EOL;
-                }
-            }
+            $ini = build_ini_string($parsed);
 
             $write = SupervisorSyncConf::write($uri, $conf_path, $ini);
             if (!$write['state'])
@@ -336,12 +341,7 @@ class CronTask extends Task
         }
         catch (Exception $e)
         {
-            print_cli(
-                get_class($e), ': ', $e->getMessage(),
-                ' in File:', $e->getFile(),
-                ' on Line: ', $e->getLine(),
-                "\n Trace: ", $e->getTraceAsString()
-            );
+            print_cli($e->getMessage());
 
             if (!$config_lock->unlock())
             {
@@ -360,6 +360,14 @@ class CronTask extends Task
         return true;
     }
 
+    /**
+     * 添加定时任务
+     *
+     * @param Server $server
+     * @param $program
+     * @param $ini
+     * @return bool
+     */
     private function addCron(Server $server, $program, $ini)
     {
         $supervisor = new Supervisor(
@@ -370,28 +378,49 @@ class CronTask extends Task
             $server->port
         );
 
-        $conf_path = '/etc/supervisor/conf.d/cron.conf';
-        $uri = "http://{$server->ip}:{$server->sync_conf_port}";
-
-        $config_lock = new ConfigLock();
-        if (!$config_lock->lock())
-        {
-            print_cli('配置锁定失败');
-            return false;
-        }
+        $uri = $server->getSupervisorUri();
+        $conf_path = $server->getCronConfPath();
 
         try
         {
+            $config_lock = new ConfigLock();
+            if (!$config_lock->lock())
+            {
+                print_cli('配置锁定失败');
+                return false;
+            }
+
             $read = SupervisorSyncConf::read($uri, $conf_path);
             $is_empty_file = strpos($read['message'], 'no such file or directory');
 
-            if (!$read['state'] && !$is_empty_file)
+            if (!$read['state'] && $is_empty_file === false)
             {
                 print_cli("配置读取出错：{$read['message']}");
                 return false;
             }
 
-            $ini = trim($read['content']) . PHP_EOL . $ini;
+            // 如果配置不为空
+            if (!empty($read['content']))
+            {
+                $parsed = parse_ini_string($read['content'], true, INI_SCANNER_RAW);
+                if ($parsed === false)
+                {
+                    print_cli("配置解析出错：{$read['content']}");
+                    return false;
+                }
+
+                $key = "program:{$program}";
+
+                // 现有配置项已经有该进程的信息
+                if (isset($parsed[$key]))
+                {
+                    print_cli("{$key} 配置项已经存在，跳过");
+                    return true;
+                }
+
+                $origin = build_ini_string($parsed);
+                $ini = trim($origin) . PHP_EOL . $ini;
+            }
 
             $write = SupervisorSyncConf::write($uri, $conf_path, $ini);
             if (!$write['state'])
@@ -403,15 +432,24 @@ class CronTask extends Task
             $supervisor->reloadConfig();
             $supervisor->addProcessGroup($program);
             $supervisor->startProcessGroup($program, false);
+
+            if (!$config_lock->unlock())
+            {
+                echo '配置解锁失败', PHP_EOL;
+                return false;
+            }
+
+            return true;
         }
         catch (Exception $e)
         {
-            print_cli(
-                get_class($e), ': ', $e->getMessage(),
-                ' in File:', $e->getFile(),
-                ' on Line: ', $e->getLine(),
-                "\n Trace: ", $e->getTraceAsString()
-            );
+//            print_cli(
+//                get_class($e), ': ', $e->getMessage(),
+//                ' in File:', $e->getFile(),
+//                ' on Line: ', $e->getLine(),
+//                "\n Trace: ", $e->getTraceAsString()
+//            );
+            print_cli($e->getMessage());
 
             if (!$config_lock->unlock())
             {
@@ -420,35 +458,5 @@ class CronTask extends Task
 
             return false;
         }
-
-        if (!$config_lock->unlock())
-        {
-            echo '配置解锁失败', PHP_EOL;
-            return false;
-        }
-
-        return true;
-    }
-
-    public function lockAction()
-    {
-        $config_lock = new ConfigLock();
-        if (!$config_lock->lock())
-        {
-            echo '配置锁定失败', PHP_EOL;
-            return false;
-        }
-
-        echo '111', PHP_EOL;
-        sleep(10);
-        echo '222', PHP_EOL;
-
-        if (!$config_lock->unlock())
-        {
-            echo '配置解锁失败', PHP_EOL;
-            return false;
-        }
-
-        echo 'done', PHP_EOL;
     }
 }

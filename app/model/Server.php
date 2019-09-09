@@ -51,4 +51,14 @@ class Server extends Model
 
         return $this->validate($validator);
     }
+
+    public function getSupervisorUri()
+    {
+        return "http://{$this->ip}:{$this->sync_conf_port}";
+    }
+
+    public function getCronConfPath()
+    {
+       return '/etc/supervisor/conf.d/cron.conf';
+    }
 }
