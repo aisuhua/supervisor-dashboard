@@ -29,8 +29,7 @@ class CronLogController extends ControllerSupervisorBase
         $cronLogs = CronLog::find([
             $where,
             'bind' => $bind,
-            'order' => 'id desc',
-            'limit' => 100
+            'order' => 'id desc'
         ]);
 
         $total = CronLog::count();
@@ -75,26 +74,25 @@ class CronLogController extends ControllerSupervisorBase
             }
             catch (Exception $e)
             {
-                // 如果进程已经执行完成，则读取数据库的日志
-                if ($e->getCode() == XmlRpc::BAD_NAME)
-                {
-                    $cronLog = $this->db->fetchOne($sql, Db::FETCH_ASSOC, [
-                        'id' => $id
-                    ]);
-
-                    if (!$cronLog)
-                    {
-                        $this->flash->error("不存在该任务日志");
-
-                        $this->dispatcher->forward([
-                            'action' => 'index'
-                        ]);
-                        return false;
-                    }
-                }
-                else
+                // 进程不存在，一般来说是因为该进程已经执行完成并已经被删除
+                if ($e->getCode() != XmlRpc::BAD_NAME)
                 {
                     throw $e;
+                }
+
+                // 如果进程已经执行完成，则读取数据库的日志
+                $cronLog = $this->db->fetchOne($sql, Db::FETCH_ASSOC, [
+                    'id' => $id
+                ]);
+
+                if (!$cronLog)
+                {
+                    $this->flash->error("不存在该任务日志");
+
+                    $this->dispatcher->forward([
+                        'action' => 'index'
+                    ]);
+                    return false;
                 }
             }
         }

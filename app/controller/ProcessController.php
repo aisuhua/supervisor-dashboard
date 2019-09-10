@@ -7,6 +7,39 @@ class ProcessController extends ControllerSupervisorBase
     {
         try
         {
+            $program = 'sys_cron_22_201909101741';
+            $result = $this->supervisor->removeProcessGroup($program);
+
+            var_dump($result);
+            exit;
+        }
+        catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+        {
+            if ($e->getCode() == XmlRpc::BAD_NAME)
+            {
+
+            }
+
+            if ($e->getCode() == XmlRpc::STILL_RUNNING)
+            {
+
+            }
+
+            echo get_class($e), PHP_EOL;
+            echo $e->getMessage(), PHP_EOL;
+            echo $e->getCode(), PHP_EOL;
+        }
+        catch (Exception $e)
+        {
+            echo get_class($e), PHP_EOL;
+            echo $e->getMessage(), PHP_EOL;
+            echo $e->getCode(), PHP_EOL;
+        }
+
+        exit;
+
+        try
+        {
             $processes = $this->supervisor->getProcessInfo('sys_cron_27_201909081319:sys_cron_27_201909081319_0');
         }
         catch (Zend\XmlRpc\Client\Exception\FaultException $e)

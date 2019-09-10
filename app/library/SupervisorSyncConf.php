@@ -38,9 +38,16 @@ class SupervisorSyncConf
             $data['file_path'] . ':' . $data['timestamp'] . ':' . self::$key
         ));
 
-        return json_decode(curl_post($url, json_encode($data)), true);
+        return self::handelResult(curl_post($url, json_encode($data)));
     }
 
+    /**
+     * 删除日志文件
+     *
+     * @param $uri
+     * @param $file_path
+     * @return mixed
+     */
     public static function delete($uri, $file_path)
     {
         $url = $uri . '/delete';
@@ -52,6 +59,17 @@ class SupervisorSyncConf
             $data['file_path'] . ':' . $data['timestamp'] . ':' . self::$key
         ));
 
-        return json_decode(curl_post($url, json_encode($data)), true);
+        return self::handelResult(curl_post($url, json_encode($data)));
+    }
+
+    /**
+     * handelResult
+     *
+     * @param $result
+     * @return mixed
+     */
+    private static function handelResult($result)
+    {
+        return json_decode($result, true);
     }
 }
