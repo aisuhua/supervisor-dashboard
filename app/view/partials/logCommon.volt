@@ -50,11 +50,12 @@
             var refresh_url = $(this).attr('href');
 
             function refresh() {
+
                 var r = 'random=' + Math.random();
-                refresh_url += refresh_url.indexOf('?') >= 0 ? ('&' + r) : ('?' + r);
+                var url = refresh_url + (refresh_url.indexOf('?') >= 0 ? ('&' + r) : ('?' + r));
 
                 $.pjax({
-                    url: refresh_url,
+                    url: url,
                     container: '#pjax-container',
                     push: false,
                     timeout: 180000

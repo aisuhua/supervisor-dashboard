@@ -44,7 +44,8 @@ class CronForm extends Form
         // command
         $command = new Text('command', [
             'class' => 'form-control',
-            'autocomplete' => 'off'
+            'autocomplete' => 'off',
+            'autofocus' => 'autofocus'
         ]);
 
         $command->addValidators([

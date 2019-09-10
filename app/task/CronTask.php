@@ -232,7 +232,7 @@ class CronTask extends Task
                     // 进程退出时间
                     $cronLog->end_time = $info['stop'];
                     // 读取进程日志并写入数据库
-                    $cronLog->log = $supervisor->tailProcessStdoutLog($process_name, 0, 128 * 1024 * 1024)[0];
+                    $cronLog->log = $supervisor->tailProcessStdoutLog($process_name, 0, 16 * 1024 * 1024)[0];
 
                     // 删除进程
                     if (!$this->removeCron($server, $cronLog->program, $info['stdout_logfile']))
@@ -545,7 +545,7 @@ class CronTask extends Task
         $ini .= "redirect_stderr=true" . PHP_EOL;
         $ini .= "stdout_logfile=AUTO" . PHP_EOL;
         $ini .= "stdout_logfile_backups=0" . PHP_EOL;
-        $ini .= "stdout_logfile_maxbytes=512MB" . PHP_EOL;
+        $ini .= "stdout_logfile_maxbytes=16MB" . PHP_EOL;
 
         return $ini;
     }
