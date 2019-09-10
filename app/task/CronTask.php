@@ -539,7 +539,7 @@ class CronTask extends Task
         $ini .= "numprocs_start=0" . PHP_EOL;
         $ini .= "user={$user}" . PHP_EOL;
         $ini .= "directory=%(here)s" . PHP_EOL;
-        $ini .= "startsecs=1" . PHP_EOL;
+        $ini .= "startsecs=0" . PHP_EOL;
         $ini .= "autostart=false" . PHP_EOL;
         $ini .= "startretries=0" . PHP_EOL;
         $ini .= "autorestart=false" . PHP_EOL;
