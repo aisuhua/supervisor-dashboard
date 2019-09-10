@@ -29,7 +29,7 @@ class CronLogController extends ControllerSupervisorBase
         $cronLogs = CronLog::find([
             $where,
             'bind' => $bind,
-            'columns' => "id, cron_id, command, program, status, start_time, end_time",
+            'columns' => "id, server_id, cron_id, command, program, status, start_time, end_time",
             'order' => 'id desc'
         ]);
 
