@@ -10,6 +10,10 @@
             {{ form.render('command') }}
         </div>
         <div class="form-group">
+            <label for="description">备注</label>
+            {{ form.render('description') }}
+        </div>
+        <div class="form-group">
             <label for="user">用户</label>
             {{ form.render('user') }}
         </div>
@@ -18,8 +22,12 @@
             {{ form.render('status') }}
         </div>
         <div class="form-group">
-            <label for="description">备注</label>
-            {{ form.render('description') }}
+            <label for="description">持续运行至少秒数</label>
+            <input type="text" class="form-control" value="0"/>
+        </div>
+        <div class="form-group">
+            <label for="description">保留日志数量</label>
+            <input type="text" class="form-control" value="60"/>
         </div>
         <button type="submit" class="btn btn-primary">保存</button>
     </div>
