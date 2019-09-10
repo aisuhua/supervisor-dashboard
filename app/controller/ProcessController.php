@@ -5,7 +5,24 @@ class ProcessController extends ControllerSupervisorBase
 {
     public function testAction()
     {
-        $processes = $this->supervisor->getProcessInfo('sys_cron_27_201909081319:sys_cron_27_201909081319_0');
+        try
+        {
+            $processes = $this->supervisor->getProcessInfo('sys_cron_27_201909081319:sys_cron_27_201909081319_0');
+        }
+        catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+        {
+            if ($e->getCode() == XmlRpc::BAD_NAME)
+            {
+                echo '该进程不存在';
+                return false;
+            }
+
+            echo get_class($e), PHP_EOL;
+            echo $e->getMessage(), PHP_EOL;
+            ECHO $e->getCode(), PHP_EOL;
+        }
+
+
 
         var_dump($processes);exit;
     }

@@ -28,6 +28,7 @@ class CronLog extends Model
     const STATUS_FINISHED = 2; // 已正常完成
     const STATUS_FAILED = -1; // 没有正常退出
     const STATUS_UNKNOWN = -2; // 无法确定进程的执行状态
+    const STATUS_STOPPED = -3; // 被中断
 
     public function initialize()
     {

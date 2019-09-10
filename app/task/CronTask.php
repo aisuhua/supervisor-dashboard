@@ -190,7 +190,7 @@ class CronTask extends Task
 
                         // 若定时任务所对应的进程不存在，则将该任务标志为不确定
                         if ($e instanceof Zend\XmlRpc\Client\Exception\FaultException &&
-                            strpos($e->getMessage(), 'BAD_NAME:') !== false
+                           $e->getCode() == XmlRpc::BAD_NAME
                         )
                         {
                             $cronLog->status = CronLog::STATUS_UNKNOWN;
@@ -213,26 +213,38 @@ class CronTask extends Task
 
                     if ($info['statename'] == 'EXITED')
                     {
+                        // 正常退出
                         $cronLog->status = CronLog::STATUS_FINISHED;
                     }
-                    elseif (in_array($info['statename'], ['BACKOFF', 'FATAL', 'UNKNOWN', 'STOPPED']))
+                    elseif (in_array($info['statename'], ['BACKOFF', 'FATAL', 'UNKNOWN']))
                     {
+                        // 异常退出
                         $cronLog->status = CronLog::STATUS_FAILED;
+                    }
+                    elseif ($info['statename'] == 'STOPPED')
+                    {
+                        // 被中断执行
+                        $cronLog->status = CronLog::STATUS_STOPPED;
                     }
 
                     // 进程退出时间
                     $cronLog->end_time = $info['stop'];
                     // 读取进程日志并写入数据库
-                    $cronLog->log = $supervisor->tailProcessStdoutLog($process_name, 0, 16 * 1024 * 1024)[0];
+                    $cronLog->log = $supervisor->tailProcessStdoutLog($process_name, 0, 128 * 1024 * 1024)[0];
                     $cronLog->save();
 
-                    // 清理进程日志，以释放该任务所占用的日志文件
-                    $result = $supervisor->clearProcessLogs($process_name);
-                    $result = $supervisor->clearProcessLogs($process_name);
-                    var_dump($result);
+                    // 每个任务只保存最新的 30 份日志
+                    $sql = "select id from cron_log where cron_id = {$cronLog->cron_id} order by id desc limit 29, 1";
+                    $one = $this->db->fetchOne($sql);
+
+                    if ($one)
+                    {
+                        $sql = "DELETE FROM cron_log where cron_id = {$cronLog->cron_id} and id < {$one['id']}";
+                        $this->db->execute($sql);
+                    }
 
                     // 删除进程
-                    $this->removeCron($server, $cronLog->program);
+                    $this->removeCron($server, $cronLog->program, $info['stdout_logfile']);
 
                     print_cli("{$cronLog->program} 已执行完成");
                 }
@@ -244,6 +256,14 @@ class CronTask extends Task
 
             sleep(1);
         }
+    }
+
+    /**
+     * 每个小时启动清理僵死进程
+     */
+    public function clearDefunctProcessAction()
+    {
+        
     }
 
     private function makeIni($program, $command, $user)
@@ -260,7 +280,7 @@ class CronTask extends Task
         $ini .= "startretries=0" . PHP_EOL;
         $ini .= "autorestart=false" . PHP_EOL;
         $ini .= "redirect_stderr=true" . PHP_EOL;
-        $ini .= "stdout_logfile=/var/log/supervisor/demo.log" . PHP_EOL;
+        $ini .= "stdout_logfile=AUTO" . PHP_EOL;
         $ini .= "stdout_logfile_backups=0" . PHP_EOL;
         $ini .= "stdout_logfile_maxbytes=512MB" . PHP_EOL;
 
@@ -272,9 +292,10 @@ class CronTask extends Task
      *
      * @param Server $server
      * @param $program
+     * @param $log_file
      * @return bool
      */
-    private function removeCron(Server $server, $program)
+    private function removeCron(Server $server, $program, $log_file = null)
     {
         $supervisor = new Supervisor(
             $server->id,
@@ -284,8 +305,8 @@ class CronTask extends Task
             $server->port
         );
 
-        $conf_path = '/etc/supervisor/conf.d/cron.conf';
-        $uri = "http://{$server->ip}:{$server->sync_conf_port}";
+        $uri = $server->getSupervisorUri();
+        $conf_path = $server->getCronConfPath();
 
         $config_lock = new ConfigLock();
         if (!$config_lock->lock())
@@ -338,6 +359,24 @@ class CronTask extends Task
 
             $supervisor->reloadConfig();
             $supervisor->removeProcessGroup($program);
+
+            // 清理进程日志，以释放该任务所占用的日志文件
+            // clearProcessLogs 方法不能清理已经退出的进程日志
+            if ($log_file)
+            {
+                $deleted = SupervisorSyncConf::delete($uri, $log_file);
+                if (!$deleted['state'])
+                {
+                    print_cli("日志文件删除失败：{$log_file}");
+                }
+            }
+
+            if (!$config_lock->unlock())
+            {
+                echo '配置解锁失败', PHP_EOL;
+            }
+
+            return true;
         }
         catch (Exception $e)
         {
@@ -350,14 +389,6 @@ class CronTask extends Task
 
             return false;
         }
-
-        if (!$config_lock->unlock())
-        {
-            echo '配置解锁失败', PHP_EOL;
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -381,15 +412,15 @@ class CronTask extends Task
         $uri = $server->getSupervisorUri();
         $conf_path = $server->getCronConfPath();
 
+        $config_lock = new ConfigLock();
+        if (!$config_lock->lock())
+        {
+            print_cli('配置锁定失败');
+            return false;
+        }
+
         try
         {
-            $config_lock = new ConfigLock();
-            if (!$config_lock->lock())
-            {
-                print_cli('配置锁定失败');
-                return false;
-            }
-
             $read = SupervisorSyncConf::read($uri, $conf_path);
             $is_empty_file = strpos($read['message'], 'no such file or directory');
 
@@ -436,19 +467,12 @@ class CronTask extends Task
             if (!$config_lock->unlock())
             {
                 echo '配置解锁失败', PHP_EOL;
-                return false;
             }
 
             return true;
         }
         catch (Exception $e)
         {
-//            print_cli(
-//                get_class($e), ': ', $e->getMessage(),
-//                ' in File:', $e->getFile(),
-//                ' on Line: ', $e->getLine(),
-//                "\n Trace: ", $e->getTraceAsString()
-//            );
             print_cli($e->getMessage());
 
             if (!$config_lock->unlock())

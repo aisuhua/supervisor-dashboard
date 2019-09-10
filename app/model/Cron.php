@@ -46,12 +46,7 @@ class Cron extends Model
         $this->update_time = time();
     }
 
-    public function reloadConfig()
-    {
-
-    }
-
-    public function getIni()
+    public function get()
     {
 
     }

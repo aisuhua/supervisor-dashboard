@@ -35,7 +35,21 @@ class SupervisorSyncConf
         $data['timestamp'] = (string) time();
 
         $data['token'] = strtoupper(md5(
-            $data['file_path'] . ':' . $data['content'] . ':' . $data['timestamp'] . ':' . self::$key
+            $data['file_path'] . ':' . $data['timestamp'] . ':' . self::$key
+        ));
+
+        return json_decode(curl_post($url, json_encode($data)), true);
+    }
+
+    public static function delete($uri, $file_path)
+    {
+        $url = $uri . '/delete';
+        $data = [];
+        $data['file_path'] = $file_path;
+        $data['timestamp'] = (string) time();
+
+        $data['token'] = strtoupper(md5(
+            $data['file_path'] . ':' . $data['timestamp'] . ':' . self::$key
         ));
 
         return json_decode(curl_post($url, json_encode($data)), true);

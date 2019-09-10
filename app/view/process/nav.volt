@@ -41,9 +41,9 @@
     <li role="presentation" class="{{ index_class }}"><a href="/process?server_id={{ server.id }}&ip={{ server.ip }}&port={{ server.port }}">进程列表</a></li>
     <li role="presentation" class="{{ create_class }}"><a href="/process/create?server_id={{ server.id }}">添加/修改进程</a></li>
     <li role="presentation" class="{{ ini_class }}"><a href="/process/ini?server_id={{ server.id }}">进程配置</a></li>
-    <li role="presentation" class="{{ cron_class }}"><a href="/cron?server_id={{ server.id }}">定时任务</a></li>
-    <li role="presentation" class="{{ cron_create_class }}"><a href="/cron/create?server_id={{ server.id }}">添加/修改任务</a></li>
-    <li role="presentation" class="{{ cron_log_class }}"><a href="/cron-log/?server_id={{ server.id }}">执行日志</a></li>
+    <li role="presentation" class="{{ cron_class }}"><a href="/cron?server_id={{ server.id }}">定时任务列表</a></li>
+    <li role="presentation" class="{{ cron_create_class }}"><a href="/cron/create?server_id={{ server.id }}">添加/修改定时任务</a></li>
+    <li role="presentation" class="{{ cron_log_class }}"><a href="/cron-log?server_id={{ server.id }}">定时任务日志</a></li>
     {#<li role="presentation" class="{{ clone_class }}"><a href="#">克隆配置</a></li>#}
 </ul>
 

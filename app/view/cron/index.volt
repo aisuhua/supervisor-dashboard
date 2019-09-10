@@ -26,9 +26,9 @@
             <td><code>{{ cron['command'] }}</code></td>
             <td>
                 {% if cron['status'] == 1 %}
-                    启用
+                    <span class="text-success">启用</span>
                 {% else %}
-                    <span class="text-danger">停用</span>
+                    <span class="text-muted">停用</span>
                 {% endif %}
             </td>
             <td>

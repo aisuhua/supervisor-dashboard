@@ -8,7 +8,7 @@ class SupervisorController extends ControllerSupervisorBase
         $callback = function ()
         {
             // 只看前面 1M 的日志
-            $log = $this->supervisor->readLog(0, 1024 * 1024);
+            $log = $log = $this->supervisor->readLog(-1024 * 1024, 0);
             $this->view->log = $log;
         };
         $this->setCallback($callback);

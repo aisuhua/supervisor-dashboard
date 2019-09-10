@@ -10,7 +10,7 @@ class CronController extends ControllerSupervisorBase
             'bind' => [
                 'server_id' => $this->server_id
             ],
-            'order' => 'id asc'
+            'order' => 'status desc, id asc'
         ])->toArray();
 
         $total = Cron::count();

@@ -9,7 +9,7 @@
         <th>ID</th>
         <th>任务 ID</th>
         <th>命令</th>
-        <th>执行状态</th>
+        <th>状态</th>
         <th>耗时</th>
         <th>启动时间</th>
         <th>操作</th>
@@ -72,13 +72,15 @@ $(function() {
                 orderable: false,
                 render: function (data, type, full, meta) {
                     if (data == 0) {
-                        return '<span class="">运行中</span>';
+                        return '<span class="">正在启动</span>';
                     } else if (data == 1) {
-                        return '<span class="">运行中</span>';
+                        return '<span class="">正在执行</span>';
                     } else if (data == 2) {
                         return '<span class="text-success">已完成</span>';
                     } else if (data == -2) {
                         return '<span class="text-warning">无法确定</span>';
+                    } else if (data == -3) {
+                        return '<span class="text-warning">被中断</span>';
                     } else {
                         return '<span class="text-danger">失败</span>';
                     }
@@ -110,7 +112,17 @@ $(function() {
                 data: 'id',
                 orderable: false,
                 render: function (data, type, full, meta) {
-                    var html = '<a href="/server-group/edit/'+ data +'">查看日志</a>';
+                    var html = '';
+
+                    if (full.status == 1) {
+                        html += '<a href="/cron-log/tail/'+ data +'?server_id='+ full.server_id + '&ip={{ server.ip }}&port={{ server.port }}" target="_blank" data-nopjax>预览日志</a>';
+                        html += ' <span class="text-muted">|</span> ';
+                        html += '<a href="/server-group/edit/'+ data +'">立即停止</a>';
+                    } else if (full.status != 0) {
+                        html += '<a href="/cron-log/tail/'+ data +'?server_id='+ full.server_id + '&ip={{ server.ip }}&port={{ server.port }}" target="_blank" data-nopjax>查看日志</a>';
+                        html += ' <span class="text-muted">|</span> ';
+                        html += '<a href="/cron-log/download/'+ data +'?server_id='+ full.server_id + '" data-nopjax>下载日志</a>';
+                    }
 
                     return html;
                 }
