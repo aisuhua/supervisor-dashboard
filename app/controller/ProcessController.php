@@ -82,16 +82,16 @@ class ProcessController extends ControllerSupervisorBase
 
     public function indexAction()
     {
-//        $processes = [];
-//        $callback = function () use (&$processes)
-//        {
-//            $processes = $this->supervisor->getAllProcessInfo();
-//        };
-//
-//        $this->setCallback($callback);
-//        $this->invoke();
+        $processes = [];
+        $callback = function () use (&$processes)
+        {
+            $processes = $this->supervisor->getAllProcessInfo();
+        };
 
-        $processes = $this->supervisor->getAllProcessInfo();
+        $this->setCallback($callback);
+        $this->invoke();
+
+        // $processes = $this->supervisor->getAllProcessInfo();
 
         $process_groups = array_unique(array_column($processes, 'group'));
         $process_warnings = array_filter($processes, function($process) {
