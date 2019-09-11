@@ -2,7 +2,7 @@
 {{ flashSession.output() }}
 {% include 'process/nav.volt' %}
 
-<table id="cron-list" class="table table-bordered table-hover">
+<table id="cron-list" class="table table-bordered table-hover ">
     <thead>
     <tr>
         <th>ID</th>
@@ -21,14 +21,14 @@
         {% for cron in cron_arr %}
         <tr>
             <td>{{ cron['id'] }}</td>
-            <td><code>{{ cron['user'] }}</code></td>
+            <td>{{ cron['user'] }}</td>
             <td><code>{{ cron['time'] }}</code></td>
             <td><code>{{ cron['command'] }}</code></td>
             <td>
                 {% if cron['status'] == 1 %}
                     <span class="text-success">启用</span>
                 {% else %}
-                    <span class="text-muted">停用</span>
+                    <span class="text-danger">停用</span>
                 {% endif %}
             </td>
             <td>

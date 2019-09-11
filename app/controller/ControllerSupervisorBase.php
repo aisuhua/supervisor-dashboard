@@ -61,7 +61,7 @@ class ControllerSupervisorBase extends ControllerBase
         $this->callback = $callback;
     }
 
-    protected function invoke($timeout = 180)
+    protected function invoke($timeout = 10)
     {
         $exception = null;
         for ($i = 1; $i <= $timeout * 2; $i++)

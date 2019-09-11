@@ -5,74 +5,93 @@ class ProcessController extends ControllerSupervisorBase
 {
     public function testAction()
     {
-
+        $supervisor = new Supervisor(111,
+            '192.168.1.229',
+            'worker',
+            '111111',
+            9001
+        );
 
 
         try
         {
-            //$process_name = 'sys_cron_22_201909111414:sys_cron_22_201909111414_0';
-            $result = $this->supervisor->stopProcessGroup('sys_cron_22_201909101741');
+            $process_name = 'sys_cron_22_201909101741:sys_cron_22_201909101741_02';
+            $process = $supervisor->stopProcess($process_name);
 
-            var_dump($result);exit;
-
+            var_dump($process);
         }
         catch (Zend\XmlRpc\Client\Exception\FaultException $e)
         {
-            if ($e->getCode() == XmlRpc::BAD_NAME)
+            if ($e->getCode() == XmlRpc::NOT_RUNNING)
             {
-
+                echo "{$process_name} 已经停止", PHP_EOL;
             }
-
-            if ($e->getCode() == XmlRpc::STILL_RUNNING)
+            elseif ($e->getCode() == XmlRpc::BAD_NAME)
             {
-
+                echo "{$process_name} 不存在，无法执行停止操作", PHP_EOL;
             }
-
-            echo get_class($e), PHP_EOL;
-            echo $e->getMessage(), PHP_EOL;
-            echo $e->getCode(), PHP_EOL;
         }
         catch (Exception $e)
         {
             echo get_class($e), PHP_EOL;
             echo $e->getMessage(), PHP_EOL;
             echo $e->getCode(), PHP_EOL;
+            echo $e->getTraceAsString(), PHP_EOL;
         }
 
         exit;
 
         try
         {
-            $processes = $this->supervisor->getProcessInfo('sys_cron_27_201909081319:sys_cron_27_201909081319_0');
+            $processes = $supervisor->getAllProcessInfo();
         }
-        catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+        catch (Zend\Http\Client\Adapter\Exception\RuntimeException $e)
         {
-            if ($e->getCode() == XmlRpc::BAD_NAME)
+            if ($e->getCode() == 0)
             {
-                echo '该进程不存在';
+                if (strpos($e->getMessage(), 'No route to host') !== false)
+                {
+                    echo "无法连接主机 192.168.1.221";
+                    return false;
+                }
+                elseif (strpos($e->getMessage(), 'Connection refused') !== false)
+                {
+                    echo "连接被拒绝，Supervisor 没有启动或者端口错误";
+                    return false;
+                }
+            }
+        }
+        catch (Zend\XmlRpc\Client\Exception\HttpException $e)
+        {
+            if ($e->getCode() == 401)
+            {
+                echo "连接 Supervisor 的账号密码不正确";
                 return false;
             }
-
+        }
+        catch (Exception $e)
+        {
             echo get_class($e), PHP_EOL;
             echo $e->getMessage(), PHP_EOL;
-            ECHO $e->getCode(), PHP_EOL;
+            echo $e->getCode(), PHP_EOL;
+            echo $e->getTraceAsString(), PHP_EOL;
         }
 
-
-
-        var_dump($processes);exit;
+        exit;
     }
 
     public function indexAction()
     {
-        $processes = [];
-        $callback = function () use (&$processes)
-        {
-            $processes = $this->supervisor->getAllProcessInfo();
-        };
+//        $processes = [];
+//        $callback = function () use (&$processes)
+//        {
+//            $processes = $this->supervisor->getAllProcessInfo();
+//        };
+//
+//        $this->setCallback($callback);
+//        $this->invoke();
 
-        $this->setCallback($callback);
-        $this->invoke();
+        $processes = $this->supervisor->getAllProcessInfo();
 
         $process_groups = array_unique(array_column($processes, 'group'));
         $process_warnings = array_filter($processes, function($process) {

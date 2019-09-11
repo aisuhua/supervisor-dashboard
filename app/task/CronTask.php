@@ -4,12 +4,14 @@ use Phalcon\Cli\Task;
 class CronTask extends Task
 {
     // 每个定时任务保留的日志记录数
-    const MAX_LOG_KEEP = 60;
+    const MAX_LOG_KEEP = 30;
     // 最大内存占用
     const MAX_MEMORY = 52428800;
 
     public function checkPerMinuteAction()
     {
+        print_cli('starting...');
+
         while (true)
         {
             if (((int) date('s')) != 0)
@@ -43,7 +45,7 @@ class CronTask extends Task
                     }
 
                     $server = $cron->getServer();
-                    $program = 'sys_cron_' . $cron->id . '_' . $current_datetime;
+                    $program = $cron->makeProgramName($current_datetime);
 
                     print_cli("{$program} is starting");
 
@@ -84,6 +86,13 @@ class CronTask extends Task
                 print_cli("任务启动时间过长，请优化");
             }
 
+            // 如果超过最大内存使用限制，则自动退出脚本
+            if (($memory = memory_get_usage(true)) > self::MAX_MEMORY)
+            {
+                print_cli("内存占用 " . size_format($memory) ." 已超过最大限制，自动退出");
+                break;
+            }
+
             // 防止当前分钟启动多次检测
             if ($cost_time < 1)
             {
@@ -118,6 +127,7 @@ class CronTask extends Task
                 }
 
                 // 只启动那些因关机等原因导致没有在约定时间启动的任务，类似 anacron 的功能
+                // 如果在约定时间的1个小时后还没有启动，则启动它
                 $delay = (int) $next_time - (int) $last_time + 3600;
                 if (($cron->last_time > 0 && $current_time - $cron->last_time < $delay) ||
                     ($cron->last_time == 0 && $current_time - $cron->update_time < $delay) ||
@@ -128,18 +138,27 @@ class CronTask extends Task
                 }
 
                 $server = $cron->getServer();
-                $program = 'sys_cron_' . $cron->id . '_' . $current_datetime;
+                $program = $cron->makeProgramName($current_datetime);
 
                 print_cli("{$program} is starting");
 
                 // 同步配置
-                $ini = $this->makeIni($program, $cron->command, $cron->user);
+                $ini = $this->makeIni($program, $cron);
 
                 if (!$this->addCron($server, $program, $ini))
                 {
                     print_cli("{$program} 配置添加失败");
                     continue;
                 }
+
+                // 写执行日志
+                $cronLog = new CronLog();
+                $cronLog->cron_id = $cron->id;
+                $cronLog->server_id = $cron->server_id;
+                $cronLog->program = $program;
+                $cronLog->command = $cron->command;
+                $cronLog->start_time = time();
+                $cronLog->create();
 
                 // 更新执行时间
                 $cron->last_time = $current_time;
@@ -149,13 +168,20 @@ class CronTask extends Task
             }
             catch (Exception $e)
             {
-                print_cli($e->getMessage());
+                print_cli(
+                    get_class($e), ': ', $e->getMessage(),
+                    ' in File:', $e->getFile(),
+                    ' on Line: ', $e->getLine(),
+                    "\n Trace: ", $e->getTraceAsString()
+                );
             }
         }
     }
 
     public function checkRunStateAction()
     {
+        print_cli('starting...');
+
         while (true)
         {
             $cronLogs = CronLog::find([
@@ -230,6 +256,8 @@ class CronTask extends Task
                     {
                         // 被中断执行
                         $cronLog->status = CronLog::STATUS_STOPPED;
+
+                        print_cli("{$cronLog->program} 被中断执行");
                     }
 
                     // 进程退出时间
@@ -273,8 +301,8 @@ class CronTask extends Task
             // 如果超过最大内存使用限制，则自动退出脚本
             if (($memory = memory_get_usage(true)) > self::MAX_MEMORY)
             {
-                print_cli("内存占用" . size_format($memory) ."，已超过最大使用限制，自动退出");
-                // break;
+                print_cli("内存占用 " . size_format($memory) ." 已超过 " . size_format(self::MAX_MEMORY) ." 最大限制，自动退出");
+                break;
             }
 
             // 每次循环至少间隔 1 秒
@@ -317,7 +345,7 @@ class CronTask extends Task
         $config_lock = new ConfigLock();
         if (!$config_lock->lock())
         {
-            print_cli('配置锁定失败');
+            print_cli('锁定失败');
             return false;
         }
 
@@ -366,7 +394,7 @@ class CronTask extends Task
             // 配置读写完成后释放锁
             if (!$config_lock->unlock())
             {
-                print_cli('配置解锁失败，忽略错误并继续往下执行');
+                print_cli('解锁失败，忽略错误并继续往下执行');
             }
 
             // 重新读取配置
@@ -412,7 +440,7 @@ class CronTask extends Task
 
             if (!$config_lock->unlock())
             {
-                print_cli('配置解锁失败，忽略错误并继续往下执行');
+                print_cli('解锁失败，忽略错误并继续往下执行');
             }
 
             return false;
@@ -443,7 +471,7 @@ class CronTask extends Task
         $config_lock = new ConfigLock();
         if (!$config_lock->lock())
         {
-            print_cli('配置锁定失败');
+            print_cli('锁定失败');
             return false;
         }
 
@@ -492,7 +520,7 @@ class CronTask extends Task
             // 配置读写完成后即可解锁
             if (!$config_lock->unlock())
             {
-                print_cli('配置解锁失败，忽略错误并继续往下执行');
+                print_cli('解锁失败，忽略错误并继续往下执行');
             }
 
             // 重载配置步骤
@@ -546,7 +574,7 @@ class CronTask extends Task
 
             if (!$config_lock->unlock())
             {
-                print_cli('配置解锁失败，忽略错误并继续往下执行');
+                print_cli('解锁失败，忽略错误并继续往下执行');
             }
 
             return false;
