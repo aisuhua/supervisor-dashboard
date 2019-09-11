@@ -12,10 +12,15 @@ class ProcessController extends ControllerSupervisorBase
             9001
         );
 
+        $process_name = "checkPerMinute";
+        $result = $this->supervisor->stopProcessGroup($process_name, false);
+
+        var_dump($result);
+        exit;
 
         try
         {
-            $process_name = 'sys_cron_22_201909101741:sys_cron_22_201909101741_02';
+            $process_name = 'sys_cron_22_201909101741:sys_cron_22_201909101741_0';
             $process = $supervisor->stopProcess($process_name);
 
             var_dump($process);
@@ -82,16 +87,7 @@ class ProcessController extends ControllerSupervisorBase
 
     public function indexAction()
     {
-        $processes = [];
-        $callback = function () use (&$processes)
-        {
-            $processes = $this->supervisor->getAllProcessInfo();
-        };
-
-        $this->setCallback($callback);
-        $this->invoke();
-
-        // $processes = $this->supervisor->getAllProcessInfo();
+        $processes = $this->supervisor->getAllProcessInfo();
 
         $process_groups = array_unique(array_column($processes, 'group'));
         $process_warnings = array_filter($processes, function($process) {
@@ -126,15 +122,18 @@ class ProcessController extends ControllerSupervisorBase
         $name = $this->request->get('name', 'string');
         $process_name = $group . ':' . $name;
 
-        $callback = function () use ($process_name) {
-            $process = $this->supervisor->getProcessInfo($process_name);
-            if ($process['statename'] == 'RUNNING')
+        $process = $this->supervisor->getProcessInfo($process_name);
+        if ($process['statename'] == 'RUNNING')
+        {
+            try
             {
                 $this->supervisor->stopProcess($process_name, false);
             }
-        };
-        $this->setCallback($callback);
-        $this->invoke();
+            catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+            {
+                $this->handleStopException($e);
+            }
+        }
 
         $result['state'] = 1;
         $result['message'] = self::formatMessage($name . " 正在停止");
@@ -149,16 +148,18 @@ class ProcessController extends ControllerSupervisorBase
         $name = $this->request->get('name', 'string');
         $process_name = $group . ':' . $name;
 
-        $callback = function() use ($process_name)
+        $process = $this->supervisor->getProcessInfo($process_name);
+        if ($process['statename'] != 'RUNNING')
         {
-            $process = $this->supervisor->getProcessInfo($process_name);
-            if ($process['statename'] != 'RUNNING')
+            try
             {
                 $this->supervisor->startProcess($process_name, false);
             }
-        };
-        $this->setCallback($callback);
-        $this->invoke();
+            catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+            {
+                $this->handleStartException($e);
+            }
+        }
 
         $result['state'] = 1;
         $result['message'] = self::formatMessage($name . " 正在启动");
@@ -180,18 +181,27 @@ class ProcessController extends ControllerSupervisorBase
 
         fastcgi_finish_request();
 
-        $callback = function() use ($process_name)
+        $process = $this->supervisor->getProcessInfo($process_name);
+        if ($process['statename'] == 'RUNNING')
         {
-            $process = $this->supervisor->getProcessInfo($process_name);
-            if ($process['statename'] == 'RUNNING')
+            try
             {
                 $this->supervisor->stopProcess($process_name, true);
             }
+            catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+            {
+                $this->handleStopException($e);
+            }
+        }
 
+        try
+        {
             $this->supervisor->startProcess($process_name, false);
-        };
-        $this->setCallback($callback);
-        $this->invoke();
+        }
+        catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+        {
+            $this->handleStartException($e);
+        }
     }
 
     public function stopGroupAction()
@@ -199,12 +209,14 @@ class ProcessController extends ControllerSupervisorBase
         $result = [];
         $group = $this->request->get('group', 'string');
 
-        $callback = function() use($group)
+        try
         {
             $this->supervisor->stopProcessGroup($group, false);
-        };
-        $this->setCallback($callback);
-        $this->invoke();
+        }
+        catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+        {
+            $this->handleStopException($e);
+        }
 
         $result['state'] = 1;
         $result['message'] = self::formatMessage($group . " 正在停止");
@@ -217,12 +229,14 @@ class ProcessController extends ControllerSupervisorBase
         $result = [];
         $group = $this->request->get('group', 'string');
 
-        $callback = function() use ($group)
+        try
         {
             $this->supervisor->startProcessGroup($group, false);
-        };
-        $this->setCallback($callback);
-        $this->invoke();
+        }
+        catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+        {
+            $this->handleStartException($e);
+        }
 
         $result['state'] = 1;
         $result['message'] = self::formatMessage($group . " 正在启动");
@@ -242,13 +256,27 @@ class ProcessController extends ControllerSupervisorBase
 
         fastcgi_finish_request();
 
-        $callback = function() use ($group)
+        try
         {
             $this->supervisor->stopProcessGroup($group, true);
+        }
+        catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+        {
+            $this->handleStopException($e);
+        }
+
+        try
+        {
             $this->supervisor->startProcessGroup($group, false);
-        };
-        $this->setCallback($callback);
-        $this->invoke();
+        }
+        catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+        {
+            $this->handleStartException($e);
+        }
+
+        $this->view->setRenderLevel(
+            View::LEVEL_NO_RENDER
+        );
     }
 
     public function tailLogAction()
@@ -257,15 +285,9 @@ class ProcessController extends ControllerSupervisorBase
         $name = $this->request->get('name', 'string');
         $process_name = $group . ':' . $name;
 
-        $callback = function() use ($process_name)
-        {
-            // 只看前面 1M 的日志
-            // 注意这里应开启 strip_ansi = true，否则当日志含有 ansi 字符时讲无法查看日志
-            $log = $this->supervisor->tailProcessStdoutLog($process_name, 0, 1 * 1024 * 1024);
-            $this->view->log = $log;
-        };
-        $this->setCallback($callback);
-        $this->invoke(30);
+        // 只看前面 1M 的日志
+        // 注意这里应开启 strip_ansi = true，否则当日志含有 ansi 字符时讲无法查看日志
+        $log = $this->supervisor->tailProcessStdoutLog($process_name, 0, 1 * 1024 * 1024);
 
         $this->view->disableLevel([
             View::LEVEL_LAYOUT => true,
@@ -280,6 +302,7 @@ class ProcessController extends ControllerSupervisorBase
 
         $this->view->group = $group;
         $this->view->name = $name;
+        $this->view->log = $log;
     }
 
     public function clearLogAction()
@@ -289,12 +312,7 @@ class ProcessController extends ControllerSupervisorBase
         $name = $this->request->get('name', 'string');
         $process_name = $group . ':' . $name;
 
-        $callback = function() use ($process_name)
-        {
-            $this->supervisor->clearProcessLogs($process_name);
-        };
-        $this->setCallback($callback);
-        $this->invoke();
+        $this->supervisor->clearProcessLogs($process_name);
 
         $result['state'] = 1;
         $result['message'] = $name . " 日志清理完成";
@@ -311,14 +329,7 @@ class ProcessController extends ControllerSupervisorBase
 
         fastcgi_finish_request();
 
-        $callback = function()
-        {
-            $this->supervisor->stopAllProcesses(false);
-        };
-        $this->setCallback($callback);
-        $this->invoke();
-
-        $this->flashSession->success("已停止所有进程");
+        $this->supervisor->stopAllProcesses(false);
 
         $this->view->setRenderLevel(
             View::LEVEL_NO_RENDER
@@ -334,15 +345,23 @@ class ProcessController extends ControllerSupervisorBase
 
         fastcgi_finish_request();
 
-        $callback = function()
+        try
         {
             $this->supervisor->stopAllProcesses(true);
-            $this->supervisor->startAllProcesses(false);
-        };
-        $this->setCallback($callback);
-        $this->invoke();
+        }
+        catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+        {
+            $this->handleStopException($e);
+        }
 
-        $this->flashSession->success("已重启所有进程");
+        try
+        {
+            $this->supervisor->startAllProcesses(false);
+        }
+        catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+        {
+            $this->handleStartException($e);
+        }
 
         $this->view->setRenderLevel(
             View::LEVEL_NO_RENDER
@@ -749,7 +768,7 @@ class ProcessController extends ControllerSupervisorBase
                     'action' => 'createIni'
                 ]);
 
-                return;
+                return false;
             }
 
             $process = new Process();

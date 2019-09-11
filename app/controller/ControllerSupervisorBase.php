@@ -99,4 +99,20 @@ class ControllerSupervisorBase extends ControllerBase
     {
         return "<strong>{$message}</strong>\n请刷新页面查看进度";
     }
+
+    protected function handleStopException(Exception $e)
+    {
+        if ($e->getCode() != XmlRpc::NOT_RUNNING)
+        {
+            throw $e;
+        }
+    }
+
+    protected function handleStartException(Exception $e)
+    {
+        if ($e->getCode() != XmlRpc::ALREADY_STARTED)
+        {
+            throw $e;
+        }
+    }
 }

@@ -48,8 +48,8 @@
             {#<td>{{ date ('Y-m-d H:i', cron['update_time']) }}</td>#}
             <td>{{ cron['description'] }}</td>
             <td>
-                <a href="/cron-log?server_id={{ server.id }}&cron_id={{ cron['id'] }}">日志</a> <span class="text-muted">|</span>
                 <a href="/cron/edit/{{ cron['id'] }}?server_id={{ server.id }}">修改</a> <span class="text-muted">|</span>
+                <a href="/cron-log?server_id={{ server.id }}&cron_id={{ cron['id'] }}">日志</a> <span class="text-muted">|</span>
                 <a href="/cron/delete/{{ cron['id'] }}?server_id={{ server.id }}" onclick="return confirm('真的要删除吗？');" data-nopush class="delete">删除</a>
             </td>
         </tr>
