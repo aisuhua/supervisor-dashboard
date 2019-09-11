@@ -18,8 +18,11 @@ class CronLogController extends ControllerSupervisorBase
         $limit = $this->request->get('length', 'int', 25);
         $cron_id = $this->request->get('cron_id', 'int');
 
-        $where = '1=1';
+        // 查看特定服务器的日志
         $bind = [];
+        $where = 'server_id = :server_id:';
+        $bind['server_id'] = $this->server_id;
+
         if ($cron_id)
         {
             $where .= ' AND cron_id = :cron_id:';
@@ -48,7 +51,7 @@ class CronLogController extends ControllerSupervisorBase
     public function tailAction($id)
     {
         // 看最后的 10M 日志内容
-        $sql = 'SELECT id, command, status, program, RIGHT(log, 10 * 1024 * 1024) as log FROM cron_log WHERE id = :id LIMIT 1';
+        $sql = 'SELECT id, command, status, program, RIGHT(log, 1 * 1024 * 1024) as log FROM cron_log WHERE id = :id LIMIT 1';
         $cronLog = $this->db->fetchOne($sql, Db::FETCH_ASSOC, [
             'id' => $id
         ]);
@@ -137,9 +140,43 @@ class CronLogController extends ControllerSupervisorBase
         header('Expires: 0');
         header('Cache-Control: must-revalidate');
         header('Pragma: public');
-        header('Content-Length: ' . strlen($cronLog->log));
 
         echo $cronLog->log;
         exit;
+    }
+
+    public function stopAction($id)
+    {
+        /** @var CronLog $cronLog */
+        $cronLog = CronLog::findFirst($id);
+        if (!$cronLog)
+        {
+            $result['state'] = 0;
+            $result['message'] = "不存在该任务，无法执行停止操作";
+
+            return $this->response->setJsonContent($result);
+        }
+
+        try
+        {
+            $this->supervisor->stopProcessGroup($cronLog->program, false);
+
+            $result['state'] = 1;
+            $result['message'] = $this->formatMessage("ID 为 {$id} 的任务正在停止");
+
+            return $this->response->setJsonContent($result);
+        }
+        catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+        {
+            if ($e->getCode() != XmlRpc::BAD_NAME)
+            {
+                throw $e;
+            }
+
+            $result['state'] = 0;
+            $result['message'] = "该任务已结束或不存在，无法执行停止操作";
+
+            return $this->response->setJsonContent($result);
+        }
     }
 }

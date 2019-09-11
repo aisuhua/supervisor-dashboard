@@ -19,7 +19,9 @@
 
 <script>
 $(function() {
-    var dataTable = $('#cron-log-table').DataTable({
+    var $cronLogTable = $('#cron-log-table');
+
+    var dataTable = $cronLogTable.DataTable({
         processing: true,
         pageLength: 25,
         lengthChange: false,
@@ -30,6 +32,7 @@ $(function() {
             url: '/cron-log/list',
             data: function ( d ) {
                 d.cron_id = {{ cron_id }};
+                d.server_id = {{ server_id }}
             }
         },
         searchHighlight: true,
@@ -80,7 +83,7 @@ $(function() {
                     } else if (data == -2) {
                         return '<span class="text-warning">无法确定</span>';
                     } else if (data == -3) {
-                        return '<span class="text-warning">被中断</span>';
+                        return '<span class="text-warning">被中断执行</span>';
                     } else {
                         return '<span class="text-danger">失败</span>';
                     }
@@ -115,13 +118,13 @@ $(function() {
                     var html = '';
 
                     if (full.status == 1) {
-                        html += '<a href="/cron-log/tail/'+ data +'?server_id='+ full.server_id + '&ip={{ server.ip }}&port={{ server.port }}" target="_blank" data-nopjax>预览日志</a>';
+                        html += '<a href="/cron-log/tail/'+ data +'?server_id='+ full.server_id + '&ip={{ server.ip }}&port={{ server.port }}" target="_blank" data-nopjax>查看日志</a>';
                         html += ' <span class="text-muted">|</span> ';
-                        html += '<a href="/server-group/edit/'+ data +'">立即停止</a>';
+                        html += '<a href="/cron-log/stop/'+ data +'?server_id='+ full.server_id +'" class="stop" data-nopjax>立即停止</a>';
                     } else if (full.status != 0) {
                         html += '<a href="/cron-log/tail/'+ data +'?server_id='+ full.server_id + '&ip={{ server.ip }}&port={{ server.port }}" target="_blank" data-nopjax>查看日志</a>';
                         html += ' <span class="text-muted">|</span> ';
-                        html += '<a href="/cron-log/download/'+ data +'?server_id='+ full.server_id + '" data-nopjax>下载日志</a>';
+                        html += '<a href="/cron-log/download/'+ data +'?server_id='+ full.server_id + '" data-nopjax>下载完整日志</a>';
                     }
 
                     return html;
@@ -163,6 +166,25 @@ $(function() {
         initComplete: function(settings, json) {
             dataTable.buttons().container().appendTo('#cron-log-table_wrapper .col-sm-6:eq(0)');
         }
+    });
+
+    $cronLogTable.on('click', 'tbody td a.stop', function () {
+        var row = dataTable.row($(this).closest('tr'));
+        var data = row.data();
+
+        if (!confirm('真的要停止 ID 为 ' + data.id + " 的任务吗？")) {
+            return false;
+        }
+
+        $.post($(this).attr('href'), function(data) {
+            if (data.state) {
+                success(data.message);
+            } else {
+                error(data.message);
+            }
+        });
+
+        return false;
     });
 
 });

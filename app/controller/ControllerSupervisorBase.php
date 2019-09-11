@@ -46,6 +46,8 @@ class ControllerSupervisorBase extends ControllerBase
             $this->server_id = $server_id;
             $this->server = $server;
             $this->supervisor = $supervisor;
+
+            $this->view->server_id = $server_id;
             $this->view->server = $server;
         }
     }

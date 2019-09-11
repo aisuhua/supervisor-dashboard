@@ -5,13 +5,16 @@ class ProcessController extends ControllerSupervisorBase
 {
     public function testAction()
     {
+
+
+
         try
         {
-            $program = 'sys_cron_22_201909101741';
-            $result = $this->supervisor->removeProcessGroup($program);
+            //$process_name = 'sys_cron_22_201909111414:sys_cron_22_201909111414_0';
+            $result = $this->supervisor->stopProcessGroup('sys_cron_22_201909101741');
 
-            var_dump($result);
-            exit;
+            var_dump($result);exit;
+
         }
         catch (Zend\XmlRpc\Client\Exception\FaultException $e)
         {
@@ -95,7 +98,6 @@ class ProcessController extends ControllerSupervisorBase
         $this->view->processes = $processes;
         $this->view->process_groups = $process_group_merge;
         $this->view->process_warnings = $process_warnings;
-
     }
 
     public function stopAction()

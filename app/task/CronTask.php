@@ -5,6 +5,8 @@ class CronTask extends Task
 {
     // 每个定时任务保留的日志记录数
     const MAX_LOG_KEEP = 60;
+    // 最大内存占用
+    const MAX_MEMORY = 52428800;
 
     public function checkPerMinuteAction()
     {
@@ -45,7 +47,7 @@ class CronTask extends Task
 
                     print_cli("{$program} is starting");
 
-                    $ini = $this->makeIni($program, $cron->command, $cron->user);
+                    $ini = $this->makeIni($program, $cron);
 
                     if (!$this->addCron($server, $program, $ini))
                     {
@@ -166,10 +168,13 @@ class CronTask extends Task
                 continue;
             }
 
+            $start_time = time();
+
             /** @var CronLog $cronLog */
             foreach ($cronLogs as $cronLog)
             {
-                try {
+                try
+                {
                     $server = $cronLog->getServer();
                     $supervisor = new Supervisor(
                         $server->id,
@@ -179,20 +184,17 @@ class CronTask extends Task
                         $server->port
                     );
 
-                    $process_name = $cronLog->program . ':' . $cronLog->program . '_0';
+                    $process_name = $cronLog->getProcessName();
 
                     try
                     {
                         // 极端的情况下，定时任务所对应的进程不存在
                         $info = $supervisor->getProcessInfo($process_name);
                     }
-                    catch (Exception $e)
+                    catch (Zend\XmlRpc\Client\Exception\FaultException $e)
                     {
-                        print_cli($e->getMessage());
-
                         // 若定时任务所对应的进程不存在，则将该任务标志为不确定
-                        if ($e instanceof Zend\XmlRpc\Client\Exception\FaultException &&
-                            $e->getCode() == XmlRpc::BAD_NAME)
+                        if ($e->getCode() == XmlRpc::BAD_NAME)
                         {
                             print_cli("{$process_name} 进程已经不存在，无法获取进程状态，跳过并继续往下执行");
                             $cronLog->status = CronLog::STATUS_UNKNOWN;
@@ -201,6 +203,7 @@ class CronTask extends Task
                             continue;
                         }
 
+                        print_cli("{$process_name} 进程信息获取失败，直接退出");
                         throw $e;
                     }
 
@@ -232,7 +235,7 @@ class CronTask extends Task
                     // 进程退出时间
                     $cronLog->end_time = $info['stop'];
                     // 读取进程日志并写入数据库
-                    $cronLog->log = $supervisor->tailProcessStdoutLog($process_name, 0, 16 * 1024 * 1024)[0];
+                    $cronLog->log = $supervisor->tailProcessStdoutLog($process_name, 0, 8 * 1024 * 1024)[0];
 
                     // 删除进程
                     if (!$this->removeCron($server, $cronLog->program, $info['stdout_logfile']))
@@ -267,12 +270,23 @@ class CronTask extends Task
                 }
             }
 
-            sleep(1);
+            // 如果超过最大内存使用限制，则自动退出脚本
+            if (($memory = memory_get_usage(true)) > self::MAX_MEMORY)
+            {
+                print_cli("内存占用" . size_format($memory) ."，已超过最大使用限制，自动退出");
+                // break;
+            }
+
+            // 每次循环至少间隔 1 秒
+            if (time() - $start_time < 1)
+            {
+                sleep(1);
+            }
         }
     }
 
     /**
-     * 每个小时启动清理僵死进程
+     * 每天启动清理僵尸进程
      */
     public function clearDefunctProcessAction()
     {
@@ -349,6 +363,13 @@ class CronTask extends Task
                 }
             }
 
+            // 配置读写完成后释放锁
+            if (!$config_lock->unlock())
+            {
+                print_cli('配置解锁失败，忽略错误并继续往下执行');
+            }
+
+            // 重新读取配置
             $supervisor->reloadConfig();
 
             try
@@ -357,21 +378,25 @@ class CronTask extends Task
             }
             catch (Zend\XmlRpc\Client\Exception\FaultException $e)
             {
-                print_cli($e->getMessage());
-
-                if ($e->getCode() != XmlRpc::ALREADY_ADDED)
+                if ($e->getCode() == XmlRpc::ALREADY_ADDED)
                 {
+                    print_cli("{$program} 进程组已经存在，忽略错误信息并进入下一步");
+                }
+                else
+                {
+                    print_cli("{$program} 进程组添加失败，直接退出");
                     throw $e;
                 }
-
-                print_cli("{$program} 进程组已经存在，忽略错误信息并进入下一步");
             }
 
-            $supervisor->startProcessGroup($program, false);
-
-            if (!$config_lock->unlock())
+            try
             {
-                echo '配置解锁失败', PHP_EOL;
+                $supervisor->startProcessGroup($program, false);
+            }
+            catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+            {
+                print_cli("{$program} 进程组启动失败，直接退出");
+                throw $e;
             }
 
             return true;
@@ -387,7 +412,7 @@ class CronTask extends Task
 
             if (!$config_lock->unlock())
             {
-                echo '配置解锁失败', PHP_EOL;
+                print_cli('配置解锁失败，忽略错误并继续往下执行');
             }
 
             return false;
@@ -464,6 +489,12 @@ class CronTask extends Task
                 return false;
             }
 
+            // 配置读写完成后即可解锁
+            if (!$config_lock->unlock())
+            {
+                print_cli('配置解锁失败，忽略错误并继续往下执行');
+            }
+
             // 重载配置步骤
             reload:
 
@@ -475,11 +506,9 @@ class CronTask extends Task
             }
             catch (Zend\XmlRpc\Client\Exception\FaultException $e)
             {
-                print_cli($e->getMessage());
-
                 if ($e->getCode() == XmlRpc::BAD_NAME)
                 {
-                    print_cli("{$program} 进程组已经不存在，无法删除，跳过并继续往下执行");
+                    print_cli("{$program} 进程组不存在，无法删除，忽略错误并继续往下执行");
                 }
                 elseif($e->getCode() == XmlRpc::STILL_RUNNING)
                 {
@@ -504,11 +533,6 @@ class CronTask extends Task
                 }
             }
 
-            if (!$config_lock->unlock())
-            {
-                print_cli('配置解锁失败');
-            }
-
             return true;
         }
         catch (Exception $e)
@@ -522,22 +546,22 @@ class CronTask extends Task
 
             if (!$config_lock->unlock())
             {
-                print_cli('配置解锁失败');
+                print_cli('配置解锁失败，忽略错误并继续往下执行');
             }
 
             return false;
         }
     }
 
-    private function makeIni($program, $command, $user)
+    private function makeIni($program, Cron $cron)
     {
         $ini = '';
         $ini .= "[program:{$program}]" . PHP_EOL;
-        $ini .= "command={$command}" . PHP_EOL;
+        $ini .= "command={$cron->command}" . PHP_EOL;
         $ini .= "process_name=%(program_name)s_%(process_num)s" . PHP_EOL;
         $ini .= "numprocs=1" . PHP_EOL;
         $ini .= "numprocs_start=0" . PHP_EOL;
-        $ini .= "user={$user}" . PHP_EOL;
+        $ini .= "user={$cron->user}" . PHP_EOL;
         $ini .= "directory=%(here)s" . PHP_EOL;
         $ini .= "startsecs=0" . PHP_EOL;
         $ini .= "autostart=false" . PHP_EOL;
@@ -546,7 +570,7 @@ class CronTask extends Task
         $ini .= "redirect_stderr=true" . PHP_EOL;
         $ini .= "stdout_logfile=AUTO" . PHP_EOL;
         $ini .= "stdout_logfile_backups=0" . PHP_EOL;
-        $ini .= "stdout_logfile_maxbytes=16MB" . PHP_EOL;
+        $ini .= "stdout_logfile_maxbytes=50MB" . PHP_EOL;
 
         return $ini;
     }

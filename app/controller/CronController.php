@@ -146,9 +146,4 @@ class CronController extends ControllerSupervisorBase
         ]);
         return true;
     }
-
-    public function logAction()
-    {
-
-    }
 }

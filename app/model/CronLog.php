@@ -48,4 +48,9 @@ class CronLog extends Model
     {
         $this->update_time = time();
     }
+
+    public function getProcessName()
+    {
+        return $this->program . ':' . $this->program . '_0';
+    }
 }
