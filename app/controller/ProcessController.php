@@ -356,9 +356,8 @@ class ProcessController extends ControllerSupervisorBase
 
         // 读取线上配置
         $uri = $this->server->getSupervisorUri();
-        $conf_path = $this->server->getProcessConfPath();
 
-        $read = SupervisorSyncConf::read($uri, $conf_path);
+        $read = SupervisorSyncConf::read($uri, $this->server->process_conf);
         $is_empty_file = strpos($read['message'], 'no such file or directory');
 
         if (!$read['state'] && $is_empty_file === false)
@@ -378,7 +377,7 @@ class ProcessController extends ControllerSupervisorBase
         }
 
         $ini = implode(PHP_EOL, $ini_arr) . PHP_EOL;
-        $ret = SupervisorSyncConf::write($uri, $conf_path, $ini);
+        $ret = SupervisorSyncConf::write($uri, $this->server->process_conf, $ini);
 
         if (!$ret['state'])
         {

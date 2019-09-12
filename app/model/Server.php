@@ -13,7 +13,8 @@ class Server extends Model
     public $username;
     public $password;
     public $sync_conf_port;
-    public $conf_path;
+    public $process_conf;
+    public $cron_conf;
     public $sort;
     public $create_time;
     public $update_time;
@@ -52,18 +53,13 @@ class Server extends Model
         return $this->validate($validator);
     }
 
+    /**
+     * 获取 Supervisor RPC 通许地址
+     *
+     * @return string
+     */
     public function getSupervisorUri()
     {
         return "http://{$this->ip}:{$this->sync_conf_port}";
-    }
-
-    public function getCronConfPath()
-    {
-       return '/etc/supervisor/conf.d/cron.conf';
-    }
-
-    public function getProcessConfPath()
-    {
-        return '/etc/supervisor/conf.d/process.conf';
     }
 }

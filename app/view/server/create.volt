@@ -55,19 +55,25 @@
         </div>
     </div>
     <div class="form-group">
-        <label for="sync_conf_port" class="col-sm-2 control-label">sync 端口</label>
+        <label for="sync_conf_port" class="col-sm-2 control-label">同步配置端口</label>
         <div class="col-sm-10">
             {{ form.render('sync_conf_port') }}
-            <span id="helpBlock" class="help-block">该端口只用于更新远程主机的 Supervisor 配置。</span>
+            <span id="helpBlock" class="help-block">请填写启动 <a href="http://gitlab.115rc.com/suzhihua/supervisor-sync-config" target="_blank">supervisor-sync-conf</a> 时所使用的端口。</span>
         </div>
     </div>
     <div class="form-group">
-        <label for="conf_path" class="col-sm-2 control-label">sync 配置文件路径</label>
+        <label for="conf_path" class="col-sm-2 control-label">进程配置</label>
         <div class="col-sm-10">
-            {{ form.render('conf_path') }}
+            {{ form.render('process_conf') }}
         </div>
     </div>
     <div class="form-group">
+        <label for="conf_path" class="col-sm-2 control-label">定时任务配置</label>
+        <div class="col-sm-10">
+            {{ form.render('cron_conf') }}
+        </div>
+    </div>
+    <div class="form-group" style="display: none;">
         <label for="sort" class="col-sm-2 control-label">排序字段</label>
         <div class="col-sm-10">
             {{ form.render('sort') }}

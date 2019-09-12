@@ -179,4 +179,50 @@ class CronLogController extends ControllerSupervisorBase
             return $this->response->setJsonContent($result);
         }
     }
+
+    public function deleteAction()
+    {
+        $ids = $this->request->getPost('ids', 'string', '');
+
+        $id_arr = array_filter(explode(',', $ids), function($item) {
+            return is_numeric($item);
+        });
+
+        if (empty($id_arr))
+        {
+            $this->flash->error("请先选择要删除的日志");
+        }
+        else
+        {
+            // 只删除已经完成的任务日志
+            $finished = implode(',', [
+                CronLog::STATUS_FAILED,
+                CronLog::STATUS_UNKNOWN,
+                CronLog::STATUS_STOPPED,
+                CronLog::STATUS_FINISHED
+            ]);
+
+            $phql = "DELETE FROM CronLog WHERE id IN ({ids:array-int}) AND status IN({$finished})";
+            $result = $this->modelsManager->executeQuery(
+                $phql,
+                ['ids' => $id_arr]
+            );
+
+            if ($result->success())
+            {
+                $this->flash->success("删除成功");
+            }
+            else
+            {
+                $this->flash->error($result->getMessages());
+            }
+        }
+
+        return $this->dispatcher->forward([
+           'action' => 'index',
+            'params' => [
+                'server_id' => $this->server_id
+            ]
+        ]);
+    }
 }

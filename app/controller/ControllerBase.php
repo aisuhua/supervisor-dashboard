@@ -44,7 +44,7 @@ class ControllerBase extends Controller
                     's.ip as server_ip',
                     's.port as server_port',
                 ])
-                ->orderBy('g.sort DESC, s.sort DESC, s.create_time ASC')
+                ->orderBy('g.sort DESC, s.ip ASC')
                 ->getQuery()
                 ->execute();
 

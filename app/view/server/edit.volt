@@ -37,13 +37,13 @@
         </div>
     </div>
     <div class="form-group">
-        <label for="username" class="col-sm-2 control-label">用户名</label>
+        <label for="username" class="col-sm-2 control-label">Supervisor 用户名</label>
         <div class="col-sm-10">
             {{ form.render('username') }}
         </div>
     </div>
     <div class="form-group">
-        <label for="password" class="col-sm-2 control-label">密码</label>
+        <label for="password" class="col-sm-2 control-label">Supervisor 密码</label>
         <div class="col-sm-10">
             {{ form.render('password') }}
         </div>
@@ -55,12 +55,18 @@
         </div>
     </div>
     <div class="form-group">
-        <label for="conf_path" class="col-sm-2 control-label">配置文件路径</label>
+        <label for="conf_path" class="col-sm-2 control-label">进程配置</label>
         <div class="col-sm-10">
-            {{ form.render('conf_path') }}
+            {{ form.render('process_conf') }}
         </div>
     </div>
     <div class="form-group">
+        <label for="conf_path" class="col-sm-2 control-label">定时任务配置</label>
+        <div class="col-sm-10">
+            {{ form.render('cron_conf') }}
+        </div>
+    </div>
+    <div class="form-group" style="display: none;">
         <label for="sort" class="col-sm-2 control-label">排序字段</label>
         <div class="col-sm-10">
             {{ form.render('sort') }}

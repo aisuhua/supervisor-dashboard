@@ -25,9 +25,9 @@
         <th>Supervisor 端口</th>
         <th>Supervisor 用户名</th>
         <th>Supervisor 密码</th>
-        <th>sync 端口</th>
-        <th>sync 配置文件路径</th>
-        <th>排序字段</th>
+        <th>同步配置端口</th>
+        <th>进程配置</th>
+        <th>定时任务配置</th>
         <th>更新时间</th>
         <th>所属分组</th>
         <th>操作</th>
@@ -58,7 +58,7 @@
                 selector: 'td:first-child'
             },
             order: [
-                [5, 'desc']
+                [1, 'asc']
             ],
             columnDefs: [
                 {
@@ -97,12 +97,12 @@
                     orderable: false
                 },
                 {
-                    data: 'conf_path',
+                    data: 'process_conf',
                     targets: 6,
                     orderable: false
                 },
                 {
-                    data: 'sort',
+                    data: 'cron_conf',
                     targets: 7,
                     orderable: false
                 },

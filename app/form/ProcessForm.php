@@ -320,12 +320,12 @@ class ProcessForm extends Form
             'value' => '1MB'
         ]);
 
-        $stdout_logfile_backups->setFilters([
+        $stdout_logfile_maxbytes->setFilters([
             'string',
             'trim'
         ]);
 
-        $stdout_logfile_backups->addValidators([
+        $stdout_logfile_maxbytes->addValidators([
             new Regex(
                 [
                     "pattern" => '/^\d+MB$/',

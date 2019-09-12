@@ -99,7 +99,14 @@ $di->setShared('db', function () {
 
                 if ($variables)
                 {
-                    $string .= ' [' . join(',', $variables) . ']';
+                    if (is_array(current($variables)))
+                    {
+                        $string .= ' [' . join(',', current($variables)) . ']';
+                    }
+                    else
+                    {
+                        $string .= ' [' . join(',', $variables) . ']';
+                    }
                 }
 
                 $di->get('logger', ['db.log'])->debug($string);

@@ -352,7 +352,6 @@ class CronTask extends Task
         );
 
         $uri = $server->getSupervisorUri();
-        $conf_path = $server->getCronConfPath();
 
         $cronLock = new CronLock();
         if (!$cronLock->lock())
@@ -363,7 +362,7 @@ class CronTask extends Task
 
         try
         {
-            $read = SupervisorSyncConf::read($uri, $conf_path);
+            $read = SupervisorSyncConf::read($uri, $server->cron_conf);
             $is_empty_file = strpos($read['message'], 'no such file or directory');
 
             if (!$read['state'] && $is_empty_file === false)
@@ -396,7 +395,7 @@ class CronTask extends Task
                 }
             }
 
-            $write = SupervisorSyncConf::write($uri, $conf_path, $ini);
+            $write = SupervisorSyncConf::write($uri, $server->cron_conf, $ini);
             if (!$write['state'])
             {
                 print_cli("配置写入出错：{$write['message']}");
@@ -478,7 +477,6 @@ class CronTask extends Task
         );
 
         $uri = $server->getSupervisorUri();
-        $conf_path = $server->getCronConfPath();
 
         $cronLock = new CronLock();
         if (!$cronLock->lock())
@@ -489,7 +487,7 @@ class CronTask extends Task
 
         try
         {
-            $read = SupervisorSyncConf::read($uri, $conf_path);
+            $read = SupervisorSyncConf::read($uri, $server->cron_conf);
             $is_empty_file = strpos($read['message'], 'no such file or directory');
 
             if (!$read['state'] && $is_empty_file === false)
@@ -522,7 +520,7 @@ class CronTask extends Task
             unset($parsed[$key]);
             $ini = build_ini_string($parsed);
 
-            $write = SupervisorSyncConf::write($uri, $conf_path, $ini);
+            $write = SupervisorSyncConf::write($uri, $server->cron_conf, $ini);
             if (!$write['state'])
             {
                 print_cli("配置写入出错：{$write['message']}");

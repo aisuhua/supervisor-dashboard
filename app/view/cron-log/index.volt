@@ -138,6 +138,7 @@ $(function() {
                 action: function () {
                     var ids = '';
                     var count = 0;
+
                     dataTable.rows({selected: true}).every( function () {
                         var d = this.data();
                         ids += d.id + ',';
@@ -146,17 +147,18 @@ $(function() {
 
                     if (count <= 0)
                     {
-                        alert('请先选择分组');
+                        alert('请选择要删除的日志');
                         return false;
                     }
 
-                    if (confirm("真的要删除这"+ count +"个分组吗？")) {
-                        var url = '/server-group/delete';
+                    if (confirm("真的要删除这 "+ count +" 条日志吗？")) {
+                        var url = '/cron-log/delete?server_id={{ server.id }}';
                         $.pjax({
                             url: url,
                             container: '#pjax-container',
                             type: 'POST',
-                            data: {ids: ids}
+                            data: {ids: ids},
+                            push: false
                         });
                     }
                     // $('#server-group-list').DataTable().ajax.reload();
@@ -172,19 +174,23 @@ $(function() {
         var row = dataTable.row($(this).closest('tr'));
         var data = row.data();
 
-        if (!confirm('真的要停止 ID 为 ' + data.id + " 的任务吗？")) {
+        // 停止正在执行的任务
+        if ($(this).hasClass('stop'))
+        {
+            if (!confirm('真的要停止 ID 为 ' + data.id + " 的任务吗？")) {
+                return false;
+            }
+
+            $.post($(this).attr('href'), function(data) {
+                if (data.state) {
+                    success(data.message);
+                } else {
+                    error(data.message);
+                }
+            });
+
             return false;
         }
-
-        $.post($(this).attr('href'), function(data) {
-            if (data.state) {
-                success(data.message);
-            } else {
-                error(data.message);
-            }
-        });
-
-        return false;
     });
 
 });

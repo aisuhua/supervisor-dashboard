@@ -27,7 +27,14 @@ class Tool
             'java',
             '/usr/bin/java',
             'aria2c',
-            '/usr/bin/aria2c'
+            '/usr/bin/aria2c',
+            '/www/disasterctl/disasterctl',
+            '/www/timer_rbmq/timerrbmq',
+            '/www/web/timer_rbmq/timerrbmq',
+            '/www/web/msg.115.com/crond/apns_worker/apns_worker',
+            '/www/web/msg.yun.115.com/crond/apns_worker/apns_worker',
+            '/www/web/home-imgload/home-imgload1604',
+            '/www/web/home-unread/home-unread1604'
         ];
 
         $cmd = array_map(function($item) {
@@ -36,6 +43,6 @@ class Tool
 
         $cmd_str = implode('|', $cmd);
 
-        return "/(^({$cmd_str})\s+[0-9a-zA-Z\._\-\s=\/]{1,255}$)|(^\/bin\/cat$)/";
+        return "/(^({$cmd_str})\s+[0-9a-zA-Z\._\-\s=:\/%()]{1,255}$)|(^\/bin\/cat$)|(^\/bin\/echo\s?\w*?$)|(date)/";
     }
 }

@@ -108,7 +108,7 @@ class ServerForm extends Form
         $this->add($username);
 
         // password
-        $password = new Password('password', [
+        $password = new Text('password', [
             'class' => 'form-control',
             'autocomplete' => 'off',
             'value' => 111111
@@ -122,23 +122,41 @@ class ServerForm extends Form
 
         $this->add($password);
 
-        // conf_path
-        $conf_path = new Text('conf_path', [
+        // process_conf
+        $process_conf = new Text('process_conf', [
             'class' => 'form-control',
             'autocomplete' => 'off',
-            'value' => '/etc/supervisor/conf.d/program.conf'
+            'value' => '/etc/supervisor/conf.d/process.conf'
         ]);
 
-        $conf_path->addValidators([
+        $process_conf->addValidators([
             new Regex(
                 [
                     "pattern" => "/^\/etc\/supervisor\/conf\.d\/[a-zA-Z0-9]+\.conf$/",
-                    "message" => "配置文件路径不正确，格式：/etc/supervisor/conf.d/YOUR_CONF_NAME.conf",
+                    "message" => "进程配置不正确，格式：/etc/supervisor/conf.d/YOUR_CONF_NAME.conf",
                 ]
             )
         ]);
 
-        $this->add($conf_path);
+        $this->add($process_conf);
+
+        // cron_conf
+        $cron_conf = new Text('cron_conf', [
+            'class' => 'form-control',
+            'autocomplete' => 'off',
+            'value' => '/etc/supervisor/conf.d/cron.conf'
+        ]);
+
+        $cron_conf->addValidators([
+            new Regex(
+                [
+                    "pattern" => "/^\/etc\/supervisor\/conf\.d\/[a-zA-Z0-9]+\.conf$/",
+                    "message" => "定时任务配置不正确，格式：/etc/supervisor/conf.d/YOUR_CONF_NAME.conf",
+                ]
+            )
+        ]);
+
+        $this->add($cron_conf);
 
         // sync_conf_port
         $sync_conf_port = new Text('sync_conf_port', [
