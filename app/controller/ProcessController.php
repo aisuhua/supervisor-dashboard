@@ -5,74 +5,12 @@ class ProcessController extends ControllerSupervisorBase
 {
     public function testAction()
     {
-        $supervisor = new Supervisor(111,
-            '192.168.1.229',
-            'worker',
-            '111111',
-            9001
-        );
-
-        $process_name = "checkPerMinute";
-        $result = $this->supervisor->stopProcessGroup($process_name, false);
-
-        var_dump($result);
-        exit;
 
         try
         {
-            $process_name = 'sys_cron_22_201909101741:sys_cron_22_201909101741_0';
-            $process = $supervisor->stopProcess($process_name);
-
-            var_dump($process);
-        }
-        catch (Zend\XmlRpc\Client\Exception\FaultException $e)
-        {
-            if ($e->getCode() == XmlRpc::NOT_RUNNING)
-            {
-                echo "{$process_name} 已经停止", PHP_EOL;
-            }
-            elseif ($e->getCode() == XmlRpc::BAD_NAME)
-            {
-                echo "{$process_name} 不存在，无法执行停止操作", PHP_EOL;
-            }
-        }
-        catch (Exception $e)
-        {
-            echo get_class($e), PHP_EOL;
-            echo $e->getMessage(), PHP_EOL;
-            echo $e->getCode(), PHP_EOL;
-            echo $e->getTraceAsString(), PHP_EOL;
-        }
-
-        exit;
-
-        try
-        {
-            $processes = $supervisor->getAllProcessInfo();
-        }
-        catch (Zend\Http\Client\Adapter\Exception\RuntimeException $e)
-        {
-            if ($e->getCode() == 0)
-            {
-                if (strpos($e->getMessage(), 'No route to host') !== false)
-                {
-                    echo "无法连接主机 192.168.1.221";
-                    return false;
-                }
-                elseif (strpos($e->getMessage(), 'Connection refused') !== false)
-                {
-                    echo "连接被拒绝，Supervisor 没有启动或者端口错误";
-                    return false;
-                }
-            }
-        }
-        catch (Zend\XmlRpc\Client\Exception\HttpException $e)
-        {
-            if ($e->getCode() == 401)
-            {
-                echo "连接 Supervisor 的账号密码不正确";
-                return false;
-            }
+            $group = 'sys_cron_22_201909121416:sys_cron_22_201909121416_0';
+            $result = $this->supervisor->getProcessInfo($group);
+            print_r($result);
         }
         catch (Exception $e)
         {
@@ -87,7 +25,17 @@ class ProcessController extends ControllerSupervisorBase
 
     public function indexAction()
     {
+        $show_sys = $this->request->get('show_sys', 'int', 0);
+
         $processes = $this->supervisor->getAllProcessInfo();
+
+        if (!$show_sys)
+        {
+            // 不显示系统进程
+            $processes = array_filter($processes, function($process) {
+                return strpos($process['name'], 'sys_') === false;
+            });
+        }
 
         $process_groups = array_unique(array_column($processes, 'group'));
         $process_warnings = array_filter($processes, function($process) {
@@ -202,6 +150,10 @@ class ProcessController extends ControllerSupervisorBase
         {
             $this->handleStartException($e);
         }
+
+        $this->view->setRenderLevel(
+            View::LEVEL_NO_RENDER
+        );
     }
 
     public function stopGroupAction()
@@ -320,6 +272,11 @@ class ProcessController extends ControllerSupervisorBase
         return $this->response->setJsonContent($result);
     }
 
+    /**
+     * 只停止非系统进程
+     *
+     * @TODO
+     */
     public function stopAllAction()
     {
         $result = [];
@@ -336,6 +293,11 @@ class ProcessController extends ControllerSupervisorBase
         );
     }
 
+    /**
+     * 只重启非系统进程
+     *
+     * @TODO
+     */
     public function restartAllAction()
     {
         $result = [];
@@ -372,6 +334,16 @@ class ProcessController extends ControllerSupervisorBase
     {
         $result = [];
 
+        $processLock = new ProcessLock();
+        if (!$processLock->lock())
+        {
+            $result['state'] = 0;
+            $result['message'] = '更新失败，无法获得锁';
+
+            return $this->response->setJsonContent($result);
+        }
+
+        // 读取数据库配置
         $processes = Process::find([
             'server_id = :server_id:',
             'bind' => [
@@ -380,6 +352,24 @@ class ProcessController extends ControllerSupervisorBase
             'order' => 'program asc, id asc'
         ]);
 
+        $process_arr = $processes->toArray();
+
+        // 读取线上配置
+        $uri = $this->server->getSupervisorUri();
+        $conf_path = $this->server->getProcessConfPath();
+
+        $read = SupervisorSyncConf::read($uri, $conf_path);
+        $is_empty_file = strpos($read['message'], 'no such file or directory');
+
+        if (!$read['state'] && $is_empty_file === false)
+        {
+            // 配置读取失败
+            $result['state'] = 0;
+            $result['message'] = "无法读取配置，{$read['message']}";
+
+            return $this->response->setJsonContent($result);
+        }
+
         $ini_arr = [];
         foreach ($processes as $process)
         {
@@ -387,10 +377,8 @@ class ProcessController extends ControllerSupervisorBase
             $ini_arr[] = $process->getIni();
         }
 
-        $ini = implode(PHP_EOL, $ini_arr);
-        $uri = "http://{$this->server->ip}:{$this->server->sync_conf_port}";
-
-        $ret = SupervisorSyncConf::write($uri, $this->server->conf_path, $ini);
+        $ini = implode(PHP_EOL, $ini_arr) . PHP_EOL;
+        $ret = SupervisorSyncConf::write($uri, $conf_path, $ini);
 
         if (!$ret['state'])
         {
@@ -400,16 +388,73 @@ class ProcessController extends ControllerSupervisorBase
             return $this->response->setJsonContent($result);
         }
 
+        // 对比数据库与线上进程配置，统计出待新增、删除和修改的进程
         $added = [];
         $changed = [];
         $removed = [];
 
-        $callback = function() use (&$added, &$changed, &$removed)
+        // 以下逻辑是为了模拟 reloadConfig 方法统计出进程的增删改
+        // 因为存在并发调用 reloadConfig，因此它的结果并不可靠
+        // list($added, $changed, $removed) = $this->supervisor->reloadConfig()[0];
+        $this->supervisor->reloadConfig();
+
+        if (empty($read['content']))
         {
-            list($added, $changed, $removed) = $this->supervisor->reloadConfig()[0];
-        };
-        $this->setCallback($callback);
-        $this->invoke();
+            // 配置内容为空，则全部进程都是新增
+            if (count($process_arr) > 0)
+            {
+                $added = array_map(function($process) {
+                    return $process['program'];
+                }, $process_arr);
+            }
+        }
+        else
+        {
+            $parsed = parse_ini_string($read['content'], true, INI_SCANNER_RAW);
+            if ($parsed === false)
+            {
+                $result['state'] = 0;
+                $result['message'] = "配置解析失败，请重试";
+
+                return $this->response->setJsonContent($result);
+            }
+
+            $db_programs = array_map(function($process) {
+                return $process['program'];
+            }, $process_arr);
+
+            $parsed_programs = array_map(function($key) {
+                return explode(':', $key)[1];
+            }, array_keys($parsed));
+
+            // 待新增的进程
+            $added = array_diff($db_programs, $parsed_programs);
+            // 待删除的进程
+            $removed = array_diff($parsed_programs, $db_programs);
+
+            // 需要判断是否发生修改的进程
+            $key_parts = [];
+            foreach ($processes as $process)
+            {
+                $key_parts[$process->program] = $process;
+            }
+
+            $intersect = array_intersect($db_programs, $parsed_programs);
+            if (!empty($intersect))
+            {
+                foreach ($intersect as $program)
+                {
+                    /** @var Process $process */
+                    $process = $key_parts[$program];
+                    $process->assign($parsed["program:{$program}"]);
+
+                    if ($process->hasChanged())
+                    {
+                        $changed[] = $program;
+                    }
+                }
+            }
+        }
 
         $messages = [];
         if (!empty($added))
@@ -453,36 +498,69 @@ class ProcessController extends ControllerSupervisorBase
 
         foreach ($added as $group)
         {
-            $callback = function() use ($group)
+            try
             {
                 $this->supervisor->addProcessGroup($group);
-            };
-            $this->setCallback($callback);
-            $this->invoke();
+            }
+            catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+            {
+                $this->handleAddException($e);
+            }
         }
 
         foreach ($changed as $group)
         {
-            $callback = function() use ($group)
+            try
             {
                 $this->supervisor->stopProcessGroup($group);
+            }
+            catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+            {
+                $this->handleStopException($e);
+            }
+
+            try
+            {
                 $this->supervisor->removeProcessGroup($group);
+            }
+            catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+            {
+                $this->handleRemoveException($e);
+            }
+
+            try
+            {
                 $this->supervisor->addProcessGroup($group);
-            };
-            $this->setCallback($callback);
-            $this->invoke();
+            }
+            catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+            {
+                $this->handleAddException($e);
+            }
         }
 
         foreach ($removed as $group)
         {
-            $callback = function() use ($group)
+            try
             {
                 $this->supervisor->stopProcessGroup($group);
+            }
+            catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+            {
+                $this->handleStopException($e);
+            }
+
+            try
+            {
                 $this->supervisor->removeProcessGroup($group);
-            };
-            $this->setCallback($callback);
-            $this->invoke();
+            }
+            catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+            {
+                $this->handleRemoveException($e);
+            }
         }
+
+        // 解锁
+        $processLock->unlock();
 
         $this->view->setRenderLevel(
             View::LEVEL_NO_RENDER

@@ -115,4 +115,20 @@ class ControllerSupervisorBase extends ControllerBase
             throw $e;
         }
     }
+
+    protected function handleAddException(Exception $e)
+    {
+        if ($e->getCode() != XmlRpc::ALREADY_ADDED)
+        {
+            throw $e;
+        }
+    }
+
+    protected function handleRemoveException(Exception $e)
+    {
+        if ($e->getCode() != XmlRpc::BAD_NAME)
+        {
+            throw $e;
+        }
+    }
 }

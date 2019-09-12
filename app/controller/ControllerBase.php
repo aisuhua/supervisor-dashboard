@@ -72,4 +72,9 @@ class ControllerBase extends Controller
             $this->view->menu_servers = $menu_servers;
         }
     }
+
+    public function sendJsonContent()
+    {
+
+    }
 }

@@ -1,15 +1,15 @@
 <?php
-class ConfigLock
+class FileLock
 {
-    protected $filename = APP_PATH . '/lock/config.txt';
+    protected $filename;
     protected $fp;
     protected $locked;
 
-    public function __construct($filename = null)
+    public function __construct($filename)
     {
         $this->fp = fopen($this->filename, "r+");
         $this->locked = false;
-        $this->filename = $filename ?: $this->filename;
+        $this->filename = $filename;
     }
 
     public function lock()

@@ -244,13 +244,18 @@ class CronTask extends Task
 
                     if ($info['statename'] == 'EXITED')
                     {
-                        // 正常退出
-                        $cronLog->status = CronLog::STATUS_FINISHED;
-                    }
-                    elseif (in_array($info['statename'], ['BACKOFF', 'FATAL', 'UNKNOWN']))
-                    {
-                        // 异常退出
-                        $cronLog->status = CronLog::STATUS_FAILED;
+                        if ($info['exitstatus'] == 0)
+                        {
+                            // 正常退出
+                            $cronLog->status = CronLog::STATUS_FINISHED;
+                        }
+                        else
+                        {
+                            // 异常退出则标志为失败
+                            $cronLog->status = CronLog::STATUS_FAILED;
+
+                            print_cli("{$cronLog->program} 异常退出，exitstatus: {$info['exitstatus']}, spawnerr: {$info['spawnerr']}");
+                        }
                     }
                     elseif ($info['statename'] == 'STOPPED')
                     {
@@ -258,6 +263,13 @@ class CronTask extends Task
                         $cronLog->status = CronLog::STATUS_STOPPED;
 
                         print_cli("{$cronLog->program} 被中断执行");
+                    }
+                    elseif (in_array($info['statename'], ['BACKOFF', 'FATAL', 'UNKNOWN']))
+                    {
+                        // 异常退出
+                        $cronLog->status = CronLog::STATUS_FAILED;
+
+                        print_cli("{$cronLog->program} {$info['statename']}");
                     }
 
                     // 进程退出时间
@@ -342,8 +354,8 @@ class CronTask extends Task
         $uri = $server->getSupervisorUri();
         $conf_path = $server->getCronConfPath();
 
-        $config_lock = new ConfigLock();
-        if (!$config_lock->lock())
+        $cronLock = new CronLock();
+        if (!$cronLock->lock())
         {
             print_cli('锁定失败');
             return false;
@@ -381,20 +393,14 @@ class CronTask extends Task
                 {
                     $origin = build_ini_string($parsed);
                     $ini = trim($origin) . PHP_EOL . $ini;
-
-                    $write = SupervisorSyncConf::write($uri, $conf_path, $ini);
-                    if (!$write['state'])
-                    {
-                        print_cli("配置写入出错：{$write['message']}");
-                        return false;
-                    }
                 }
             }
 
-            // 配置读写完成后释放锁
-            if (!$config_lock->unlock())
+            $write = SupervisorSyncConf::write($uri, $conf_path, $ini);
+            if (!$write['state'])
             {
-                print_cli('解锁失败，忽略错误并继续往下执行');
+                print_cli("配置写入出错：{$write['message']}");
+                return false;
             }
 
             // 重新读取配置
@@ -427,6 +433,12 @@ class CronTask extends Task
                 throw $e;
             }
 
+            // 配置读写完成后释放锁
+            if (!$cronLock->unlock())
+            {
+                print_cli('解锁失败，忽略错误并继续往下执行');
+            }
+
             return true;
         }
         catch (Exception $e)
@@ -438,7 +450,7 @@ class CronTask extends Task
                 "\n Trace: ", $e->getTraceAsString()
             );
 
-            if (!$config_lock->unlock())
+            if (!$cronLock->unlock())
             {
                 print_cli('解锁失败，忽略错误并继续往下执行');
             }
@@ -468,8 +480,8 @@ class CronTask extends Task
         $uri = $server->getSupervisorUri();
         $conf_path = $server->getCronConfPath();
 
-        $config_lock = new ConfigLock();
-        if (!$config_lock->lock())
+        $cronLock = new CronLock();
+        if (!$cronLock->lock())
         {
             print_cli('锁定失败');
             return false;
@@ -486,7 +498,7 @@ class CronTask extends Task
                 return false;
             }
 
-            if (!$read['content'])
+            if (empty($read['content']))
             {
                 print_cli("配置文件为空，直接跳到 reload 配置步骤");
                 goto reload;
@@ -515,12 +527,6 @@ class CronTask extends Task
             {
                 print_cli("配置写入出错：{$write['message']}");
                 return false;
-            }
-
-            // 配置读写完成后即可解锁
-            if (!$config_lock->unlock())
-            {
-                print_cli('解锁失败，忽略错误并继续往下执行');
             }
 
             // 重载配置步骤
@@ -561,6 +567,12 @@ class CronTask extends Task
                 }
             }
 
+            // 配置读写完成后即可解锁
+            if (!$cronLock->unlock())
+            {
+                print_cli('解锁失败，忽略错误并继续往下执行');
+            }
+
             return true;
         }
         catch (Exception $e)
@@ -572,7 +584,7 @@ class CronTask extends Task
                 "\n Trace: ", $e->getTraceAsString()
             );
 
-            if (!$config_lock->unlock())
+            if (!$cronLock->unlock())
             {
                 print_cli('解锁失败，忽略错误并继续往下执行');
             }

@@ -20,9 +20,10 @@
             </button>
             <ul class="dropdown-menu">
                 <li><a href="/process/reloadConfig?server_id={{ server.id }}&ip={{ server.ip }}&port={{ server.port }}" class="update-config" title="">同步配置</a></li>
-                <li><a href="/process/restartAll?server_id={{ server.id }}" class="restartall" data-nopjax data-confirm="真的要重启所有进程吗？">重启所有进程</a></li>
-                <li><a href="/process/stopAll?server_id={{ server.id }}" class="stopall" data-nopjax data-confirm="真的要停止所有进程吗？">停止所有进程</a></li>
-                <li><a href="/supervisor/restart?server_id={{ server.id }}" class="restart_supervisor" data-nopjax data-confirm="真的要重启 Supervisor 服务吗？">重启 Supervisor 服务</a></li>
+                <li><a href="/process?server_id={{ server.id }}&ip={{ server.ip }}&port={{ server.port }}&show_sys=1">显示系统进程</a></li>
+                <li><a href="/process/restartAll?server_id={{ server.id }}" class="restartall" data-nopjax data-confirm="警告：如果有定时任务正在运行，也会被重启。真的要重启所有进程吗？">重启所有进程</a></li>
+                <li><a href="/process/stopAll?server_id={{ server.id }}" class="stopall" data-nopjax data-confirm="警告：如果有定时任务正在运行，也会被停止。真的要停止所有进程吗？">停止所有进程</a></li>
+                <li><a href="/supervisor/restart?server_id={{ server.id }}" class="restart_supervisor" data-nopjax data-confirm="警告：重启期间所有进程都将停止运行。真的要重启 Supervisor 服务吗？">重启 Supervisor 服务</a></li>
                 {#<li><a href="/server/{{ server.id }}/supervisor/shutdown">停止服务</a></li>#}
             </ul>
         </div>
@@ -71,7 +72,7 @@
 
 {% endif %}
 
-<table class="table table-striped table-bordered table-hover">
+<table class="table table-bordered table-hover">
     <thead>
     <tr>
         <th>进程号</th>

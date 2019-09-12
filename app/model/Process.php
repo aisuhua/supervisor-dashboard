@@ -25,6 +25,11 @@ class Process extends Model
     public $update_time;
     public $create_time;
 
+    public function initialize()
+    {
+        $this->keepSnapshots(true);
+    }
+
     public function beforeUpdate()
     {
 

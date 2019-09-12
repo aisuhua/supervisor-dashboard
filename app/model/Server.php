@@ -61,4 +61,9 @@ class Server extends Model
     {
        return '/etc/supervisor/conf.d/cron.conf';
     }
+
+    public function getProcessConfPath()
+    {
+        return '/etc/supervisor/conf.d/process.conf';
+    }
 }
