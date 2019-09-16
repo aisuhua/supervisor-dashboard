@@ -43,6 +43,6 @@ class Tool
 
         $cmd_str = implode('|', $cmd);
 
-        return "/(^({$cmd_str})\s+[0-9a-zA-Z\._\-\s=:\/%()]{1,255}$)|(^\/bin\/cat$)|(^\/bin\/echo\s?\w*?$)|(date)/";
+        return "/(^({$cmd_str})\s+[0-9a-zA-Z\._\-\s=:\/%()]{1,255}$)|(^\/bin\/cat$)/";
     }
 }

@@ -27,21 +27,30 @@ class ProcessController extends ControllerSupervisorBase
     {
         $show_sys = $this->request->get('show_sys', 'int', 0);
 
-        $processes = $this->supervisor->getAllProcessInfo();
+        $process_groups = [];
+        $process_warnings = [];
 
-        if (!$show_sys)
+        $processes = $this->supervisor->getAllProcessInfo();
+        foreach ($processes as $process)
         {
             // 不显示系统进程
-            $processes = array_filter($processes, function($process) {
-                return strpos($process['name'], 'sys_') === false;
-            });
+            if (!$show_sys && strpos($process['name'], 'sys_') !== false)
+            {
+               continue;
+            }
+
+            $process_groups[] = $process['group'];
+
+            if ($process['statename'] != 'RUNNING')
+            {
+                $process_warnings[] = $process;
+            }
         }
 
-        $process_groups = array_unique(array_column($processes, 'group'));
-        $process_warnings = array_filter($processes, function($process) {
-            return $process['statename'] != 'RUNNING';
-        });
+        // 所有进程组
+        $process_groups = array_unique($process_groups);
 
+        // 数据库的进程信息
         $local_processes = Process::find([
             "server_id = {$this->server->id}"
         ])->toArray();

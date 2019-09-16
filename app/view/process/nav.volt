@@ -64,10 +64,9 @@ function reloadConfig() {
 }
 
 $(function() {
-
     var ini_editor = document.getElementById('ini');
-    if (ini_editor)
-    {
+
+    if (ini_editor) {
         // code editor
         var editor = CodeMirror.fromTextArea(document.getElementById('ini'), {
             mode: "properties",

@@ -28,8 +28,6 @@
     <link href="https://cdn.staticfile.org/codemirror/5.48.4/addon/search/matchesonscrollbar.css" rel="stylesheet">
     <link href="https://cdn.staticfile.org/codemirror/5.48.4/addon/display/fullscreen.css" rel="stylesheet">
 
-
-
     <link rel="stylesheet" href="/css/override.css">
 
     <!-- bootstrap -->
@@ -70,6 +68,7 @@
     <script src="https://cdn.staticfile.org/codemirror/5.48.4/addon/search/jump-to-line.js"></script>
     <script src="https://cdn.staticfile.org/codemirror/5.48.4/addon/display/fullscreen.js"></script>
 
+    <script src="/plugins/autosize/autosize.js"></script>
 
     <!-- https://github.com/jacwright/date.format -->
     <script src="/js/date.format.js"></script>
