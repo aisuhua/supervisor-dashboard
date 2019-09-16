@@ -59,16 +59,17 @@
 
     <!-- codemirror -->
     <script src="http://cdn.staticfile.org/codemirror/5.48.4/codemirror.js"></script>
-    <script src="http://cdn.staticfile.org/codemirror/5.48.4/addon/dialog/dialog.js"></script>
+    {#<script src="http://cdn.staticfile.org/codemirror/5.48.4/addon/dialog/dialog.js"></script>#}
     <script src="https://cdn.staticfile.org/codemirror/5.48.4/mode/properties/properties.js"></script>
-    <script src=" https://cdn.staticfile.org/codemirror/5.48.4/addon/search/searchcursor.js"></script>
-    <script src="https://cdn.staticfile.org/codemirror/5.48.4/addon/search/search.js"></script>
-    <script src="https://cdn.staticfile.org/codemirror/5.48.4/addon/scroll/annotatescrollbar.js"></script>
-    <script src="https://cdn.staticfile.org/codemirror/5.48.4/addon/search/matchesonscrollbar.js"></script>
-    <script src="https://cdn.staticfile.org/codemirror/5.48.4/addon/search/jump-to-line.js"></script>
-    <script src="https://cdn.staticfile.org/codemirror/5.48.4/addon/display/fullscreen.js"></script>
+    {#<script src=" https://cdn.staticfile.org/codemirror/5.48.4/addon/search/searchcursor.js"></script>#}
+    {#<script src="https://cdn.staticfile.org/codemirror/5.48.4/addon/search/search.js"></script>#}
+    {#<script src="https://cdn.staticfile.org/codemirror/5.48.4/addon/scroll/annotatescrollbar.js"></script>#}
+    {#<script src="https://cdn.staticfile.org/codemirror/5.48.4/addon/search/matchesonscrollbar.js"></script>#}
+    {#<script src="https://cdn.staticfile.org/codemirror/5.48.4/addon/search/jump-to-line.js"></script>#}
+    {#<script src="https://cdn.staticfile.org/codemirror/5.48.4/addon/display/fullscreen.js"></script>#}
 
     <script src="/plugins/autosize/autosize.js"></script>
+    <script src="https://cdn.staticfile.org/highlight.js/9.15.10/highlight.min.js"></script>
 
     <!-- https://github.com/jacwright/date.format -->
     <script src="/js/date.format.js"></script>

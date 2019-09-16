@@ -32,7 +32,7 @@ class Cron extends Model
 
         $this->belongsTo('server_id', 'Server', 'id', [
             'alias' => 'server',
-            'reusable' => true
+            'reusable' => false
         ]);
     }
 

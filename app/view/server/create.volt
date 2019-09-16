@@ -73,6 +73,12 @@
             {{ form.render('cron_conf') }}
         </div>
     </div>
+    <div class="form-group">
+        <label for="conf_path" class="col-sm-2 control-label">命令配置</label>
+        <div class="col-sm-10">
+            {{ form.render('command_conf') }}
+        </div>
+    </div>
     <div class="form-group" style="display: none;">
         <label for="sort" class="col-sm-2 control-label">排序字段</label>
         <div class="col-sm-10">

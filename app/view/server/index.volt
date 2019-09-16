@@ -28,6 +28,7 @@
         <th>同步配置端口</th>
         <th>进程配置</th>
         <th>定时任务配置</th>
+        <th>命令配置</th>
         <th>更新时间</th>
         <th>所属分组</th>
         <th>操作</th>
@@ -107,8 +108,13 @@
                     orderable: false
                 },
                 {
-                    data: 'update_time',
+                    data: 'command_conf',
                     targets: 8,
+                    orderable: false
+                },
+                {
+                    data: 'update_time',
+                    targets: 9,
                     orderable: false,
                     render: function (data, type, full, meta) {
                         var myDate = new Date(data * 1000);
@@ -117,7 +123,7 @@
                 },
                 {
                     data: 'server_group_id',
-                    targets: 9,
+                    targets: 10,
                     orderable: false,
                     visible: server_group_id <= 0,
                     render: function (data, type, full, meta) {
@@ -125,7 +131,7 @@
                     }
                 },
                 {
-                    targets: 10,
+                    targets: 11,
                     data: 'id',
                     orderable: false,
                     render: function (data, type, full, meta) {

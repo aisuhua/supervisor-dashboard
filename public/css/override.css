@@ -22,8 +22,10 @@ body {
     width: 15%;
     vertical-align: middle;
 }
-samp#pjax-container {
+samp {
     word-wrap: break-word;
     white-space: pre-wrap;
+}
+samp#pjax-container {
     padding-bottom: 20px;
 }

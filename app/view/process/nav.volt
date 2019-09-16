@@ -3,50 +3,49 @@
     <li class="active">{{ server.ip }}:{{ server.port }}</li>
 </ol>
 
-<ul id="" class="nav nav-tabs my-tabs1" role="tablist" style="margin-bottom: 20px;">
-    {% set index_class = '' %}
-    {% set create_class = '' %}
-    {% set ini_class = '' %}
-    {% set cron_class = '' %}
-    {% set cron_create_class = '' %}
-    {% set cron_log_class = '' %}
-    {% set command_class = '' %}
-    {% set command_log_class = '' %}
+{% set index_class = '' %}
+{% set create_class = '' %}
+{% set ini_class = '' %}
+{% set cron_class = '' %}
+{% set cron_create_class = '' %}
+{% set cron_log_class = '' %}
+{% set command_class = '' %}
+{% set command_history_class = '' %}
 
-    {% if dispatcher.getControllerName() == 'process' %}
-        {% if dispatcher.getActionName() == 'index' %}
-            {% set index_class = 'active' %}
-        {% elseif dispatcher.getActionName() == 'create' or
-        dispatcher.getActionName() == 'edit' or
-        dispatcher.getActionName() == 'createIni' or
-        dispatcher.getActionName() == 'editIni'
-        %}
-            {% set create_class = 'active' %}
-        {% elseif dispatcher.getActionName() == 'ini' %}
-            {% set ini_class = 'active' %}
-        {% endif %}
-
-    {% elseif dispatcher.getControllerName() == 'cron' %}
-        {% if dispatcher.getActionName() == 'index' %}
-            {% set cron_class = 'active' %}
-        {% elseif dispatcher.getActionName() == 'create' or
-            dispatcher.getActionName() == 'edit'
-        %}
-            {% set cron_create_class = 'active' %}
-        {% endif %}
-    {% elseif dispatcher.getControllerName() == 'cron-log' %}
-        {% if dispatcher.getActionName() == 'index' %}
-            {% set cron_log_class = 'active' %}
-        {% endif %}
-
-    {% elseif dispatcher.getControllerName() == 'command' %}
-        {% if dispatcher.getActionName() == 'index' %}
-            {% set command_class = 'active' %}
-        {% elseif dispatcher.getActionName() == 'log' %}
-            {% set command_log_class = 'active' %}
-        {% endif %}
+{% if dispatcher.getControllerName() == 'process' %}
+    {% if dispatcher.getActionName() == 'index' %}
+        {% set index_class = 'active' %}
+    {% elseif dispatcher.getActionName() == 'create' or
+    dispatcher.getActionName() == 'edit' or
+    dispatcher.getActionName() == 'createIni' or
+    dispatcher.getActionName() == 'editIni'
+    %}
+        {% set create_class = 'active' %}
+    {% elseif dispatcher.getActionName() == 'ini' %}
+        {% set ini_class = 'active' %}
+    {% endif %}
+{% elseif dispatcher.getControllerName() == 'cron' %}
+    {% if dispatcher.getActionName() == 'index' %}
+        {% set cron_class = 'active' %}
+    {% elseif dispatcher.getActionName() == 'create' or
+    dispatcher.getActionName() == 'edit'
+    %}
+        {% set cron_create_class = 'active' %}
+    {% endif %}
+{% elseif dispatcher.getControllerName() == 'cron-log' %}
+    {% if dispatcher.getActionName() == 'index' %}
+        {% set cron_log_class = 'active' %}
     {% endif %}
 
+{% elseif dispatcher.getControllerName() == 'command' %}
+    {% if dispatcher.getActionName() == 'index' %}
+        {% set command_class = 'active' %}
+    {% elseif dispatcher.getActionName() == 'history' %}
+        {% set command_history_class = 'active' %}
+    {% endif %}
+{% endif %}
+
+<ul id="" class="nav nav-tabs my-tabs1" role="tablist" style="margin-bottom: 20px;">
     <li role="presentation" class="{{ index_class }}"><a href="/process?server_id={{ server.id }}&ip={{ server.ip }}&port={{ server.port }}">进程列表</a></li>
     <li role="presentation" class="{{ create_class }}"><a href="/process/create?server_id={{ server.id }}">添加/修改进程</a></li>
     <li role="presentation" class="{{ ini_class }}"><a href="/process/ini?server_id={{ server.id }}">进程配置</a></li>
@@ -54,7 +53,7 @@
     <li role="presentation" class="{{ cron_create_class }}"><a href="/cron/create?server_id={{ server.id }}">添加/修改定时任务</a></li>
     <li role="presentation" class="{{ cron_log_class }}"><a href="/cron-log?server_id={{ server.id }}">定时任务日志</a></li>
     <li role="presentation" class="{{ command_class }}"><a href="/command?server_id={{ server.id }}">执行命令</a></li>
-    <li role="presentation" class="{{ command_log_class }}"><a href="/command/log?server_id={{ server.id }}">命令执行历史</a></li>
+    <li role="presentation" class="{{ command_history_class }}"><a href="/command/history?server_id={{ server.id }}">命令执行历史</a></li>
     {#<li role="presentation" class="{{ clone_class }}"><a href="#">克隆配置</a></li>#}
 </ul>
 

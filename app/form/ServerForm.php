@@ -158,6 +158,24 @@ class ServerForm extends Form
 
         $this->add($cron_conf);
 
+        // command_conf
+        $command_conf = new Text('command_conf', [
+            'class' => 'form-control',
+            'autocomplete' => 'off',
+            'value' => '/etc/supervisor/conf.d/command.conf'
+        ]);
+
+        $command_conf->addValidators([
+            new Regex(
+                [
+                    "pattern" => "/^\/etc\/supervisor\/conf\.d\/[a-zA-Z0-9]+\.conf$/",
+                    "message" => "命令配置不正确，格式：/etc/supervisor/conf.d/YOUR_CONF_NAME.conf",
+                ]
+            )
+        ]);
+
+        $this->add($command_conf);
+
         // sync_conf_port
         $sync_conf_port = new Text('sync_conf_port', [
             'class' => 'form-control',

@@ -15,6 +15,7 @@ class Server extends Model
     public $sync_conf_port;
     public $process_conf;
     public $cron_conf;
+    public $command_conf;
     public $sort;
     public $create_time;
     public $update_time;

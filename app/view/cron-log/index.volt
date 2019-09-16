@@ -118,13 +118,13 @@ $(function() {
                     var html = '';
 
                     if (full.status == 1) {
-                        html += '<a href="/cron-log/tail/'+ data +'?server_id='+ full.server_id + '&ip={{ server.ip }}&port={{ server.port }}" target="_blank" data-nopjax>查看日志</a>';
+                        html += '<a href="/cron-log/tail/'+ data +'?server_id='+ full.server_id + '&ip={{ server.ip }}&port={{ server.port }}" target="_blank" data-nopjax>预览日志</a>';
                         html += ' <span class="text-muted">|</span> ';
                         html += '<a href="/cron-log/stop/'+ data +'?server_id='+ full.server_id +'" class="stop" data-nopjax>立即停止</a>';
                     } else if (full.status != 0) {
-                        html += '<a href="/cron-log/tail/'+ data +'?server_id='+ full.server_id + '&ip={{ server.ip }}&port={{ server.port }}" target="_blank" data-nopjax>查看日志</a>';
+                        html += '<a href="/cron-log/tail/'+ data +'?server_id='+ full.server_id + '&ip={{ server.ip }}&port={{ server.port }}" target="_blank" data-nopjax>预览日志</a>';
                         html += ' <span class="text-muted">|</span> ';
-                        html += '<a href="/cron-log/download/'+ data +'?server_id='+ full.server_id + '" data-nopjax>下载完整日志</a>';
+                        html += '<a href="/cron-log/download/'+ data +'?server_id='+ full.server_id + '" data-nopjax>下载日志</a>';
                     }
 
                     return html;

@@ -131,8 +131,7 @@ class CronLogController extends ControllerSupervisorBase
             return false;
         }
 
-        $path_parts = pathinfo($cronLog->command);
-        $filename = $path_parts['filename'] . '_' . date('Ymd-Hi', $cronLog->start_time) . $cronLog->id . '.log';
+        $filename =  'cron_' . $cronLog->id . '_' . date('YmdHi', $cronLog->start_time) . '.log';
 
         header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');
