@@ -5,8 +5,8 @@ return new Config([
     'database' => [
         'adapter' => 'Mysql',
         'host' => '192.168.1.229',
-        'username' => 'root',
-        'password' => 'suhua123',
+        'username' => 'supervisor',
+        'password' => '123456',
         'dbname' => 'supervisor',
         'charset' => 'utf8mb4',
     ],
