@@ -16,73 +16,93 @@
     <button type="button" class="btn btn-warning" style="display: none;">停止</button>
 </form>
 
-<div id="output" style="margin-top: 20px;display: block;">
+<div id="output" style="margin-top: 20px;display: none;">
     <p>日志输出
         <span class="text-success" style="display: none;" id="output-info">已执行完毕</span>
         <span class="fa fa-spinner fa-pulse fa-fw" style="display: none;" id="output-icon"></span>
     </p>
-    <pre id="output-container" style="max-height: 300px;"></pre>
+    <pre id="output-log" style="max-height: 500px;"></pre>
 </div>
 
 <script>
 $(function() {
+
     $('#form-command').submit(function() {
 
-        $('#output-container').html('');
+        $('#output-log').html('');
+        $('#output-info').hide();
+        $('#output-icon').hide();
 
         $.post($(this).attr('action'), $(this).serialize(), function(data) {
-            if (data.state) {
-                success(data.message);
 
-                var command = data.command;
-                var interval = null;
+            if (!data.state) {
+                error(data.message);
+                return false;
+            }
 
-                function tailLog() {
-                    $.get('/command/tailLog/' + command.id + '?server_id=' + {{ server.id }}, function(data) {
+            success(data.message);
+            var command = data.command;
+            var timeoutId = null;
+            var stop = false;
+
+            function tailLog() {
+                $.ajax({
+                    url : '/command/tailLog/' + command.id + '?server_id=' + {{ server.id }},
+                    async: false,
+                    success : function(data) {
+                        console.log(data);
+
                         if (data.state == 1) {
                             // 执行完成
-                            if (data.log.length <= 0) {
-                                data.log = '暂无任何日志'
+                            if (!data.log) {
+                                data.log = '无任何日志'
                             }
 
-                            if (interval) {
-                                clearInterval(interval);
+                            if (timeoutId) {
+                                clearTimeout(timeoutId);
                             }
+
+                            stop = true;
 
                             $('#output-icon').hide();
                             $('#output-info').show();
 
-                            $('#output-container').html(data.log);
+                            $('#output-log').html(data.log);
                             $('#output').show();
                         } else if (data.state == 2) {
                             // 正在执行
-                            if (data.log.length <= 0) {
-                                data.log = '暂无任何日志'
+                            if (!data.log) {
+                                data.log = '无任何日志'
                             }
 
                             $('#output-info').hide();
                             $('#output-icon').show();
 
                             // 执行完成
-                            $('#output-container').html(data.log);
+                            $('#output-log').html(data.log);
                             $('#output').show();
                         } else {
                             // 执行失败
                             error(data.message);
+                            stop = true;
 
-                            if (interval) {
-                                clearInterval(interval);
+                            if (timeoutId) {
+                                clearTimeout(timeoutId);
                             }
                         }
-                    });
-                }
+                    }
+                });
+            }
 
-                tailLog();
-                interval = setInterval(tailLog, 1000);
-            }
-            else {
-                error(data.message);
-            }
+//            tailLog();
+//            timeoutId = setTimeout(function run() {
+//                if (stop) {
+//                    clearTimeout(timeoutId);
+//                    return false;
+//                }
+//                tailLog();
+//                timeoutId = setTimeout(run, 1000);
+//            }, 1000);
         });
 
         return false;

@@ -39,7 +39,7 @@ class CommandTask extends Task
                     );
 
                     $program = $command->getProgramName();
-                    $process_name = $command->getProcessName();
+                    $process_name = Command::makeProcessName($command->id);
 
                     try
                     {

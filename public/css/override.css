@@ -22,7 +22,7 @@ body {
     width: 15%;
     vertical-align: middle;
 }
-samp {
+samp,pre {
     word-wrap: break-word;
     white-space: pre-wrap;
 }

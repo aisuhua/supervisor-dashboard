@@ -10,7 +10,7 @@
         <th>命令</th>
         <th>状态</th>
         <th>耗时</th>
-        <th>启动时间</th>
+        <th>执行时间</th>
         <th>操作</th>
     </tr>
     </thead>

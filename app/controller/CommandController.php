@@ -97,7 +97,7 @@ class CommandController extends ControllerSupervisorBase
             $form->clear();
 
             $result['state'] = 1;
-            $result['message'] = '正在开始执行，可观察日志查看执行情况。';
+            $result['message'] = '正在执行，观察日志查看执行情况。';
             $result['command'] = $command->toArray();
 
             return $this->response->setJsonContent($result);
@@ -127,7 +127,7 @@ class CommandController extends ControllerSupervisorBase
         {
             try
             {
-                $process_name = 'sys_command_' . $command['id'] . ':' . $command['id'] . '_0';
+                $process_name = Command::makeProcessName($command['id']);
                 $log = $this->supervisor->tailProcessStdoutLog($process_name, 0, 1 * 1024 * 1024)[0];
 
                 $result['state'] = 2;
@@ -166,11 +166,9 @@ class CommandController extends ControllerSupervisorBase
             }
         }
 
-        $log = $command['log'];
-
         $result['state'] = 1;
         $result['message'] = '已执行完成';
-        $result['log'] = $log;
+        $result['log'] = $command['log'];
 
         return $this->response->setJsonContent($result);
     }
@@ -233,7 +231,7 @@ class CommandController extends ControllerSupervisorBase
         {
             try
             {
-                $process_name = 'sys_command_' . $command['id'] . ':' . $command['id'] . '_0';
+                $process_name = Command::makeProcessName($command['id']);
                 $command['log'] = $this->supervisor->tailProcessStdoutLog($process_name, 0, 1 * 1024 * 1024)[0];
                 $running = true;
             }

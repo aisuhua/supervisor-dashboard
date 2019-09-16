@@ -62,9 +62,9 @@ class Command extends Model
      *
      * @return string
      */
-    public function getProcessName()
+    public static function makeProcessName($id)
     {
-        return 'sys_command_' . $this->id . ':' . 'sys_command_' . $this->id . '_0';
+        return 'sys_command_' . $id . ':' . 'sys_command_' . $id . '_0';
     }
 
     public function getIni()
