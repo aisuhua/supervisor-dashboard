@@ -53,7 +53,7 @@
     <li role="presentation" class="{{ cron_create_class }}"><a href="/cron/create?server_id={{ server.id }}">添加/修改定时任务</a></li>
     <li role="presentation" class="{{ cron_log_class }}"><a href="/cron-log?server_id={{ server.id }}">定时任务日志</a></li>
     <li role="presentation" class="{{ command_class }}"><a href="/command?server_id={{ server.id }}">执行命令</a></li>
-    <li role="presentation" class="{{ command_history_class }}"><a href="/command/history?server_id={{ server.id }}">命令执行日志</a></li>
+    <li role="presentation" class="{{ command_history_class }}"><a href="/command/history?server_id={{ server.id }}">命令执行历史</a></li>
     {#<li role="presentation" class="{{ clone_class }}"><a href="#">克隆配置</a></li>#}
 </ul>
 

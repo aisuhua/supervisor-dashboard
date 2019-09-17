@@ -47,6 +47,11 @@ class CommandForm extends Form
             'autocomplete' => 'off'
         ]);
 
+        $command->setFilters([
+            'string',
+            'trim'
+        ]);
+
         $command->addValidators([
             new PresenceOf([
                 'message' => '命令不能为空'

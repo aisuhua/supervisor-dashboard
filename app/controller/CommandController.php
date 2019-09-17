@@ -10,8 +10,6 @@ class CommandController extends ControllerSupervisorBase
 
         if ($this->request->isPost())
         {
-            $result = [];
-
             $command = new Command();
             $form->bind($this->request->getPost(), $command);
 
@@ -19,22 +17,15 @@ class CommandController extends ControllerSupervisorBase
             {
                 foreach ($form->getMessages() as $message)
                 {
-                    $result['state'] = 0;
-                    $result['message'] = $message->getMessage();
-
-                    return $this->response->setJsonContent($result);
+                    $this->flash->error($message->getMessage());
+                    goto end;
                 }
             }
 
             if (!$command->create())
             {
-                foreach ($command->getMessages() as $message)
-                {
-                    $result['state'] = 0;
-                    $result['message'] = $message->getMessage();
-
-                    return $this->response->setJsonContent($result);
-                }
+                $this->flash->error($command->getMessages());
+                goto end;
             }
 
             // 向 supervisor 添加进程并启动进程
@@ -43,8 +34,7 @@ class CommandController extends ControllerSupervisorBase
             $commandLock = new CommandLock();
             if (!$commandLock->lock())
             {
-                $result['state'] = 0;
-                $result['message'] = '锁定失败';
+                $this->flash->error('无法获得锁');
             }
 
             // 先读取配置
@@ -54,10 +44,8 @@ class CommandController extends ControllerSupervisorBase
             if (!$read['state'] && $is_empty_file === false)
             {
                 // 配置读取失败
-                $result['state'] = 0;
-                $result['message'] = "无法读取配置，{$read['message']}";
-
-                return $this->response->setJsonContent($result);
+                $this->flash->error("配置读取失败，{$read['message']}");
+                goto end;
             }
 
             // 将新进程配置追加到配置末尾
@@ -66,10 +54,8 @@ class CommandController extends ControllerSupervisorBase
 
             if (!$write['state'])
             {
-                $result['state'] = 0;
-                $result['message'] = $write['message'];
-
-                return $this->response->setJsonContent($result);
+                $this->flash->error($write['message']);
+                goto end;
             }
 
             // 启动进程
@@ -85,92 +71,24 @@ class CommandController extends ControllerSupervisorBase
 
             if (!$command->save())
             {
-                foreach ($command->getMessages() as $message)
-                {
-                    $result['state'] = 0;
-                    $result['message'] = $message->getMessage();
-
-                    return $this->response->setJsonContent($result);
-                }
+                $this->flash->error($command->getMessages());
+                goto end;
             }
 
-            $form->clear();
-
-            $result['state'] = 1;
-            $result['message'] = '正在执行，观察日志查看执行情况。';
-            $result['command'] = $command->toArray();
-
-            return $this->response->setJsonContent($result);
+            // $form->clear();
+            $this->flash->success("命令已开始执行");
+            $this->view->success = true;
+            $this->view->command = $command;
         }
+
+        end:
 
         $this->view->form = $form;
     }
 
-    public function tailLogAction($id)
+    public function historyAction()
     {
-        /** @var Command $command */
-        $sql = 'SELECT id, command, status, RIGHT(log, 1 * 1024 * 1024) as log FROM command WHERE id = :id LIMIT 1';
-        $command = $this->db->fetchOne($sql, Db::FETCH_ASSOC, [
-            'id' => $id
-        ]);
 
-        if (!$command)
-        {
-            $result['state'] = 0;
-            $result['message'] = '不存在该命令日志';
-
-            return $this->response->setJsonContent($result);
-        }
-
-        // 正在运行的进程直接读取 Supervisor 日志
-        if ($command['status'] == Command::STATUS_STARTED)
-        {
-            try
-            {
-                $process_name = Command::makeProcessName($command['id']);
-                $log = $this->supervisor->tailProcessStdoutLog($process_name, 0, 1 * 1024 * 1024)[0];
-
-                $result['state'] = 2;
-                $result['message'] = '正在执行';
-                $result['log'] = $log;
-
-                return $this->response->setJsonContent($result);
-            }
-            catch (Exception $e)
-            {
-                // 进程不存在，一般来说是因为该进程已经执行完成并已经被删除
-                if ($e->getCode() != XmlRpc::BAD_NAME)
-                {
-                    throw $e;
-                }
-
-                // 如果进程已经执行完成，则读取数据库的日志
-                $sql = 'SELECT id, command, status, RIGHT(log, 1 * 1024 * 1024) as log FROM command WHERE id = :id LIMIT 1';
-                $command = $this->db->fetchOne($sql, Db::FETCH_ASSOC, [
-                    'id' => $id
-                ]);
-
-                if (!$command)
-                {
-                    $result['state'] = 0;
-                    $result['message'] = '不存在该命令日志';
-
-                    return $this->response->setJsonContent($result);
-                }
-
-                $result['state'] = 1;
-                $result['message'] = '已执行完成';
-                $result['log'] = $command['log'];
-
-                return $this->response->setJsonContent($result);
-            }
-        }
-
-        $result['state'] = 1;
-        $result['message'] = '已执行完成';
-        $result['log'] = $command['log'];
-
-        return $this->response->setJsonContent($result);
     }
 
     public function listAction()
@@ -201,11 +119,6 @@ class CommandController extends ControllerSupervisorBase
         $result['data'] = $data;
 
         return $this->response->setJsonContent($result);
-    }
-
-    public function historyAction()
-    {
-
     }
 
     public function tailAction($id)

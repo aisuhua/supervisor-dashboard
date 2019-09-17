@@ -2,7 +2,37 @@
 {{ flashSession.output() }}
 {% include 'process/nav.volt' %}
 
-<form method="post" action="/command?server_id={{ server.id }}" id="form-command">
+{% if success is not empty %}
+<div class="modal fade" tabindex="-1" role="dialog" id="myModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">成功提示</h4>
+            </div>
+            <div class="modal-body">
+                <p>命令已开始执行</p>
+                <p>
+                    <a href="/command/tail/{{ command.id }}?server_id={{ server.id }}&ip={{ server.ip }}&port={{ server.port }}" data-nopjax target="_blank" class="btn btn-primary">查看日志</a>
+                    或前往<a href="/command/history?server_id={{ server.id }}" id="link" data-nopjax>命令执行历史</a>页面执行更多操作。
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+<script>
+$('#myModal').modal({
+    backdrop: 'static',
+    show: true
+});
+</script>
+{% endif %}
+
+<form method="post" action="/command?server_id={{ server.id }}" data-pjax>
     {{ form.render('server_id', ['value': server.id]) }}
     <div class="form-group">
         <label for="command">命令</label>
@@ -13,99 +43,5 @@
         {{ form.render('user') }}
     </div>
     <button type="submit" class="btn btn-primary">执行</button>
-    <button type="button" class="btn btn-warning" style="display: none;">停止</button>
 </form>
 
-<div id="output" style="margin-top: 20px;display: none;">
-    <p>日志输出
-        <span class="text-success" style="display: none;" id="output-info">已执行完毕</span>
-        <span class="fa fa-spinner fa-pulse fa-fw" style="display: none;" id="output-icon"></span>
-    </p>
-    <pre id="output-log" style="max-height: 500px;"></pre>
-</div>
-
-<script>
-$(function() {
-
-    $('#form-command').submit(function() {
-
-        $('#output-log').html('');
-        $('#output-info').hide();
-        $('#output-icon').hide();
-
-        $.post($(this).attr('action'), $(this).serialize(), function(data) {
-
-            if (!data.state) {
-                error(data.message);
-                return false;
-            }
-
-            success(data.message);
-            var command = data.command;
-            var timeoutId = null;
-            var stop = false;
-
-            function tailLog() {
-                $.ajax({
-                    url : '/command/tailLog/' + command.id + '?server_id=' + {{ server.id }},
-                    async: false,
-                    success : function(data) {
-                        console.log(data);
-
-                        if (data.state == 1) {
-                            // 执行完成
-                            if (!data.log) {
-                                data.log = '无任何日志'
-                            }
-
-                            if (timeoutId) {
-                                clearTimeout(timeoutId);
-                            }
-
-                            stop = true;
-
-                            $('#output-icon').hide();
-                            $('#output-info').show();
-
-                            $('#output-log').html(data.log);
-                            $('#output').show();
-                        } else if (data.state == 2) {
-                            // 正在执行
-                            if (!data.log) {
-                                data.log = '无任何日志'
-                            }
-
-                            $('#output-info').hide();
-                            $('#output-icon').show();
-
-                            // 执行完成
-                            $('#output-log').html(data.log);
-                            $('#output').show();
-                        } else {
-                            // 执行失败
-                            error(data.message);
-                            stop = true;
-
-                            if (timeoutId) {
-                                clearTimeout(timeoutId);
-                            }
-                        }
-                    }
-                });
-            }
-
-//            tailLog();
-//            timeoutId = setTimeout(function run() {
-//                if (stop) {
-//                    clearTimeout(timeoutId);
-//                    return false;
-//                }
-//                tailLog();
-//                timeoutId = setTimeout(run, 1000);
-//            }, 1000);
-        });
-
-        return false;
-    });
-});
-</script>

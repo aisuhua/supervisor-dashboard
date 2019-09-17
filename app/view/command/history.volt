@@ -169,7 +169,7 @@
             // 停止正在执行的任务
             if ($(this).hasClass('stop'))
             {
-                if (!confirm('真的要停止 ID 为 ' + data.id + " 的任务吗？")) {
+                if (!confirm('真的要停止 ID 为 ' + data.id + " 的命令吗？")) {
                     return false;
                 }
 
