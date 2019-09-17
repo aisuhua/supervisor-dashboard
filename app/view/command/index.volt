@@ -6,14 +6,10 @@
 <div class="modal fade" tabindex="-1" role="dialog" id="myModal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                <h4 class="modal-title">成功提示</h4>
-            </div>
             <div class="modal-body">
                 <p>命令已开始执行</p>
                 <p>
-                    <a href="/command/tail/{{ command.id }}?server_id={{ server.id }}&ip={{ server.ip }}&port={{ server.port }}" data-nopjax target="_blank" class="btn btn-primary">查看日志</a>
+                    <a href="/command/log/{{ command.id }}?server_id={{ server.id }}&ip={{ server.ip }}&port={{ server.port }}" data-nopjax target="_blank" class="btn btn-primary">查看日志</a>
                     或前往<a href="/command/history?server_id={{ server.id }}" id="link" data-nopjax>命令执行历史</a>页面执行更多操作。
                 </p>
             </div>

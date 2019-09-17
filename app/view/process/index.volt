@@ -64,7 +64,7 @@
         </td>
         <td>
             <a href="/process/start?server_id={{ server.id }}&group={{ process['group'] }}&name={{ process['name'] }}" data-nopjax class="start">启动</a>&nbsp;
-            <a href="/process/tailLog?server_id={{ server.id }}&group={{ process['group'] }}&name={{ process['name'] }}&ip={{ server.ip }}&port={{ server.port }}" data-nopjax target="_blank" class="tail_log">查看日志</a>
+            <a href="/process/log?server_id={{ server.id }}&group={{ process['group'] }}&name={{ process['name'] }}&ip={{ server.ip }}&port={{ server.port }}" data-nopjax target="_blank" class="tail_log">查看日志</a>
         </td>
     </tr>
 {% endfor %}
@@ -132,8 +132,8 @@
                     <a href="/process/restart?server_id={{ server.id }}&group={{ process['group'] }}&name={{ process['name'] }}" data-nopjax class="restart">重启</a>&nbsp;
                     <a href="/process/start?server_id={{ server.id }}&group={{ process['group'] }}&name={{ process['name'] }}" data-nopjax class="start">启动</a>&nbsp;
                     <a href="/process/stop?server_id={{ server.id }}&group={{ process['group'] }}&name={{ process['name'] }}" data-nopjax class="stop">停止</a>&nbsp;
+                    <a href="/process/log?server_id={{ server.id }}&group={{ process['group'] }}&name={{ process['name'] }}&ip={{ server.ip }}&port={{ server.port }}" data-nopjax target="_blank" class="tail_log">查看日志</a>&nbsp;
                     <a href="/process/clearLog?server_id={{ server.id }}&group={{ process['group'] }}&name={{ process['name'] }}" data-nopjax class="clear_log">清理日志</a>&nbsp;
-                    <a href="/process/tailLog?server_id={{ server.id }}&group={{ process['group'] }}&name={{ process['name'] }}&ip={{ server.ip }}&port={{ server.port }}" data-nopjax target="_blank" class="tail_log">查看日志</a>
                 </td>
             </tr>
             {% endif %}

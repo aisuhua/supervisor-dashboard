@@ -75,8 +75,7 @@ class CommandController extends ControllerSupervisorBase
                 goto end;
             }
 
-            // $form->clear();
-            $this->flash->success("命令已开始执行");
+            // $this->flash->success("命令已开始执行");
             $this->view->success = true;
             $this->view->command = $command;
         }
@@ -121,7 +120,7 @@ class CommandController extends ControllerSupervisorBase
         return $this->response->setJsonContent($result);
     }
 
-    public function tailAction($id)
+    public function logAction($id)
     {
         $sql = 'SELECT id, command, status, RIGHT(log, 1 * 1024 * 1024) as log FROM command WHERE id = :id LIMIT 1';
         $command = $this->db->fetchOne($sql, Db::FETCH_ASSOC, [
@@ -131,21 +130,26 @@ class CommandController extends ControllerSupervisorBase
         if (!$command)
         {
             $this->flash->error("不存在该命令日志");
-
             $this->dispatcher->forward([
                 'action' => 'index'
             ]);
+
             return false;
         }
 
         $running = false;
+        $offset = 0;
+
         // 正在运行的进程直接读取 Supervisor 日志
         if ($command['status'] == Command::STATUS_STARTED)
         {
             try
             {
                 $process_name = Command::makeProcessName($command['id']);
-                $command['log'] = $this->supervisor->tailProcessStdoutLog($process_name, 0, 1 * 1024 * 1024)[0];
+                $info = $this->supervisor->tailProcessStdoutLog($process_name, 0, 1 * 1024 * 1024);
+
+                $log = $info[0];
+                $offset = $info[1];
                 $running = true;
             }
             catch (Exception $e)
@@ -164,28 +168,32 @@ class CommandController extends ControllerSupervisorBase
                 if (!$command)
                 {
                     $this->flash->error("不存在该命令日志");
-
                     $this->dispatcher->forward([
                         'action' => 'index'
                     ]);
+
                     return false;
                 }
+
+                $log = $command['log'];
             }
+        }
+        else
+        {
+            $log = $command['log'];
         }
 
         $this->view->disableLevel([
             View::LEVEL_LAYOUT => true,
         ]);
 
-        $this->view->setTemplateBefore('commandTail');
-
-        if ($this->isPjax())
-        {
-            $this->view->setRenderLevel(View::LEVEL_ACTION_VIEW);
-        }
-
         $this->view->running = $running;
+        $this->view->group = Command::makeProgramName($command['id']);
+        $this->view->name = Command::makeProgramName($command['id']) . '_0';
         $this->view->command = $command;
+        $this->view->log = $log;
+
+        $this->view->offset = $offset;
     }
 
     public function downloadAction($id)
@@ -200,6 +208,7 @@ class CommandController extends ControllerSupervisorBase
             $this->dispatcher->forward([
                 'action' => 'index'
             ]);
+
             return false;
         }
 
@@ -254,12 +263,14 @@ class CommandController extends ControllerSupervisorBase
             }
         }
 
-        return $this->dispatcher->forward([
+        $this->dispatcher->forward([
             'action' => 'history',
             'params' => [
                 'server_id' => $this->server_id
             ]
         ]);
+
+        return false;
     }
 
     public function stopAction($id)

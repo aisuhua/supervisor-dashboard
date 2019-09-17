@@ -1,98 +1,80 @@
-<samp id="pjax-container">{{ content() }}</samp>
+<samp id="log">{{ log | escape | default("没有任何日志记录") }}</samp>
 
 <script>
-    $(function() {
+$(function() {
+    $(document).off('pjax:send');
+    $(document).off('pjax:complete');
+    $(document).off('pjax:end');
+    $(document).off('ajaxStart');
+    $(document).off('ajaxStop');
 
-        $(document).off('pjax:send');
-        $(document).off('pjax:complete');
-        $(document).off('pjax:end');
-        $(document).off('ajaxStart');
-        $(document).off('ajaxStop');
+    var offset = {{ offset }};
+    var log = document.querySelector('#log');
+    var xhr = null;
 
-        var timerId;
+    function scrollToButton() {
+        $('html, body').scrollTop(function() {
+            return $(this).height();
+        });
+    }
 
-        // F5 刷新时先将自动刷日志停止
-        // https://stackoverflow.com/questions/14707602/capturing-f5-keypress-event-in-javascript-using-window-event-keycode-in-window-o
-        document.onkeydown = fkey;
-        document.onkeypress = fkey;
-        document.onkeyup = fkey;
+    $('#refresh').click(function() {
+        var url = $(this).attr('href');
 
-        var wasPressed = false;
-        function fkey(e){
-            e = e || window.event;
-            if( wasPressed ) return;
-
-            if (e.keyCode == 116) {
-                wasPressed = true;
-                if (timerId) {
-                    clearTimeout(timerId);
-                }
-            }
+        if (log.innerHTML == '没有任何日志记录') {
+            log.innerHTML = '';
         }
 
-        $('.refresh').click(function() {
-            event.stopPropagation();
-
-            if (timerId) {
-                clearTimeout(timerId);
+        if ($(this).hasClass('refreshing')) {
+            if (xhr) {
+                xhr.abort();
             }
-
-            if ($(this).hasClass('refreshing')) {
-                $(this).removeClass('refreshing').html('自动刷新');
-                return false;
-            }
-
-            $(this).addClass('refreshing').html('停止刷新 <i class="fa fa-spinner fa-pulse fa-fw"></i>');
-            $('html, body').scrollTop(function() {
-                return $(this).height();
-            });
-
-            var refresh_url = $(this).attr('href');
-
-            function refresh() {
-
-                var r = 'random=' + Math.random();
-                var url = refresh_url + (refresh_url.indexOf('?') >= 0 ? ('&' + r) : ('?' + r));
-
-                $.pjax({
-                    url: url,
-                    container: '#pjax-container',
-                    push: false,
-                    timeout: 180000
-                }).done(function() {
-                    $('html, body').scrollTop(function() {
-                        return $(this).height();
-                    });
-                });
-            }
-
-            refresh();
-            timerId = setTimeout(function run() {
-                refresh();
-                timerId = setTimeout(run, 2000);
-            }, 2000);
+            $(this).removeClass('refreshing').html('自动刷新');
 
             return false;
-        });
+        }
 
-        $('.clear_log').click(function() {
-            event.stopPropagation();
-            NProgress.start();
+        $(this).addClass('refreshing').html('停止刷新 <i class="fa fa-spinner fa-pulse fa-fw"></i>');
+        // 滚动到页底
+        scrollToButton();
 
-            var $that = $(this);
-            var url = $that.attr('href');
+        function refresh() {
+            url = removeURLParameter(removeURLParameter(url, 'r'), 'offset');
+            url = url + '&offset=' + offset + '&r=' + Math.random();
 
-            $.get(url, function(data) {
-                NProgress.done();
+            xhr = $.ajax({
+                url: url,
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    if (data.state <= 0) {
+                        info(data.message);
 
-                if (data.state) {
-                    // success(data.message, {delay: 1000});
-                    $("#pjax-container").html('没有任何日志记录');
-                } else {
-                    error(data.message);
+                        $('#refresh').removeClass('refreshing').html('自动刷新');
+                        return false;
+                    }
+
+                    if (data.log.length > 0) {
+                        // https://stackoverflow.com/questions/18393981/append-vs-html-vs-innerhtml-performance
+                        var c = document.createDocumentFragment();
+                        var e = document.createElement("span");
+                        e.textContent = data.log;
+                        c.appendChild(e);
+                        log.appendChild(c);
+                    }
+
+                    // 修改 offset
+                    offset = data.offset;
+                    scrollToButton();
+
+                    refresh();
                 }
             });
-            return false;
-        });
+        }
+
+        refresh();
+
+        return false;
     });
+});
 </script>

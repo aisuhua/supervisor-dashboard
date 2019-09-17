@@ -240,30 +240,111 @@ class ProcessController extends ControllerSupervisorBase
         );
     }
 
-    public function tailLogAction()
+    public function logAction()
     {
         $group = $this->request->get('group', 'string');
         $name = $this->request->get('name', 'string');
+
         $process_name = $group . ':' . $name;
+        $running = false;
+
+        $info = $this->supervisor->getProcessInfo($process_name);
+        if (in_array($info['statename'], ['STARTING', 'RUNNING', 'STOPPING']))
+        {
+            $running = true;
+        }
 
         // 只看前面 1M 的日志
         // 注意这里应开启 strip_ansi = true，否则当日志含有 ansi 字符时讲无法查看日志
-        $log = $this->supervisor->tailProcessStdoutLog($process_name, 0, 1 * 1024 * 1024);
+        $log = $this->supervisor->tailProcessStdoutLog($process_name, 0, 1024 * 1024);
 
         $this->view->disableLevel([
             View::LEVEL_LAYOUT => true,
         ]);
 
-        $this->view->setTemplateBefore('tailLog');
-
-        if ($this->isPjax())
-        {
-            $this->view->setRenderLevel(View::LEVEL_ACTION_VIEW);
-        }
-
+        $this->view->running = $running;
         $this->view->group = $group;
         $this->view->name = $name;
-        $this->view->log = $log;
+        $this->view->log = $log[0];
+        $this->view->offset = $log[1];
+    }
+
+    public function tailAction()
+    {
+        $result = [];
+
+        $group = $this->request->get('group', 'string');
+        $name = $this->request->get('name', 'string');
+        $offset = $this->request->get('offset', 'int', 0);
+
+        $process_name = $group . ':' . $name;
+        $timeout = 10;
+        $start_time = time();
+        $log = [];
+
+        while (true)
+        {
+            try
+            {
+                // 先查看是否有新日志产生
+                $log = $this->supervisor->tailProcessStdoutLog($process_name, 0, 0);
+
+                $offset = $log[1] < $offset ? 0 : $offset;
+                if ($log[1] > $offset)
+                {
+                    // 有新日志产生
+                    $log = $this->supervisor->tailProcessStdoutLog($process_name, 0, $log[1] - $offset);
+                    break;
+                }
+            }
+            catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+            {
+                if ($e->getCode() == XmlRpc::BAD_NAME)
+                {
+                    $result['state'] = 0;
+                    $result['message'] = '已执行完毕，页面将停止刷新';
+
+                    return $this->response->setJsonContent($result);
+                }
+
+                throw $e;
+            }
+
+            if (time() - $start_time >= $timeout)
+            {
+                break;
+            }
+
+            sleep(1);
+            continue;
+        }
+
+        $result['state'] = 1;
+        $result['log'] = $log[0];
+        $result['offset'] = $log[1];
+
+        return $this->response->setJsonContent($result);
+    }
+
+    public function downloadAction()
+    {
+        $group = $this->request->get('group', 'string');
+        $name = $this->request->get('name', 'string');
+
+        $process_name = $group . ':' . $name;
+        $filename = $name . '_' . $this->server_id .'_' . date('YmdHis') . '.log';
+        $log_info = $this->supervisor->tailProcessStdoutLog($process_name, 0, 1 * 1024 * 1024);
+
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename="'.basename($filename).'"');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header("Content-Length: {$log_info[1]}");
+
+        echo $log_info[0];
+        exit;
     }
 
     public function clearLogAction()

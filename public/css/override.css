@@ -26,6 +26,6 @@ samp,pre {
     word-wrap: break-word;
     white-space: pre-wrap;
 }
-samp#pjax-container {
+samp#log {
     padding-bottom: 20px;
 }

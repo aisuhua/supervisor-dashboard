@@ -67,6 +67,11 @@ class Command extends Model
         return 'sys_command_' . $id . ':' . 'sys_command_' . $id . '_0';
     }
 
+    public static function makeProgramName($id)
+    {
+        return 'sys_command_' . $id;
+    }
+
     public function getIni()
     {
         $program = $this->getProgramName();

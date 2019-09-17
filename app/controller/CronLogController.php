@@ -48,7 +48,7 @@ class CronLogController extends ControllerSupervisorBase
         return $this->response->setJsonContent($result);
     }
 
-    public function tailAction($id)
+    public function logAction($id)
     {
         // 看最后的 10M 日志内容
         $sql = 'SELECT id, command, status, program, RIGHT(log, 1 * 1024 * 1024) as log FROM cron_log WHERE id = :id LIMIT 1';
@@ -63,17 +63,23 @@ class CronLogController extends ControllerSupervisorBase
             $this->dispatcher->forward([
                 'action' => 'index'
             ]);
+
             return false;
         }
 
         $running = false;
+        $offset = 0;
+
         // 正在运行的进程直接读取 Supervisor 日志
         if ($cronLog['status'] == CronLog::STATUS_STARTED)
         {
             try
             {
                 $process_name = $cronLog['program'] . ':' . $cronLog['program'] . '_0';
-                $cronLog['log'] = $this->supervisor->tailProcessStdoutLog($process_name, 0, 1 * 1024 * 1024)[0];
+                $info = $this->supervisor->tailProcessStdoutLog($process_name, 0, 1 * 1024 * 1024);
+
+                $log = $info[0];
+                $offset = $info[1];
                 $running = true;
             }
             catch (Exception $e)
@@ -96,24 +102,28 @@ class CronLogController extends ControllerSupervisorBase
                     $this->dispatcher->forward([
                         'action' => 'index'
                     ]);
+
                     return false;
                 }
+
+                $log = $cronLog['log'];
             }
+        }
+        else
+        {
+            $log = $cronLog['log'];
         }
 
         $this->view->disableLevel([
             View::LEVEL_LAYOUT => true,
         ]);
 
-        $this->view->setTemplateBefore('cronLogTail');
-
-        if ($this->isPjax())
-        {
-            $this->view->setRenderLevel(View::LEVEL_ACTION_VIEW);
-        }
-
         $this->view->running = $running;
+        $this->view->group = $cronLog['program'];
+        $this->view->name = $cronLog['program'] . '_0';
         $this->view->cronLog = $cronLog;
+        $this->view->log = $log;
+        $this->view->offset = $offset;
     }
 
     public function downloadAction($id)
@@ -217,11 +227,13 @@ class CronLogController extends ControllerSupervisorBase
             }
         }
 
-        return $this->dispatcher->forward([
+        $this->dispatcher->forward([
            'action' => 'index',
             'params' => [
                 'server_id' => $this->server_id
             ]
         ]);
+
+        return false;
     }
 }
