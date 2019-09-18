@@ -78,15 +78,12 @@ $(function() {
 
         editor.setSize('100%', '100%');
 
+        editor.on('change',function(cMirror){
+            cMirror.refresh();
+            editor.setSize('100%', '100%');
+        });
+
         $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-            editor.refresh();
-        });
-
-        $(ini_editor).change(function() {
-            editor.refresh();
-        });
-
-        $(ini_editor).blur(function() {
             editor.refresh();
         });
     }
