@@ -31,16 +31,16 @@
                 {{ form.render('command') }}
             </div>
             <div class="form-group">
-                <label for="process_name">进程名</label>
-                {{ form.render('process_name') }}
-            </div>
-            <div class="form-group">
                 <label for="numprocs">进程数</label>
                 {{ form.render('numprocs') }}
             </div>
             <div class="form-group">
                 <label for="numprocs_start">进程下标起始值</label>
                 {{ form.render('numprocs_start') }}
+            </div>
+            <div class="form-group">
+                <label for="process_name">进程名</label>
+                {{ form.render('process_name') }}
             </div>
             <div class="form-group">
                 <label for="user">执行进程的用户</label>

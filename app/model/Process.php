@@ -42,9 +42,9 @@ class Process extends Model
 
     public function beforeSave()
     {
-        $this->process_name ?: $this->process_name = '%(program_name)s_%(process_num)s';
         $this->numprocs ?: $this->numprocs = 1;
         $this->numprocs_start ?: $this->numprocs_start = 0;
+        $this->process_name ?: $this->process_name = '%(program_name)s_%(process_num)s';
         $this->user ?: $this->user = 'www-data';
         $this->directory ?: $this->directory = '%(here)s';
         $this->autostart ?: $this->autostart = 'true';
@@ -79,9 +79,9 @@ class Process extends Model
         $ini = '';
         $ini .= "[program:{$this->program}]" . PHP_EOL;
         $ini .= "command={$this->command}" . PHP_EOL;
-        $ini .= "process_name={$this->process_name}" . PHP_EOL;
         $ini .= "numprocs={$this->numprocs}" . PHP_EOL;
         $ini .= "numprocs_start={$this->numprocs_start}" . PHP_EOL;
+        $ini .= "process_name={$this->process_name}" . PHP_EOL;
         $ini .= "user={$this->user}" . PHP_EOL;
         $ini .= "directory={$this->directory}" . PHP_EOL;
         $ini .= "autostart={$this->autostart}" . PHP_EOL;
@@ -97,9 +97,9 @@ class Process extends Model
 
     public static function applyDefaultValue(&$value)
     {
-        !empty($value['process_name']) ?: $value['process_name'] = '%(program_name)s_%(process_num)s';
         !empty($value['numprocs']) ?: $value['numprocs'] = 1;
         !empty($value['numprocs_start']) ?: $value['numprocs_start'] = 0;
+        !empty($value['process_name']) ?: $value['process_name'] = '%(program_name)s_%(process_num)s';
         !empty($value['user']) ?: $value['user'] = 'www-data';
         !empty($value['directory']) ?: $value['directory'] = '%(here)s';
         !empty($value['autostart']) ?: $value['autostart'] = 'true';
@@ -116,9 +116,9 @@ class Process extends Model
         $ini = '';
         $ini .= "[program:cat]" . PHP_EOL;
         $ini .= "command=/bin/cat" . PHP_EOL;
-        $ini .= "process_name=%(program_name)s_%(process_num)s" . PHP_EOL;
         $ini .= "numprocs=1" . PHP_EOL;
         $ini .= "numprocs_start=0" . PHP_EOL;
+        $ini .= "process_name=%(program_name)s_%(process_num)s" . PHP_EOL;
         $ini .= "user=www-data" . PHP_EOL;
         $ini .= "directory=%(here)s" . PHP_EOL;
         $ini .= "autostart=true" . PHP_EOL;
