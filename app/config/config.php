@@ -7,7 +7,7 @@ return new Config([
         'host' => '192.168.1.229',
         'username' => 'root',
         'password' => 'lala123',
-        'dbname' => 'supervisor',
+        'dbname' => 'supervisor-dashboard',
         'charset' => 'utf8mb4',
     ],
     'application' => [

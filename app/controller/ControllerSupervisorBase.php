@@ -52,49 +52,6 @@ class ControllerSupervisorBase extends ControllerBase
         }
     }
 
-    /**
-     * @link https://stackoverflow.com/questions/16941456/adding-a-php-anonymous-function-to-an-object
-     * @param $callback
-     */
-    protected function setCallback($callback)
-    {
-        $this->callback = $callback;
-    }
-
-    protected function invoke($timeout = 10)
-    {
-        $exception = null;
-        for ($i = 1; $i <= $timeout * 2; $i++)
-        {
-            try
-            {
-                call_user_func($this->callback);
-                $exception = null;
-                break;
-            }
-            catch (Exception $e)
-            {
-                $exception = $e;
-                usleep(500000);
-            }
-        }
-
-        if ($exception)
-        {
-            throw $exception;
-        }
-    }
-
-    protected function redirectToIndex()
-    {
-        return $this->response->redirect(self::getIndexUrl());
-    }
-
-    protected function getIndexUrl()
-    {
-        return "/server/{$this->server->id}/process?ip={$this->server->ip}&port={$this->server->port}";
-    }
-
     protected function formatMessage($message)
     {
         return "<strong>{$message}</strong>\n请刷新页面查看进度";

@@ -66,22 +66,8 @@ $(function() {
     var ini_editor = document.getElementById('ini');
 
     if (ini_editor) {
-        // code editor
-        var editor = CodeMirror.fromTextArea(document.getElementById('ini'), {
-            mode: "properties",
-            lineNumbers: true,
-            lineWrapping: true,
-            indentUnit: 0,
-            autoRefresh: true,
-            automaticLayout: true
-        });
-
+        var editor = CodeMirror.fromTextArea(document.getElementById('ini'));
         editor.setSize('100%', '100%');
-
-        editor.on('change',function(cMirror){
-            cMirror.refresh();
-            editor.setSize('100%', '100%');
-        });
 
         $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
             editor.refresh();
