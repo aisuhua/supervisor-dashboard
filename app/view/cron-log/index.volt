@@ -94,11 +94,11 @@ $(function() {
                 targets: 5,
                 orderable: false,
                 render: function (data, type, full, meta) {
-                    if (data > 0) {
+                    if (data > 0 && full.start_time > 0) {
                         return Math.abs((data - full.start_time)) + "秒" ;
                     }
 
-                    return data;
+                    return 0;
                 }
             },
             {
@@ -106,8 +106,11 @@ $(function() {
                 targets: 6,
                 orderable: false,
                 render: function (data, type, full, meta) {
-                    var date = new Date(data * 1000);
-                    return date.format('Y-m-d H:i:s');
+                    if (data > 0) {
+                        var date = new Date(data * 1000);
+                        return date.format('Y-m-d H:i:s');
+                    }
+                    return 0;
                 }
             },
             {
