@@ -98,7 +98,7 @@ $(function() {
                         return Math.abs((data - full.start_time)) + "秒" ;
                     }
 
-                    return 0;
+                    return '';
                 }
             },
             {
@@ -110,7 +110,7 @@ $(function() {
                         var date = new Date(data * 1000);
                         return date.format('Y-m-d H:i:s');
                     }
-                    return 0;
+                    return '';
                 }
             },
             {
