@@ -1,4 +1,6 @@
 <?php
+namespace SupBoard\Controller;
+
 use Phalcon\Mvc\View;
 
 class SupervisorController extends ControllerSupervisorBase

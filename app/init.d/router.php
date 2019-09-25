@@ -1,9 +1,10 @@
 <?php
-
 /**
  * @var Phalcon\Mvc\Router $router;
+ * @var Phalcon\Di $di;
  */
-$router = $di->getRouter();
+
+$router = $di->get('router');
 
 /**
  * 分組服務器管理

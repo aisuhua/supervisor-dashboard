@@ -1,4 +1,6 @@
 <?php
+namespace SupBoard\Supervisor;
+
 use Supervisor\Supervisor as SupervisorBase;
 
 class Supervisor extends SupervisorBase

@@ -1,5 +1,11 @@
 <?php
+namespace SupBoard\Controller;
+
 use Phalcon\Mvc\View;
+use SupBoard\Supervisor\StatusCode;
+use Zend\XmlRpc\Client\Exception\FaultException;
+use SupBoard\Model\Process;
+use SupBoard\Form\ProcessForm;
 
 class ProcessController extends ControllerSupervisorBase
 {
@@ -12,7 +18,7 @@ class ProcessController extends ControllerSupervisorBase
             $result = $this->supervisor->getProcessInfo($group);
             print_r($result);
         }
-        catch (Exception $e)
+        catch (FaultException $e)
         {
             echo get_class($e), PHP_EOL;
             echo $e->getMessage(), PHP_EOL;
@@ -86,7 +92,7 @@ class ProcessController extends ControllerSupervisorBase
             {
                 $this->supervisor->stopProcess($process_name, false);
             }
-            catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+            catch (FaultException $e)
             {
                 $this->handleStopException($e);
             }
@@ -112,7 +118,7 @@ class ProcessController extends ControllerSupervisorBase
             {
                 $this->supervisor->startProcess($process_name, false);
             }
-            catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+            catch (FaultException $e)
             {
                 $this->handleStartException($e);
             }
@@ -145,7 +151,7 @@ class ProcessController extends ControllerSupervisorBase
             {
                 $this->supervisor->stopProcess($process_name, true);
             }
-            catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+            catch (FaultException $e)
             {
                 $this->handleStopException($e);
             }
@@ -155,7 +161,7 @@ class ProcessController extends ControllerSupervisorBase
         {
             $this->supervisor->startProcess($process_name, false);
         }
-        catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+        catch (FaultException $e)
         {
             $this->handleStartException($e);
         }
@@ -174,7 +180,7 @@ class ProcessController extends ControllerSupervisorBase
         {
             $this->supervisor->stopProcessGroup($group, false);
         }
-        catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+        catch (FaultException $e)
         {
             $this->handleStopException($e);
         }
@@ -194,7 +200,7 @@ class ProcessController extends ControllerSupervisorBase
         {
             $this->supervisor->startProcessGroup($group, false);
         }
-        catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+        catch (FaultException $e)
         {
             $this->handleStartException($e);
         }
@@ -221,7 +227,7 @@ class ProcessController extends ControllerSupervisorBase
         {
             $this->supervisor->stopProcessGroup($group, true);
         }
-        catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+        catch (FaultException $e)
         {
             $this->handleStopException($e);
         }
@@ -230,7 +236,7 @@ class ProcessController extends ControllerSupervisorBase
         {
             $this->supervisor->startProcessGroup($group, false);
         }
-        catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+        catch (FaultException $e)
         {
             $this->handleStartException($e);
         }
@@ -297,9 +303,9 @@ class ProcessController extends ControllerSupervisorBase
                     break;
                 }
             }
-            catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+            catch (FaultException $e)
             {
-                if ($e->getCode() == XmlRpc::BAD_NAME)
+                if ($e->getCode() == StatusCode::BAD_NAME)
                 {
                     $result['state'] = 0;
                     $result['message'] = '已执行完毕，页面将停止刷新';
@@ -401,7 +407,7 @@ class ProcessController extends ControllerSupervisorBase
         {
             $this->supervisor->stopAllProcesses(true);
         }
-        catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+        catch (FaultException $e)
         {
             $this->handleStopException($e);
         }
@@ -410,7 +416,7 @@ class ProcessController extends ControllerSupervisorBase
         {
             $this->supervisor->startAllProcesses(false);
         }
-        catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+        catch (FaultException $e)
         {
             $this->handleStartException($e);
         }
@@ -591,7 +597,7 @@ class ProcessController extends ControllerSupervisorBase
             {
                 $this->supervisor->addProcessGroup($group);
             }
-            catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+            catch (FaultException $e)
             {
                 $this->handleAddException($e);
             }
@@ -603,7 +609,7 @@ class ProcessController extends ControllerSupervisorBase
             {
                 $this->supervisor->stopProcessGroup($group);
             }
-            catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+            catch (FaultException $e)
             {
                 $this->handleStopException($e);
             }
@@ -612,7 +618,7 @@ class ProcessController extends ControllerSupervisorBase
             {
                 $this->supervisor->removeProcessGroup($group);
             }
-            catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+            catch (FaultException $e)
             {
                 $this->handleRemoveException($e);
             }
@@ -621,7 +627,7 @@ class ProcessController extends ControllerSupervisorBase
             {
                 $this->supervisor->addProcessGroup($group);
             }
-            catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+            catch (FaultException $e)
             {
                 $this->handleAddException($e);
             }
@@ -633,7 +639,7 @@ class ProcessController extends ControllerSupervisorBase
             {
                 $this->supervisor->stopProcessGroup($group);
             }
-            catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+            catch (FaultException $e)
             {
                 $this->handleStopException($e);
             }
@@ -642,7 +648,7 @@ class ProcessController extends ControllerSupervisorBase
             {
                 $this->supervisor->removeProcessGroup($group);
             }
-            catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+            catch (FaultException $e)
             {
                 $this->handleRemoveException($e);
             }
@@ -890,7 +896,7 @@ class ProcessController extends ControllerSupervisorBase
                 $this->flash->success('修改成功');
                 $this->view->reload_config = true;
             }
-            catch (Exception $e)
+            catch (\Exception $e)
             {
                 $this->db->rollback();
                 $this->flash->error("修改失败：{$e->getMessage()}");

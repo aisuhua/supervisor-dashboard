@@ -9,22 +9,15 @@ use Phalcon\Flash\Session as FlashSession;
 use Phalcon\Flash\Direct as FlashDirect;
 use Phalcon\Events\Manager as EventsManager;
 use Phalcon\Logger\Adapter\File as FileLogger;
+use Phalcon\Db\Adapter\Pdo\Mysql;
+use Phalcon\Events\Event;
+use Phalcon\Di;
+use SupBoard\Supervisor\SupAgent;
 
-/**
- * Shared configuration service
- */
-$di->setShared('config', function () {
-    return include APP_PATH . "/config/config.php";
-});
-
-/**
- * The URL component is used to generate all kind of urls in the application
- */
+/** @var Di $di */
 $di->setShared('url', function () {
-    $config = $this->getConfig();
-
     $url = new UrlResolver();
-    $url->setBaseUri($config->application->baseUri);
+    $url->setBaseUri('/');
 
     return $url;
 });
@@ -33,21 +26,17 @@ $di->setShared('url', function () {
  * Setting up the view component
  */
 $di->setShared('view', function () {
-    $config = $this->getConfig();
-
     $view = new View();
     $view->setDI($this);
-    $view->setViewsDir($config->application->viewDir);
+    $view->setViewsDir(PATH_APP . '/view/');
 
     $view->registerEngines([
         '.volt' => function ($view) {
-            $config = $this->getConfig();
-
             $volt = new VoltEngine($view, $this);
 
             $volt->setOptions([
-                'compiledPath' => $config->volt->compiledPath,
-                'compileAlways' => $config->volt->compileAlways
+                'compiledPath' => PATH_CACHE . '/volt/',
+                'compileAlways' => DEBUG_MODE ? true : false
             ]);
 
             return $volt;
@@ -61,9 +50,8 @@ $di->setShared('view', function () {
  * 日志服务
  */
 $di->setShared('logger', function($filename = null) {
-    $config = $this->getConfig();
     $filename = empty($filename) ? 'default.log' : $filename;
-    $logger = new FileLogger($config->logger->logDir . $filename);
+    $logger = new FileLogger(PATH_LOG . '/' . $filename);
 
     return $logger;
 });
@@ -72,47 +60,39 @@ $di->setShared('logger', function($filename = null) {
  * Database connection is created based in the parameters defined in the configuration file
  */
 $di->setShared('db', function () {
-    $config = $this->getConfig();
-
-    $class = 'Phalcon\Db\Adapter\Pdo\\' . $config->database->adapter;
-    $params = [
-        'host' => $config->database->host,
-        'username' => $config->database->username,
-        'password' => $config->database->password,
-        'dbname' => $config->database->dbname,
-        'charset' => $config->database->charset
-    ];
-
-    $connection = new $class($params);
+    $connection = new Mysql([
+        'host' => $GLOBALS['db']['host'],
+        'username' => $GLOBALS['db']['username'],
+        'password' => $GLOBALS['db']['password'],
+        'dbname' => $GLOBALS['db']['dbname'],
+        'charset' => $GLOBALS['db']['charset'],
+    ]);
 
     $em = new EventsManager();
     $di = $this;
 
-    $em->attach(
-        'db',
-        function ($event, $connection) use ($di)
+    $em->attach('db', function (Event $event, Mysql $connection) use ($di) {
+        if ($event->getType() == 'beforeQuery')
         {
-            if ($event->getType() == 'beforeQuery')
+            $variables = $connection->getSQLVariables();
+            $string = $connection->getSQLStatement();
+
+            if ($variables)
             {
-                $variables = $connection->getSQLVariables();
-                $string    = $connection->getSQLStatement();
-
-                if ($variables)
+                if (is_array(current($variables)))
                 {
-                    if (is_array(current($variables)))
-                    {
-                        $string .= ' [' . join(',', current($variables)) . ']';
-                    }
-                    else
-                    {
-                        $string .= ' [' . join(',', $variables) . ']';
-                    }
+                    $string .= ' [' . join(',', current($variables)) . ']';
                 }
-
-                $di->get('logger', ['db.log'])->debug($string);
+                else
+                {
+                    $string .= ' [' . join(',', $variables) . ']';
+                }
             }
+
+            /** @var Di $di */
+            $di->get('logger', ['db.log'])->debug($string);
         }
-    );
+    });
 
     $connection->setEventsManager($em);
 
@@ -120,16 +100,10 @@ $di->setShared('db', function () {
 });
 
 
-/**
- * If the configuration specify the use of metadata adapter use it or use memory otherwise
- */
 $di->setShared('modelsMetadata', function () {
     return new MetaDataAdapter();
 });
 
-/**
- * Start the session the first time some component request the session service
- */
 $di->setShared('session', function () {
     $session = new SessionAdapter();
     $session->start();
@@ -137,9 +111,6 @@ $di->setShared('session', function () {
     return $session;
 });
 
-/**
- * Register the session flash service with the Twitter Bootstrap classes
- */
 $di->set('flashSession', function () {
     return new FlashSession([
         'error'   => 'alert alert-danger pnotify fade',
@@ -157,10 +128,11 @@ $di->set('flash', function () {
         'warning' => 'alert alert-warning pnotify fade'
     ]);
 
-//    $flashBootstrap->setAutoescape(false);
-//    $flashBootstrap->setAutomaticHtml(false);
     return $flash;
 });
 
+$di->setShared('supAgent', function ($ip, $port) {
+    return new SupAgent($ip, $port);
+});
 
 

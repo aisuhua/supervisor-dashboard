@@ -1,4 +1,6 @@
 <?php
+namespace SupBoard\Form;
+
 use Phalcon\Forms\Form;
 use Phalcon\Forms\Element\Text;
 use Phalcon\Forms\Element\Select;
@@ -9,6 +11,7 @@ use Phalcon\Validation\Validator\Between;
 use Phalcon\Validation\Validator\Regex;
 use Phalcon\Validation\Validator\Numericality;
 use Phalcon\Validation\Validator\InclusionIn;
+use SupBoard\Tool\Tool;
 
 class ProcessForm extends Form
 {

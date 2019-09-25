@@ -1,4 +1,6 @@
 <?php
+namespace SupBoard\Model;
+
 use Phalcon\Mvc\Model;
 use Phalcon\Validation;
 use Phalcon\Validation\Validator\Uniqueness;
@@ -30,8 +32,8 @@ class Cron extends Model
     {
         $this->keepSnapshots(true);
 
-        $this->belongsTo('server_id', 'Server', 'id', [
-            'alias' => 'server',
+        $this->belongsTo('server_id', Server::class, 'id', [
+            'alias' => 'Server',
             'reusable' => false
         ]);
     }

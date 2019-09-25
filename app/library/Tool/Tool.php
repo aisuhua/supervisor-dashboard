@@ -1,4 +1,6 @@
 <?php
+namespace SupBoard\Tool;
+
 class Tool
 {
     /**

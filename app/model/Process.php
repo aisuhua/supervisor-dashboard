@@ -1,4 +1,6 @@
 <?php
+namespace SupBoard\Model;
+
 use Phalcon\Mvc\Model;
 use Phalcon\Validation;
 use Phalcon\Validation\Validator\Uniqueness;

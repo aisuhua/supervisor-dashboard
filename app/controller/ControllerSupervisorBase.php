@@ -1,6 +1,10 @@
 <?php
-use Phalcon\Mvc\Controller;
-use Phalcon\Mvc\View;
+namespace SupBoard\Controller;
+
+use SupBoard\Model\Server;
+use SupBoard\Supervisor\StatusCode;
+use SupBoard\Supervisor\Supervisor;
+use Zend\XmlRpc\Client\Exception\FaultException;
 
 class ControllerSupervisorBase extends ControllerBase
 {
@@ -57,33 +61,33 @@ class ControllerSupervisorBase extends ControllerBase
         return "<strong>{$message}</strong>\n请刷新页面查看进度";
     }
 
-    protected function handleStopException(Exception $e)
+    protected function handleStopException(FaultException $e)
     {
-        if ($e->getCode() != XmlRpc::NOT_RUNNING)
+        if ($e->getCode() != StatusCode::NOT_RUNNING)
         {
             throw $e;
         }
     }
 
-    protected function handleStartException(Exception $e)
+    protected function handleStartException(FaultException $e)
     {
-        if ($e->getCode() != XmlRpc::ALREADY_STARTED)
+        if ($e->getCode() != StatusCode::ALREADY_STARTED)
         {
             throw $e;
         }
     }
 
-    protected function handleAddException(Exception $e)
+    protected function handleAddException(FaultException $e)
     {
-        if ($e->getCode() != XmlRpc::ALREADY_ADDED)
+        if ($e->getCode() != StatusCode::ALREADY_ADDED)
         {
             throw $e;
         }
     }
 
-    protected function handleRemoveException(Exception $e)
+    protected function handleRemoveException(FaultException $e)
     {
-        if ($e->getCode() != XmlRpc::BAD_NAME)
+        if ($e->getCode() != StatusCode::BAD_NAME)
         {
             throw $e;
         }

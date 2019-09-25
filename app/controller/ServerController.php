@@ -1,4 +1,5 @@
 <?php
+namespace SupBoard\Controller;
 
 class ServerController extends ControllerBase
 {

@@ -1,4 +1,6 @@
 <?php
+namespace SupBoard\Controller;
+
 use Phalcon\Tag;
 
 class ServerGroupController extends ControllerBase

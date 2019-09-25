@@ -1,5 +1,9 @@
 <?php
-use Phalcon\Mvc\View;
+namespace SupBoard\Controller;
+
+use Cron\CronExpression;
+use SupBoard\Form\CronForm;
+use SupBoard\Model\Cron;
 
 class CronController extends ControllerSupervisorBase
 {
@@ -17,7 +21,7 @@ class CronController extends ControllerSupervisorBase
 
         foreach ($cron_arr as &$cron)
         {
-            $cronExpress = Cron\CronExpression::factory($cron['time']);
+            $cronExpress = CronExpression::factory($cron['time']);
             $cron['next_time'] = $cronExpress->getNextRunDate()->format('U');
         }
 

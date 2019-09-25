@@ -1,6 +1,14 @@
 <?php
+namespace SupBoard\Controller;
+
 use Phalcon\Mvc\View;
 use Phalcon\Db;
+use SupBoard\Lock\Cron;
+use SupBoard\Model\Command;
+use SupBoard\Form\CommandForm;
+use SupBoard\Model\CronLog;
+use SupBoard\Supervisor\StatusCode;
+use Zend\XmlRpc\Client\Exception\FaultException;
 
 class CommandController extends ControllerSupervisorBase
 {
@@ -152,10 +160,10 @@ class CommandController extends ControllerSupervisorBase
                 $offset = $info[1];
                 $running = true;
             }
-            catch (Exception $e)
+            catch (\Exception $e)
             {
                 // 进程不存在，一般来说是因为该进程已经执行完成并已经被删除
-                if ($e->getCode() != XmlRpc::BAD_NAME)
+                if ($e->getCode() != StatusCode::BAD_NAME)
                 {
                     throw $e;
                 }
@@ -247,7 +255,7 @@ class CommandController extends ControllerSupervisorBase
                 CronLog::STATUS_FINISHED
             ]);
 
-            $phql = "DELETE FROM Command WHERE id IN ({ids:array-int}) AND status IN({$finished})";
+            $phql = "DELETE FROM " . Command::class . " WHERE id IN ({ids:array-int}) AND status IN({$finished})";
             $result = $this->modelsManager->executeQuery(
                 $phql,
                 ['ids' => $id_arr]
@@ -294,9 +302,9 @@ class CommandController extends ControllerSupervisorBase
 
             return $this->response->setJsonContent($result);
         }
-        catch (Zend\XmlRpc\Client\Exception\FaultException $e)
+        catch (FaultException $e)
         {
-            if ($e->getCode() != XmlRpc::BAD_NAME)
+            if ($e->getCode() != StatusCode::BAD_NAME)
             {
                 throw $e;
             }

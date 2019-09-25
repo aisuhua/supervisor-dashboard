@@ -1,5 +1,9 @@
 <?php
-class FileLock
+namespace SupBoard\Lock;
+
+use SupBoard\Exception\Exception;
+
+class File
 {
     protected $filename;
     protected $fp;
@@ -8,6 +12,11 @@ class FileLock
     public function __construct($filename)
     {
         $this->fp = fopen($this->filename, "r+");
+        if ($this->fp === false)
+        {
+            throw new Exception("无法打开文件：{$this->filename}");
+        }
+
         $this->locked = false;
         $this->filename = $filename;
     }
@@ -16,7 +25,7 @@ class FileLock
     {
         if (!flock($this->fp, LOCK_EX))
         {
-            return false;
+            throw new Exception("无法获得锁：{$this->filename}");
         }
 
         $this->locked = true;
@@ -33,7 +42,7 @@ class FileLock
 
         if (!flock($this->fp, LOCK_UN))
         {
-            return false;
+            throw new Exception("解锁失败：{$this->filename}");
         }
 
         fclose($this->fp);
