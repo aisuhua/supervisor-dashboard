@@ -2,6 +2,7 @@
 namespace SupBoard\Controller;
 
 use Phalcon\Mvc\View;
+use Cron\CronExpression;
 
 class PublicController extends ControllerBase
 {
@@ -17,7 +18,7 @@ class PublicController extends ControllerBase
 
         try
         {
-            $cron = Cron\CronExpression::factory($time);
+            $cron = CronExpression::factory($time);
             for ($i = 0; $i < 10; $i++)
             {
                 $date =  $cron->getNextRunDate(null, $i)->format('Y-m-d H:i:s');
@@ -26,9 +27,8 @@ class PublicController extends ControllerBase
 
             $str = "<ul>{$str}</ul>";
         }
-        catch (Exception $e) {}
+        catch (\Exception $e) {}
 
         return $this->response->setContent($str);
     }
 }
-

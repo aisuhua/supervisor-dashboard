@@ -12,13 +12,14 @@
 {% set command_class = '' %}
 {% set command_history_class = '' %}
 
-{% if dispatcher.getControllerName() == 'process' %}
+{% if dispatcher.getControllerName() == 'process-manager' %}
+    {% set index_class = 'active' %}
+{% elseif dispatcher.getControllerName() == 'process' %}
     {% if dispatcher.getActionName() == 'index' %}
-        {% set index_class = 'active' %}
     {% elseif dispatcher.getActionName() == 'create' or
-    dispatcher.getActionName() == 'edit' or
-    dispatcher.getActionName() == 'createIni' or
-    dispatcher.getActionName() == 'editIni'
+        dispatcher.getActionName() == 'edit' or
+        dispatcher.getActionName() == 'createIni' or
+        dispatcher.getActionName() == 'editIni'
     %}
         {% set create_class = 'active' %}
     {% elseif dispatcher.getActionName() == 'ini' %}

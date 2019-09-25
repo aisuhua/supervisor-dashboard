@@ -1,7 +1,8 @@
 <?php
 namespace SupBoard\Controller;
 
-use Phalcon\Tag;
+use SupBoard\Model\ServerGroup;
+use SupBoard\Form\ServerGroupForm;
 
 class ServerGroupController extends ControllerBase
 {

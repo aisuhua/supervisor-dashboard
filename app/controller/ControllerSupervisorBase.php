@@ -56,8 +56,12 @@ class ControllerSupervisorBase extends ControllerBase
         }
     }
 
-    protected function formatMessage($message)
+    protected function formatMessage($message, $only = false)
     {
+        if ($only)
+        {
+           return "<strong>{$message}</strong>";
+        }
         return "<strong>{$message}</strong>\n请刷新页面查看进度";
     }
 

@@ -7,6 +7,19 @@
 $router = $di->get('router');
 
 /**
+ * 进程管理
+ */
+$router->add('/process', [
+    'controller' => 'process-manager',
+    'action' => 'index'
+]);
+
+$router->add('/process/log', [
+    'controller' => 'process-manager',
+    'action' => 'log'
+]);
+
+/**
  * 分組服務器管理
  */
 $router->add(
