@@ -24,9 +24,10 @@ class ProcessController extends ControllerSupervisorBase
                 return false;
             }
 
+            $post_data = Process::applyDefault($this->request->getPost());
             $process = new Process();
-            $form->bind($this->request->getPost(), $process);
 
+            $form->bind($post_data, $process);
             if (!$form->isValid())
             {
                 foreach ($form->getMessages() as $message)
@@ -44,7 +45,7 @@ class ProcessController extends ControllerSupervisorBase
                 {
                     $form->clear();
                     $this->flash->success("添加成功");
-                    $this->view->reload_config = true;
+                    $this->view->reload = true;
                 }
             }
         }
@@ -80,6 +81,7 @@ class ProcessController extends ControllerSupervisorBase
                 {
                     $value['program'] = explode(':', $key)[1];
                     $value['server_id'] = $server_id;
+                    $value = Process::applyDefault($value);
 
                     $process = new Process();
                     $form->bind($value, $process);
@@ -101,7 +103,7 @@ class ProcessController extends ControllerSupervisorBase
                         {
                             unset($ini);
                             $this->flash->success("添加成功");
-                            $this->view->reload_config = true;
+                            $this->view->reload = true;
                         }
                     }
                 }
@@ -153,7 +155,7 @@ class ProcessController extends ControllerSupervisorBase
                 {
                     $this->flash->success("修改成功");
                     $form->clear();
-                    $this->view->reload_config = true;
+                    $this->view->reload = true;
                 }
             }
         }
@@ -216,7 +218,7 @@ class ProcessController extends ControllerSupervisorBase
                             unset($ini);
                             $form->clear();
                             $this->flash->success("修改成功");
-                            $this->view->reload_config = true;
+                            $this->view->reload = true;
                         }
                     }
                 }
@@ -300,7 +302,7 @@ class ProcessController extends ControllerSupervisorBase
                 $form->clear();
 
                 // 使用默认值填充配置文件没有写的字段
-                Process::applyDefaultValue($value);
+                $value = Process::applyDefault($value);
                 // Sort by key
                 ksort($value);
                 $filtered[] = $value;
@@ -348,7 +350,7 @@ class ProcessController extends ControllerSupervisorBase
                 unset($ini);
                 $this->db->commit();
                 $this->flash->success('修改成功');
-                $this->view->reload_config = true;
+                $this->view->reload = true;
             }
             catch (\Exception $e)
             {
@@ -410,7 +412,7 @@ class ProcessController extends ControllerSupervisorBase
 
         $result['state'] = 1;
         $result['message'] = self::formatMessage($process->program . ' 正在删除');
-        $result['reload_config'] = true;
+        $result['reload'] = true;
 
         return $this->response->setJsonContent($result);
     }

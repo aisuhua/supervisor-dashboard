@@ -1,31 +1,65 @@
 <?php
 namespace SupBoard\Supervisor;
 
+use SupBoard\Exception\Exception;
+use SupBoard\Model\Server;
+
 class SupAgent
 {
+    protected $server_id;
     protected $host;
     protected $port;
     protected $base_uri;
 
-    public function __construct($host, $port)
+    public function __construct(Server $server)
     {
-        $this->host = $host;
-        $this->port = $port;
+        $this->host = $server->ip;
+        $this->port = $server->port;
+        $this->server_id = $server->id;
     }
 
-    protected function getBaseUri()
+    public function ping()
     {
-        return $this->host . ':8000';
-    }
+        $api_url = self::makeUrl("/state");
 
-    protected function getUrl($api_uri)
-    {
-        return self::getBaseUri() . $api_uri;
+        try
+        {
+            curl_get($api_url);
+            return true;
+        }
+        catch (Exception $e)
+        {
+            return false;
+        }
     }
 
     public function tailCronLog($log_id, $file_size = 1048576)
     {
-        $api_url = self::getUrl("/cron-log/log/{$log_id}/{$file_size}");
+        $api_url = self::makeUrl("/cron-log/tail/{$log_id}/{$file_size}");
         return curl_get($api_url, [], 3);
+    }
+
+    public function processReload()
+    {
+        $api_url = self::makeUrl("/process/reload/{$this->server_id}");
+        return self::handelResult(curl_get($api_url));
+    }
+
+    protected function makeUrl($uri)
+    {
+        $time = time();
+        $url = $this->host . ':8000' . $uri;
+        $auth = md5($url . $time . $GLOBALS['api']['key']);
+
+        return  $url . "?time={$time}&auth=$auth";
+    }
+
+    /**
+     * @param $result
+     * @return mixed
+     */
+    protected function handelResult($result)
+    {
+        return json_decode($result, true);
     }
 }

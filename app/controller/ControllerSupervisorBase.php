@@ -39,13 +39,7 @@ class ControllerSupervisorBase extends ControllerBase
                 return $this->response->redirect($this->request->getHTTPReferer());
             }
 
-            $supervisor = new Supervisor(
-                $server->id,
-                $server->ip,
-                $server->username,
-                $server->password,
-                $server->port
-            );
+            $supervisor = $server->getSupervisor();
 
             $this->server_id = $server_id;
             $this->server = $server;

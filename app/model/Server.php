@@ -7,6 +7,7 @@ use Phalcon\Validation;
 use Phalcon\Validation\Validator\Uniqueness;
 use Phalcon\Validation\Validator\PresenceOf;
 use SupBoard\Supervisor\SupAgent;
+use SupBoard\Supervisor\Supervisor;
 
 class Server extends Model
 {
@@ -24,6 +25,7 @@ class Server extends Model
     public $create_time;
     public $update_time;
 
+    protected $supervisor;
     protected $supAgent;
 
     public function initialize()
@@ -61,6 +63,20 @@ class Server extends Model
     }
 
     /**
+     * 处理服务器添加后的初始化工作
+     */
+    public function afterCreate()
+    {
+        // 添加一个　cron 进程
+        $cronProcess = new Process();
+        $cronProcess->server_id = $this->id;
+        $cronProcess->program = '_supervisor_cron';
+        $cronProcess->command = "/usr/bin/php /www/web/supervisor-agent/app/cli.php cron start {$this->id}";
+        $cronProcess->user = 'root';
+        $cronProcess->save();
+    }
+
+    /**
      * 获取 Supervisor RPC 通许地址
      *
      * @return string
@@ -68,6 +84,25 @@ class Server extends Model
     public function getSupervisorUri()
     {
         return "http://{$this->ip}:{$this->sync_conf_port}";
+    }
+
+    /**
+     * @param bool $reusable
+     *
+     * @return Supervisor
+     */
+    public function getSupervisor($reusable = true)
+    {
+        if ($reusable && $this->supervisor)
+        {
+            return $this->supervisor;
+        }
+
+        $this->supervisor = Di::getDefault()->get('supervisor', [
+            $this->id, $this->ip, $this->port, $this->username, $this->password
+        ]);
+
+        return $this->supervisor;
     }
 
     /**
@@ -81,7 +116,7 @@ class Server extends Model
             return $this->supAgent;
         }
 
-        $this->supAgent = Di::getDefault()->get('supAgent', [$this->ip, $this->port]);
+        $this->supAgent = Di::getDefault()->get('supAgent', [$this]);
 
         return $this->supAgent;
     }

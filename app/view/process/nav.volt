@@ -60,7 +60,7 @@
 
 <script>
 function reloadConfig() {
-    $.get('/process/reloadConfig?server_id={{ server.id }}');
+    $.get('/process-manager/reloadConfig?server_id={{ server.id }}');
 }
 
 $(function() {
@@ -77,7 +77,7 @@ $(function() {
 });
 </script>
 
-{% if reload_config is not empty %}
+{% if reload is not empty %}
 <script>reloadConfig();</script>
 {% endif %}
 

@@ -89,8 +89,8 @@
             <a class="btn btn-xs btn-warning start" href="/process-manager/startGroup?server_id={{ server.id }}&group={{ group['program'] }}" data-nopjax>启动</a>&nbsp;
             <a class="btn btn-xs btn-warning stop" href="/process-manager/stopGroup?server_id={{ server.id }}&group={{ group['program'] }}" data-nopjax>停止</a>&nbsp;
             {% if group['id'] is not empty %}
-                <a class="btn btn-xs btn-warning {{ btn_class }}" href="/process-manager/edit/{{ group['id'] }}?server_id={{ server.id }}">修改</a>&nbsp;
-                <a class="btn btn-xs btn-warning delete {{ btn_class }}" href="/process-manager/delete/{{ group['id'] }}?server_id={{ server.id }}" data-confirm="真的要删除 {{ group['program'] }} 吗？" data-nopjax>删除</a>
+                <a class="btn btn-xs btn-warning {{ btn_class }}" href="/process/edit/{{ group['id'] }}?server_id={{ server.id }}">修改</a>&nbsp;
+                <a class="btn btn-xs btn-warning delete {{ btn_class }}" href="/process/delete/{{ group['id'] }}?server_id={{ server.id }}" data-confirm="真的要删除 {{ group['program'] }} 吗？" data-nopjax>删除</a>
             {% else %}
                 <a class="btn btn-xs btn-warning {{ btn_class }}" href="">修改</a>&nbsp;
                 {#<a class="btn btn-xs btn-warning {{ btn_class }}" href="#">复制</a>&nbsp;#}
@@ -145,7 +145,7 @@ $(function () {
             if (data.state) {
                 success(data.message);
 
-                if (typeof data.reload_config != 'undefined') {
+                if (typeof data.reload != 'undefined') {
                     reloadConfig();
                 }
             } else {

@@ -6,6 +6,7 @@ use SupBoard\Supervisor\StatusCode;
 use Zend\XmlRpc\Client\Exception\FaultException;
 use SupBoard\Model\Process;
 use SupBoard\Form\ProcessForm;
+use SupBoard\Lock\Process as ProcessLock;
 
 class ProcessManagerController extends ControllerSupervisorBase
 {
@@ -304,125 +305,28 @@ class ProcessManagerController extends ControllerSupervisorBase
         $result = [];
 
         $processLock = new ProcessLock();
-        if (!$processLock->lock())
+        $processLock->lock();
+
+        // 更新服务器配置
+        $supAgent = $this->server->getSupAgent();
+        if (!$supAgent->ping())
         {
             $result['state'] = 0;
-            $result['message'] = '更新失败，无法获得锁';
-
+            $result['message'] = "同步失败，无法连接 <a href='#'>SupAgent</a> 服务";
             return $this->response->setJsonContent($result);
         }
 
-        // 读取数据库配置
-        $processes = Process::find([
-            'server_id = :server_id:',
-            'bind' => [
-                'server_id' => $this->server->id
-            ],
-            'order' => 'program asc, id asc'
-        ]);
-
-        $process_arr = $processes->toArray();
-
-        // 读取线上配置
-        $uri = $this->server->getSupervisorUri();
-
-        $read = SupervisorSyncConf::read($uri, $this->server->process_conf);
-        $is_empty_file = strpos($read['message'], 'no such file or directory');
-
-        if (!$read['state'] && $is_empty_file === false)
-        {
-            // 配置读取失败
-            $result['state'] = 0;
-            $result['message'] = "无法读取配置，{$read['message']}";
-
-            return $this->response->setJsonContent($result);
-        }
-
-        $ini_arr = [];
-        foreach ($processes as $process)
-        {
-            /** @var Process $process */
-            $ini_arr[] = $process->getIni();
-        }
-
-        $ini = implode(PHP_EOL, $ini_arr) . PHP_EOL;
-        $ret = SupervisorSyncConf::write($uri, $this->server->process_conf, $ini);
-
-        if (!$ret['state'])
+        $reload = $supAgent->processReload();
+        if (!$reload['state'])
         {
             $result['state'] = 0;
-            $result['message'] = $ret['message'];
-
+            $result['message'] = $reload['message'];
             return $this->response->setJsonContent($result);
         }
-
-        // 对比数据库与线上进程配置，统计出待新增、删除和修改的进程
-        $added = [];
-        $changed = [];
-        $removed = [];
 
         // 以下逻辑是为了模拟 reloadConfig 方法统计出进程的增删改
         // 因为存在并发调用 reloadConfig，因此它的结果并不可靠
-        // list($added, $changed, $removed) = $this->supervisor->reloadConfig()[0];
-        $this->supervisor->reloadConfig();
-
-        if (empty($read['content']))
-        {
-            // 配置内容为空，则全部进程都是新增
-            if (count($process_arr) > 0)
-            {
-                $added = array_map(function($process) {
-                    return $process['program'];
-                }, $process_arr);
-            }
-        }
-        else
-        {
-            $parsed = parse_ini_string($read['content'], true, INI_SCANNER_RAW);
-            if ($parsed === false)
-            {
-                $result['state'] = 0;
-                $result['message'] = "配置解析失败，请重试";
-
-                return $this->response->setJsonContent($result);
-            }
-
-            $db_programs = array_map(function($process) {
-                return $process['program'];
-            }, $process_arr);
-
-            $parsed_programs = array_map(function($key) {
-                return explode(':', $key)[1];
-            }, array_keys($parsed));
-
-            // 待新增的进程
-            $added = array_diff($db_programs, $parsed_programs);
-            // 待删除的进程
-            $removed = array_diff($parsed_programs, $db_programs);
-
-            // 需要判断是否发生修改的进程
-            $key_parts = [];
-            foreach ($processes as $process)
-            {
-                $key_parts[$process->program] = $process;
-            }
-
-            $intersect = array_intersect($db_programs, $parsed_programs);
-            if (!empty($intersect))
-            {
-                foreach ($intersect as $program)
-                {
-                    /** @var Process $process */
-                    $process = $key_parts[$program];
-                    $process->assign($parsed["program:{$program}"]);
-
-                    if ($process->hasChanged())
-                    {
-                        $changed[] = $program;
-                    }
-                }
-            }
-        }
+        list($added, $changed, $removed) = $this->supervisor->reloadConfig()[0];
 
         $messages = [];
         if (!empty($added))

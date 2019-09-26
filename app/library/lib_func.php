@@ -1,4 +1,6 @@
 <?php
+use SupBoard\Exception\Exception;
+
 /**
  * 发送POST请求
  *
@@ -41,7 +43,7 @@ function curl_get($url, $fields = [], $timeout = 1)
     $ch = curl_init();
     if (!empty($fields))
     {
-        $url .= "?" . http_build_query($fields);
+        $url .= (strpos($url, '?') ? '' : '?') . http_build_query($fields);
     }
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

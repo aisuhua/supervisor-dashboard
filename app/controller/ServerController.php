@@ -205,7 +205,7 @@ class ServerController extends ControllerBase
         }
         else
         {
-            $phql = "DELETE FROM Server WHERE id IN ({ids:array-int})";
+            $phql = "DELETE FROM " . Server::class . " WHERE id IN ({ids:array-int})";
             $result = $this->modelsManager->executeQuery(
                 $phql,
                 ['ids' => $id_arr]

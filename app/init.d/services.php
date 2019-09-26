@@ -13,6 +13,8 @@ use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Events\Event;
 use Phalcon\Di;
 use SupBoard\Supervisor\SupAgent;
+use SupBoard\Model\Server;
+use SupBoard\Supervisor\Supervisor;
 
 /** @var Di $di */
 $di->setShared('url', function () {
@@ -131,8 +133,12 @@ $di->set('flash', function () {
     return $flash;
 });
 
-$di->setShared('supAgent', function ($ip, $port) {
-    return new SupAgent($ip, $port);
+$di->set('supervisor', function ($name, $ip, $port, $username = null, $password = null) {
+    return new Supervisor($name, $ip, $username, $password, $port);
+});
+
+$di->setShared('supAgent', function (Server $server) {
+    return new SupAgent($server);
 });
 
 

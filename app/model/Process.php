@@ -27,6 +27,21 @@ class Process extends Model
     public $update_time;
     public $create_time;
 
+    CONST DEFAULT = [
+        'numprocs' => 1,
+        'numprocs_start' => 0,
+        'process_name' => '%(program_name)s_%(process_num)s',
+        'user' => 'www-data',
+        'directory' => '%(here)s',
+        'autostart' => 'true',
+        'startretries' => 20,
+        'autorestart' => 'true',
+        'redirect_stderr' => 'true',
+        'stdout_logfile' => 'AUTO',
+        'stdout_logfile_backups' => 0,
+        'stdout_logfile_maxbytes' => '1MB'
+    ];
+
     public function initialize()
     {
         $this->keepSnapshots(true);
@@ -44,20 +59,13 @@ class Process extends Model
 
     public function beforeSave()
     {
-        $this->numprocs ?: $this->numprocs = 1;
-        $this->numprocs_start ?: $this->numprocs_start = 0;
-        $this->process_name ?: $this->process_name = '%(program_name)s_%(process_num)s';
-        $this->user ?: $this->user = 'www-data';
-        $this->directory ?: $this->directory = '%(here)s';
-        $this->autostart ?: $this->autostart = 'true';
-        $this->startretries ?: $this->startretries = 20;
-        $this->autorestart ?: $this->autorestart = 'true';
-        $this->redirect_stderr ?: $this->redirect_stderr = 'true';
-        $this->stdout_logfile ?: $this->stdout_logfile = 'AUTO';
-        $this->stdout_logfile_backups ?: $this->stdout_logfile_backups = 0;
-        $this->stdout_logfile_maxbytes ?: $this->stdout_logfile_maxbytes = '1MB';
-
         $this->update_time = time();
+
+        foreach (self::DEFAULT as $key => $value)
+        {
+            !empty($this->{$key}) ?: $this->{$key} = $value;
+        }
+
     }
 
     public function validation()
@@ -74,6 +82,16 @@ class Process extends Model
         );
 
         return $this->validate($validator);
+    }
+
+    public static function applyDefault(array $data)
+    {
+        foreach (self::DEFAULT as $key => $value)
+        {
+            !empty($data[$key]) ?: $data[$key] = $value;
+        }
+
+        return $data;
     }
 
     public function getIni()
@@ -97,40 +115,18 @@ class Process extends Model
         return $ini;
     }
 
-    public static function applyDefaultValue(&$value)
-    {
-        !empty($value['numprocs']) ?: $value['numprocs'] = 1;
-        !empty($value['numprocs_start']) ?: $value['numprocs_start'] = 0;
-        !empty($value['process_name']) ?: $value['process_name'] = '%(program_name)s_%(process_num)s';
-        !empty($value['user']) ?: $value['user'] = 'www-data';
-        !empty($value['directory']) ?: $value['directory'] = '%(here)s';
-        !empty($value['autostart']) ?: $value['autostart'] = 'true';
-        !empty($value['startretries']) ?: $value['startretries'] = 20;
-        !empty($value['autorestart']) ?: $value['autorestart'] = 'true';
-        !empty($value['redirect_stderr']) ?: $value['redirect_stderr'] = 'true';
-        !empty($value['stdout_logfile']) ?: $value['stdout_logfile'] = 'AUTO';
-        !empty($value['stdout_logfile_backups']) ?: $value['stdout_logfile_backups'] = 0;
-        !empty($value['stdout_logfile_maxbytes']) ?: $value['stdout_logfile_maxbytes'] = '1MB';
-    }
-
     public static function getIniTemplate()
     {
         $ini = '';
         $ini .= "[program:cat]" . PHP_EOL;
         $ini .= "command=/bin/cat" . PHP_EOL;
-        $ini .= "numprocs=1" . PHP_EOL;
-        $ini .= "numprocs_start=0" . PHP_EOL;
-        $ini .= "process_name=%(program_name)s_%(process_num)s" . PHP_EOL;
-        $ini .= "user=www-data" . PHP_EOL;
-        $ini .= "directory=%(here)s" . PHP_EOL;
-        $ini .= "autostart=true" . PHP_EOL;
-        $ini .= "startretries=20" . PHP_EOL;
-        $ini .= "autorestart=true" . PHP_EOL;
-        $ini .= "redirect_stderr=true" . PHP_EOL;
-        $ini .= "stdout_logfile=AUTO" . PHP_EOL;
-        $ini .= "stdout_logfile_backups=0" . PHP_EOL;
-        $ini .= "stdout_logfile_maxbytes=1MB";
 
-        return $ini;
+        foreach (self::DEFAULT as $key => $value)
+        {
+            $ini .= "{$key}={$value}" . PHP_EOL;
+        }
+
+        return trim($ini);
     }
+
 }
