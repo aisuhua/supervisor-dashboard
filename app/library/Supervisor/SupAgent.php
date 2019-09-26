@@ -45,6 +45,12 @@ class SupAgent
         return self::handelResult(curl_get($api_url));
     }
 
+    public function commandReload($id)
+    {
+        $api_url = self::makeUrl("/command/reload/{$this->server_id}/{$id}");
+        return self::handelResult(curl_get($api_url));
+    }
+
     protected function makeUrl($uri)
     {
         $time = time();

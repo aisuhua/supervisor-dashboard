@@ -1,9 +1,9 @@
 <?php
 namespace SupBoard\Lock;
 
-class Cron extends File
+class Command extends File
 {
-    protected $filename = PATH_APP . '/lock/cron.lock';
+    protected $filename = PATH_APP . '/lock/command.lock';
 
     public function __construct()
     {

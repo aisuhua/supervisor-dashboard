@@ -9,6 +9,7 @@ use SupBoard\Form\CommandForm;
 use SupBoard\Model\CronLog;
 use SupBoard\Supervisor\StatusCode;
 use Zend\XmlRpc\Client\Exception\FaultException;
+use SupBoard\Lock\Command as CommandLock;
 
 class CommandController extends ControllerSupervisorBase
 {
@@ -18,6 +19,13 @@ class CommandController extends ControllerSupervisorBase
 
         if ($this->request->isPost())
         {
+            $supAgent = $this->server->getSupAgent();
+            if (!$supAgent->ping())
+            {
+                $this->flash->error("执行失败，无法连接 <a href='#'>SupAgent</a> 服务");
+                goto end;
+            }
+
             $command = new Command();
             $form->bind($this->request->getPost(), $command);
 
@@ -36,56 +44,30 @@ class CommandController extends ControllerSupervisorBase
                 goto end;
             }
 
-            // 向 supervisor 添加进程并启动进程
-            $uri = $this->server->getSupervisorUri();
-
             $commandLock = new CommandLock();
-            if (!$commandLock->lock())
+            $commandLock->lock();
+
+            $command->refresh();
+            $program = $command->getProgram();
+            $command->program = $program;
+            $command->save();
+
+            // 更新配置
+            $reload = $supAgent->commandReload($command->id);
+            if (!$reload['state'])
             {
-                $this->flash->error('无法获得锁');
-            }
-
-            // 先读取配置
-            $read = SupervisorSyncConf::read($uri, $this->server->command_conf);
-            $is_empty_file = strpos($read['message'], 'no such file or directory');
-
-            if (!$read['state'] && $is_empty_file === false)
-            {
-                // 配置读取失败
-                $this->flash->error("配置读取失败，{$read['message']}");
-                goto end;
-            }
-
-            // 将新进程配置追加到配置末尾
-            $ini = trim($read['content']) . PHP_EOL . $command->getIni();
-            $write = SupervisorSyncConf::write($uri, $this->server->command_conf, $ini);
-
-            if (!$write['state'])
-            {
-                $this->flash->error($write['message']);
+                $this->flash->error($reload['message']);
                 goto end;
             }
 
             // 启动进程
             $this->supervisor->reloadConfig();
-            $this->supervisor->addProcessGroup($command->getProgramName());
-            $this->supervisor->startProcessGroup($command->getProgramName());
-
-            // 更新命令进程状态为已启动
-            /** @var Command $command */
-            $command = Command::findFirst($command->id);
-            $command->status = Command::STATUS_STARTED;
-            $command->start_time = time();
-
-            if (!$command->save())
-            {
-                $this->flash->error($command->getMessages());
-                goto end;
-            }
+            $this->supervisor->addProcessGroup($program);
+            $this->supervisor->startProcessGroup($program);
 
             // $this->flash->success("命令已开始执行");
             $this->view->success = true;
-            $this->view->command = $command;
+            $this->view->command = $command->refresh();
         }
 
         end:

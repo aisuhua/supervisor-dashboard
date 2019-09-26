@@ -47,11 +47,6 @@ class Process extends Model
         $this->keepSnapshots(true);
     }
 
-    public function beforeUpdate()
-    {
-
-    }
-
     public function beforeCreate()
     {
         $this->create_time = time();
@@ -65,7 +60,16 @@ class Process extends Model
         {
             !empty($this->{$key}) ?: $this->{$key} = $value;
         }
+    }
 
+    public static function applyDefault(array $data)
+    {
+        foreach (self::DEFAULT as $key => $value)
+        {
+            !empty($data[$key]) ?: $data[$key] = $value;
+        }
+
+        return $data;
     }
 
     public function validation()
@@ -82,16 +86,6 @@ class Process extends Model
         );
 
         return $this->validate($validator);
-    }
-
-    public static function applyDefault(array $data)
-    {
-        foreach (self::DEFAULT as $key => $value)
-        {
-            !empty($data[$key]) ?: $data[$key] = $value;
-        }
-
-        return $data;
     }
 
     public function getIni()
