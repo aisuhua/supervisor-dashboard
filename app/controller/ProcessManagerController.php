@@ -6,7 +6,6 @@ use SupBoard\Supervisor\StatusCode;
 use Zend\XmlRpc\Client\Exception\FaultException;
 use SupBoard\Model\Process;
 use SupBoard\Form\ProcessForm;
-use SupBoard\Lock\Process as ProcessLock;
 
 class ProcessManagerController extends ControllerSupervisorBase
 {
@@ -304,9 +303,6 @@ class ProcessManagerController extends ControllerSupervisorBase
     {
         $result = [];
 
-        $processLock = new ProcessLock();
-        $processLock->lock();
-
         // 更新服务器配置
         $supAgent = $this->server->getSupAgent();
         if (!$supAgent->ping())
@@ -430,9 +426,6 @@ class ProcessManagerController extends ControllerSupervisorBase
                 $this->handleRemoveException($e);
             }
         }
-
-        // 解锁
-        $processLock->unlock();
 
         $this->view->setRenderLevel(
             View::LEVEL_NO_RENDER

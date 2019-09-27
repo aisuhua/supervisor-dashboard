@@ -57,4 +57,9 @@ class Command extends Model
     {
         return self::PROGRAM_PREFIX . $this->id;
     }
+
+    public function getProcessName()
+    {
+        return $this->program . ':' . $this->program . '_0';
+    }
 }

@@ -11,6 +11,7 @@ $(function() {
     var offset = {{ offset }};
     var log = document.querySelector('#log');
     var xhr = null;
+    var $refreshBtn = $('#refresh');
 
     function scrollToButton() {
         $('html, body').scrollTop(function() {
@@ -18,7 +19,7 @@ $(function() {
         });
     }
 
-    $('#refresh').click(function() {
+    $refreshBtn.click(function() {
         var url = $(this).attr('href');
 
         if (log.innerHTML == '没有任何日志记录') {
@@ -76,5 +77,10 @@ $(function() {
 
         return false;
     });
+
+    {#{% if running is not empty %}#}
+    {#scrollToButton();#}
+    {#$refreshBtn.click();#}
+    {#{% endif %}#}
 });
 </script>

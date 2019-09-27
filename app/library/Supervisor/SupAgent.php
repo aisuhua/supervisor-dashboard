@@ -39,6 +39,12 @@ class SupAgent
         return curl_get($api_url, [], 3);
     }
 
+    public function tailCommandLog($log_id, $file_size = 1048576)
+    {
+        $api_url = self::makeUrl("/command-log/tail/{$log_id}/{$file_size}");
+        return curl_get($api_url, [], 3);
+    }
+
     public function processReload()
     {
         $api_url = self::makeUrl("/process/reload/{$this->server_id}");

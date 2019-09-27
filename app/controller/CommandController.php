@@ -2,14 +2,11 @@
 namespace SupBoard\Controller;
 
 use Phalcon\Mvc\View;
-use Phalcon\Db;
-use SupBoard\Lock\Cron;
 use SupBoard\Model\Command;
 use SupBoard\Form\CommandForm;
 use SupBoard\Model\CronLog;
 use SupBoard\Supervisor\StatusCode;
 use Zend\XmlRpc\Client\Exception\FaultException;
-use SupBoard\Lock\Command as CommandLock;
 
 class CommandController extends ControllerSupervisorBase
 {
@@ -44,9 +41,6 @@ class CommandController extends ControllerSupervisorBase
                 goto end;
             }
 
-            $commandLock = new CommandLock();
-            $commandLock->lock();
-
             $command->refresh();
             $program = $command->getProgram();
             $command->program = $program;
@@ -66,6 +60,7 @@ class CommandController extends ControllerSupervisorBase
             $this->supervisor->startProcessGroup($program);
 
             // $this->flash->success("命令已开始执行");
+            $form->clear();
             $this->view->success = true;
             $this->view->command = $command->refresh();
         }
@@ -112,16 +107,23 @@ class CommandController extends ControllerSupervisorBase
 
     public function logAction($id)
     {
-        $sql = 'SELECT id, command, status, RIGHT(log, 1 * 1024 * 1024) as log FROM command WHERE id = :id LIMIT 1';
-        $command = $this->db->fetchOne($sql, Db::FETCH_ASSOC, [
-            'id' => $id
-        ]);
-
+        /** @var Command $command */
+        $command = Command::findFirst($id);
         if (!$command)
         {
-            $this->flash->error("不存在该命令日志");
+            $this->flash->error("该日志不存在");
             $this->dispatcher->forward([
-                'action' => 'index'
+                'action' => 'history'
+            ]);
+
+            return false;
+        }
+
+        if ($command->status == CronLog::STATUS_INI)
+        {
+            $this->flash->error("该命令正在启动执行，请稍后");
+            $this->dispatcher->forward([
+                'action' => 'history'
             ]);
 
             return false;
@@ -131,18 +133,18 @@ class CommandController extends ControllerSupervisorBase
         $offset = 0;
 
         // 正在运行的进程直接读取 Supervisor 日志
-        if ($command['status'] == Command::STATUS_STARTED)
+        if ($command->status == CronLog::STATUS_STARTED)
         {
             try
             {
-                $process_name = Command::makeProcessName($command['id']);
+                $process_name = $command->getProcessName();
                 $info = $this->supervisor->tailProcessStdoutLog($process_name, 0, 1 * 1024 * 1024);
 
                 $log = $info[0];
                 $offset = $info[1];
                 $running = true;
             }
-            catch (\Exception $e)
+            catch (FaultException $e)
             {
                 // 进程不存在，一般来说是因为该进程已经执行完成并已经被删除
                 if ($e->getCode() != StatusCode::BAD_NAME)
@@ -150,27 +152,14 @@ class CommandController extends ControllerSupervisorBase
                     throw $e;
                 }
 
-                // 如果进程已经执行完成，则读取数据库的日志
-                $command = $this->db->fetchOne($sql, Db::FETCH_ASSOC, [
-                    'id' => $id
-                ]);
-
-                if (!$command)
-                {
-                    $this->flash->error("不存在该命令日志");
-                    $this->dispatcher->forward([
-                        'action' => 'index'
-                    ]);
-
-                    return false;
-                }
-
-                $log = $command['log'];
+                $supAgent = $command->getServer()->getSupAgent();
+                $log = $supAgent->tailCommandLog($command->id);
             }
         }
         else
         {
-            $log = $command['log'];
+            $supAgent = $command->getServer()->getSupAgent();
+            $log = $supAgent->tailCommandLog($command->id);
         }
 
         $this->view->disableLevel([
@@ -178,11 +167,10 @@ class CommandController extends ControllerSupervisorBase
         ]);
 
         $this->view->running = $running;
-        $this->view->group = Command::makeProgramName($command['id']);
-        $this->view->name = Command::makeProgramName($command['id']) . '_0';
+        $this->view->group = $command->program;
+        $this->view->name = $command->program . '_0';
         $this->view->command = $command;
         $this->view->log = $log;
-
         $this->view->offset = $offset;
     }
 
@@ -190,19 +178,19 @@ class CommandController extends ControllerSupervisorBase
     {
         /** @var Command $command */
         $command = Command::findFirst($id);
-
         if (!$command)
         {
-            $this->flash->error("不存在该命令日志");
-
+            $this->flash->error("该命令日志不存在");
             $this->dispatcher->forward([
-                'action' => 'index'
+                'action' => 'history'
             ]);
 
             return false;
         }
 
-        $filename = 'command_' . $command->id . '_' . date('YmdHi', $command->start_time) . '.log';
+        $supAgent = $command->getServer()->getSupAgent();
+        $log = $supAgent->tailCommandLog($command->id, 0);
+        $filename =  $command->program . '_' . date('YmdHi', $command->start_time) . '.log';
 
         header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');
@@ -211,7 +199,7 @@ class CommandController extends ControllerSupervisorBase
         header('Cache-Control: must-revalidate');
         header('Pragma: public');
 
-        echo $command->log;
+        echo $log;
         exit;
     }
 
@@ -270,14 +258,14 @@ class CommandController extends ControllerSupervisorBase
         if (!$command)
         {
             $result['state'] = 0;
-            $result['message'] = "不存在该命令记录，无法执行停止操作";
+            $result['message'] = "不存在该命令执行记录，无法执行停止操作";
 
             return $this->response->setJsonContent($result);
         }
 
         try
         {
-            $this->supervisor->stopProcessGroup($command->getProgramName(), false);
+            $this->supervisor->stopProcessGroup($command->getProgram(), false);
 
             $result['state'] = 1;
             $result['message'] = $this->formatMessage("ID 为 {$id} 的命令正在停止");
