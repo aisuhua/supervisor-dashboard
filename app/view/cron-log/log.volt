@@ -11,7 +11,7 @@
         </div>
         <div class="collapse navbar-collapse navbar-right">
             {% if running %}
-                <a class="btn btn-primary btn-sm navbar-btn" id="refresh" href="/process/tail?server_id={{ server.id }}&group={{ group }}&name={{ name }}" data-nopjax>自动刷新</a>
+                <a class="btn btn-primary btn-sm navbar-btn" id="refresh" href="/process-manager/tail?server_id={{ server.id }}&group={{ group }}&name={{ name }}" data-nopjax>自动刷新</a>
             {% else %}
                 <a class="btn btn-default navbar-btn" href="/cron-log/download/{{ cronLog.id }}?server_id={{ server.id }}" data-nopjax>下载日志</a>
             {% endif %}

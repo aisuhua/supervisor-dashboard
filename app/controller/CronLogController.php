@@ -139,9 +139,6 @@ class CronLogController extends ControllerSupervisorBase
             return false;
         }
 
-        $supAgent = $cronLog->getServer()->getSupAgent();
-        $log = $supAgent->tailCronLog($cronLog->id, 0);
-
         $filename =  $cronLog->program . '_' . date('YmdHi', $cronLog->start_time) . '.log';
 
         header('Content-Description: File Transfer');
@@ -151,7 +148,8 @@ class CronLogController extends ControllerSupervisorBase
         header('Cache-Control: must-revalidate');
         header('Pragma: public');
 
-        echo $log;
+        $supAgent = $cronLog->getServer()->getSupAgent();
+        echo $supAgent->tailCronLog($cronLog->id, 0);
         exit;
     }
 

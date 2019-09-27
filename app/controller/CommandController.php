@@ -188,8 +188,6 @@ class CommandController extends ControllerSupervisorBase
             return false;
         }
 
-        $supAgent = $command->getServer()->getSupAgent();
-        $log = $supAgent->tailCommandLog($command->id, 0);
         $filename =  $command->program . '_' . date('YmdHi', $command->start_time) . '.log';
 
         header('Content-Description: File Transfer');
@@ -199,7 +197,8 @@ class CommandController extends ControllerSupervisorBase
         header('Cache-Control: must-revalidate');
         header('Pragma: public');
 
-        echo $log;
+        $supAgent = $command->getServer()->getSupAgent();
+        echo $supAgent->tailCommandLog($command->id, 0);
         exit;
     }
 
