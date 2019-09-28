@@ -48,13 +48,13 @@ class SupAgent
     public function processReload()
     {
         $api_url = self::makeUrl("/process/reload/{$this->server_id}");
-        return self::handelResult(curl_get($api_url));
+        return self::handelResult(curl_post($api_url));
     }
 
     public function commandAdd($id)
     {
         $api_url = self::makeUrl("/command/add/{$this->server_id}/{$id}");
-        return self::handelResult(curl_get($api_url));
+        return self::handelResult(curl_post($api_url));
     }
 
     protected function makeUrl($uri)

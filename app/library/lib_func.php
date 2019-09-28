@@ -10,7 +10,7 @@ use SupBoard\Exception\Exception;
  * @throws Exception
  * @return string
  */
-function curl_post($url, $fields, $timeout = 1)
+function curl_post($url, $fields = '', $timeout = 1)
 {
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
