@@ -47,7 +47,7 @@ class CommandController extends ControllerSupervisorBase
             $command->save();
 
             // 更新配置
-            $reload = $supAgent->commandReload($command->id);
+            $reload = $supAgent->commandAdd($command->id);
             if (!$reload['state'])
             {
                 $this->flash->error($reload['message']);
