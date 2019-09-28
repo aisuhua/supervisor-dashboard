@@ -23,7 +23,7 @@
 {% if process_warnings is not empty %}
 
 <div class="alert alert-danger">
-    您有 {{ process_warnings | length }} 个进程异常，请联系相关人员进行处理。
+    有 {{ process_warnings | length }} 个进程状态异常，请处理。
 </div>
 
 <table class="table table-bordered">
