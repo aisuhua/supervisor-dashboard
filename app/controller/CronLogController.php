@@ -210,7 +210,7 @@ class CronLogController extends ControllerSupervisorBase
                 CronLog::STATUS_FINISHED
             ]);
 
-            $phql = "DELETE FROM CronLog WHERE id IN ({ids:array-int}) AND status IN({$finished})";
+            $phql = "DELETE FROM " . CronLog::class . " WHERE id IN ({ids:array-int}) AND status IN({$finished})";
             $result = $this->modelsManager->executeQuery(
                 $phql,
                 ['ids' => $id_arr]
