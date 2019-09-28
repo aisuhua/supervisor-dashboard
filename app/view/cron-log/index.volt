@@ -23,7 +23,7 @@ $(function() {
 
     var dataTable = $cronLogTable.DataTable({
         processing: true,
-        pageLength: 25,
+        pageLength: 10,
         lengthChange: false,
         searching: true,
         serverSide: false,
