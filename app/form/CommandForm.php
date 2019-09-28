@@ -48,7 +48,7 @@ class CommandForm extends Form
         $command = new Text('command', [
             'class' => 'form-control',
             'autocomplete' => 'off',
-            'placeholder' => '请输入需要执行的命令'
+            'placeholder' => ''
         ]);
 
         $command->setFilters([

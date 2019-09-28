@@ -14,7 +14,7 @@ class SupAgent
     public function __construct(Server $server)
     {
         $this->host = $server->ip;
-        $this->port = $server->port;
+        $this->port = $server->agent_port;
         $this->server_id = $server->id;
     }
 
@@ -60,7 +60,7 @@ class SupAgent
     protected function makeUrl($uri)
     {
         $time = time();
-        $url = $this->host . ':8000' . $uri;
+        $url = $this->host . ':' . $this->port . $uri;
         $auth = md5($url . $time . $GLOBALS['api']['key']);
 
         return  $url . "?time={$time}&auth=$auth";

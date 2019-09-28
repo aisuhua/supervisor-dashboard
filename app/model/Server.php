@@ -17,11 +17,8 @@ class Server extends Model
     public $port;
     public $username;
     public $password;
-    public $sync_conf_port;
-    public $process_conf;
-    public $cron_conf;
-    public $command_conf;
-    public $sort;
+    public $agent_port;
+    public $agent_root;
     public $create_time;
     public $update_time;
 
@@ -71,19 +68,9 @@ class Server extends Model
         $cronProcess = new Process();
         $cronProcess->server_id = $this->id;
         $cronProcess->program = '_supervisor_cron';
-        $cronProcess->command = "/usr/bin/php /www/web/supervisor-agent/app/cli.php cron start {$this->id}";
+        $cronProcess->command = "/usr/bin/php " . rtrim($this->agent_root, '/') . "/app/cli.php cron start {$this->id}";;
         $cronProcess->user = 'root';
         $cronProcess->save();
-    }
-
-    /**
-     * 获取 Supervisor RPC 通许地址
-     *
-     * @return string
-     */
-    public function getSupervisorUri()
-    {
-        return "http://{$this->ip}:{$this->sync_conf_port}";
     }
 
     /**

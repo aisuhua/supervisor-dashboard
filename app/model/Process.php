@@ -27,7 +27,7 @@ class Process extends Model
     public $update_time;
     public $create_time;
 
-    CONST DEFAULT = [
+    const DEFAULT_VALUES = [
         'numprocs' => 1,
         'numprocs_start' => 0,
         'process_name' => '%(program_name)s_%(process_num)s',
@@ -56,20 +56,10 @@ class Process extends Model
     {
         $this->update_time = time();
 
-        foreach (self::DEFAULT as $key => $value)
+        foreach (self::DEFAULT_VALUES as $key => $value)
         {
             !empty($this->{$key}) ?: $this->{$key} = $value;
         }
-    }
-
-    public static function applyDefault(array $data)
-    {
-        foreach (self::DEFAULT as $key => $value)
-        {
-            !empty($data[$key]) ?: $data[$key] = $value;
-        }
-
-        return $data;
     }
 
     public function validation()
@@ -115,7 +105,7 @@ class Process extends Model
         $ini .= "[program:cat]" . PHP_EOL;
         $ini .= "command=/bin/cat" . PHP_EOL;
 
-        foreach (self::DEFAULT as $key => $value)
+        foreach (self::DEFAULT_VALUES as $key => $value)
         {
             $ini .= "{$key}={$value}" . PHP_EOL;
         }
@@ -123,4 +113,13 @@ class Process extends Model
         return trim($ini);
     }
 
+    public static function applyDefault(array $data)
+    {
+        foreach (self::DEFAULT_VALUES as $key => $value)
+        {
+            !empty($data[$key]) ?: $data[$key] = $value;
+        }
+
+        return $data;
+    }
 }

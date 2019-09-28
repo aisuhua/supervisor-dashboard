@@ -47,15 +47,4 @@ class Cron extends Model
     {
         $this->update_time = time();
     }
-
-    /**
-     * 产生定时任务对应的程序名称
-     *
-     * @param $datetime
-     * @return string
-     */
-    public function makeProgramName($datetime)
-    {
-        return 'sys_cron_' . $this->id . '_' . $datetime;
-    }
 }

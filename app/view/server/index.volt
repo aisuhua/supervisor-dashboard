@@ -25,10 +25,8 @@
         <th>Supervisor 端口</th>
         <th>Supervisor 用户名</th>
         <th>Supervisor 密码</th>
-        <th>同步配置端口</th>
-        <th>进程配置</th>
-        <th>定时任务配置</th>
-        <th>命令配置</th>
+        <th>agent port</th>
+        <th>agent root</th>
         <th>更新时间</th>
         <th>所属分组</th>
         <th>操作</th>
@@ -93,28 +91,18 @@
                     orderable: false
                 },
                 {
-                    data: 'sync_conf_port',
+                    data: 'agent_port',
                     targets: 5,
                     orderable: false
                 },
                 {
-                    data: 'process_conf',
+                    data: 'agent_root',
                     targets: 6,
                     orderable: false
                 },
                 {
-                    data: 'cron_conf',
-                    targets: 7,
-                    orderable: false
-                },
-                {
-                    data: 'command_conf',
-                    targets: 8,
-                    orderable: false
-                },
-                {
                     data: 'update_time',
-                    targets: 9,
+                    targets: 7,
                     orderable: false,
                     render: function (data, type, full, meta) {
                         var myDate = new Date(data * 1000);
@@ -123,7 +111,7 @@
                 },
                 {
                     data: 'server_group_id',
-                    targets: 10,
+                    targets: 8,
                     orderable: false,
                     visible: server_group_id <= 0,
                     render: function (data, type, full, meta) {
@@ -131,7 +119,7 @@
                     }
                 },
                 {
-                    targets: 11,
+                    targets: 9,
                     data: 'id',
                     orderable: false,
                     render: function (data, type, full, meta) {

@@ -99,7 +99,6 @@ class ServerForm extends Form
         $username = new Text('username', [
             'class' => 'form-control',
             'autocomplete' => 'off',
-            'value' => 'worker'
         ]);
 
         $username->addValidators([
@@ -114,7 +113,6 @@ class ServerForm extends Form
         $password = new Text('password', [
             'class' => 'form-control',
             'autocomplete' => 'off',
-            'value' => 111111
         ]);
 
         $password->addValidators([
@@ -125,68 +123,14 @@ class ServerForm extends Form
 
         $this->add($password);
 
-        // process_conf
-        $process_conf = new Text('process_conf', [
+        // agent port
+        $agent_port = new Text('agent_port', [
             'class' => 'form-control',
             'autocomplete' => 'off',
-            'value' => '/etc/supervisor/conf.d/process.conf'
+            'value' => '9002'
         ]);
 
-        $process_conf->addValidators([
-            new Regex(
-                [
-                    "pattern" => "/^\/etc\/supervisor\/conf\.d\/[a-zA-Z0-9]+\.conf$/",
-                    "message" => "进程配置不正确，格式：/etc/supervisor/conf.d/YOUR_CONF_NAME.conf",
-                ]
-            )
-        ]);
-
-        $this->add($process_conf);
-
-        // cron_conf
-        $cron_conf = new Text('cron_conf', [
-            'class' => 'form-control',
-            'autocomplete' => 'off',
-            'value' => '/etc/supervisor/conf.d/cron.conf'
-        ]);
-
-        $cron_conf->addValidators([
-            new Regex(
-                [
-                    "pattern" => "/^\/etc\/supervisor\/conf\.d\/[a-zA-Z0-9]+\.conf$/",
-                    "message" => "定时任务配置不正确，格式：/etc/supervisor/conf.d/YOUR_CONF_NAME.conf",
-                ]
-            )
-        ]);
-
-        $this->add($cron_conf);
-
-        // command_conf
-        $command_conf = new Text('command_conf', [
-            'class' => 'form-control',
-            'autocomplete' => 'off',
-            'value' => '/etc/supervisor/conf.d/command.conf'
-        ]);
-
-        $command_conf->addValidators([
-            new Regex(
-                [
-                    "pattern" => "/^\/etc\/supervisor\/conf\.d\/[a-zA-Z0-9]+\.conf$/",
-                    "message" => "命令配置不正确，格式：/etc/supervisor/conf.d/YOUR_CONF_NAME.conf",
-                ]
-            )
-        ]);
-
-        $this->add($command_conf);
-
-        // sync_conf_port
-        $sync_conf_port = new Text('sync_conf_port', [
-            'class' => 'form-control',
-            'autocomplete' => 'off',
-            'value' => '8089'
-        ]);
-
-        $sync_conf_port->addValidators([
+        $agent_port->addValidators([
             new Numericality(
                 [
                     "message" => "sync_conf 端口必须是数字",
@@ -196,20 +140,25 @@ class ServerForm extends Form
                 [
                     "minimum" => 1,
                     "maximum" => 65535,
-                    "message" => "请填写正确的 sync_conf 端口",
+                    "message" => "请填写正确的 agent port",
                 ]
             )
         ]);
 
-        $this->add($sync_conf_port);
+        $this->add($agent_port);
 
-        // sort
-        $sort = new Text('sort', [
+        // agent root
+        $agent_root = new Text('agent_root', [
             'class' => 'form-control',
             'autocomplete' => 'off',
-            'value' => 0
+            'value' => '/www/web/supervisor-agent'
         ]);
 
-        $this->add($sort);
+        $agent_root->addValidators([
+            new PresenceOf([
+                'message' => '请填写正确的 agent root'
+            ])
+        ]);
+        $this->add($agent_root);
     }
 }

@@ -49,34 +49,15 @@
         </div>
     </div>
     <div class="form-group">
-        <label for="sync_conf_port" class="col-sm-2 control-label">sync_conf 端口</label>
+        <label for="agent_port" class="col-sm-2 control-label">agent port</label>
         <div class="col-sm-10">
-            {{ form.render('sync_conf_port') }}
+            {{ form.render('agent_port') }}
         </div>
     </div>
     <div class="form-group">
-        <label for="conf_path" class="col-sm-2 control-label">进程配置</label>
+        <label for="agent_root" class="col-sm-2 control-label">agent root</label>
         <div class="col-sm-10">
-            {{ form.render('process_conf') }}
-        </div>
-    </div>
-    <div class="form-group">
-        <label for="conf_path" class="col-sm-2 control-label">定时任务配置</label>
-        <div class="col-sm-10">
-            {{ form.render('cron_conf') }}
-        </div>
-    </div>
-    <div class="form-group">
-        <label for="conf_path" class="col-sm-2 control-label">命令配置</label>
-        <div class="col-sm-10">
-            {{ form.render('command_conf') }}
-        </div>
-    </div>
-    <div class="form-group" style="display: none;">
-        <label for="sort" class="col-sm-2 control-label">排序字段</label>
-        <div class="col-sm-10">
-            {{ form.render('sort') }}
-            <span id="helpBlock" class="help-block">值越大排得越靠前，有效值范围 0 ～ 999。</span>
+            {{ form.render('agent_root') }}
         </div>
     </div>
     <div class="form-group">
