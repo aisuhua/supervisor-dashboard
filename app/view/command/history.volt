@@ -88,7 +88,7 @@
                     orderable: false,
                     render: function (data, type, full, meta) {
                         if (data > 0) {
-                            return Math.abs((data - full.start_time)) + "秒" ;
+                            return fancyTimeFormat(data - full.start_time);
                         }
 
                         return data;

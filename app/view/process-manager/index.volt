@@ -95,9 +95,8 @@
             {% else %}
                 <a class="btn btn-xs btn-warning {{ btn_class }}" href="">修改</a>&nbsp;
                 {#<a class="btn btn-xs btn-warning {{ btn_class }}" href="#">复制</a>&nbsp;#}
-                <a class="btn btn-xs btn-warning delete {{ btn_class }}" href="" data-confirm="真的要删除 {{ group['program'] }} 吗？" data-nopjax>删除</a>
+                <a class="btn btn-xs btn-warning delete {{ btn_class }}" href="">删除</a>
             {% endif %}
-
         </th>
     </tr>
         {% for process in processes %}
@@ -150,7 +149,7 @@ $(function () {
             $tr.addClass('anchor-hover');
             setTimeout(function() {
                 $tr.removeClass('anchor-hover');
-            }, 1500);
+            }, 1000);
         }
     }
 

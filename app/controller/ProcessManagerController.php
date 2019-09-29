@@ -22,7 +22,7 @@ class ProcessManagerController extends ControllerSupervisorBase
         foreach ($processes as $process)
         {
             // 不显示系统进程
-            if (!$show_sys && strpos($process['name'], 'sys_') !== false)
+            if (!$show_sys && Process::isSystemProcess($process['group']))
             {
                 continue;
             }

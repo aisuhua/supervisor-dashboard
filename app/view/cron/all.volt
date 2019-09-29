@@ -39,9 +39,6 @@ $(function() {
             style:    'os',
             selector: 'td:first-child'
         },
-        order: [
-            [2, 'desc']
-        ],
         columnDefs: [
             {
                 data: null,

@@ -22,6 +22,37 @@ function timeAgo(timestamp) {
     return date.format('Y-m-d H:i');
 }
 
+function fancyTimeFormat(time) {
+    // Hours, minutes and seconds
+    var hrs = ~~(time / 3600);
+    var mins = ~~((time % 3600) / 60);
+    var secs = ~~time % 60;
+
+    // Output like "1:01" or "4:03:59" or "123:03:59"
+    var ret = "";
+
+    if (hrs == 0) {
+        hrs = '00';
+    } else if (hrs < 10) {
+        hrs = '0' + hrs;
+    }
+
+    if (mins == 0) {
+        mins = '00';
+    } else if (mins < 10) {
+        mins = '0' + mins;
+    }
+
+    if (secs == 0) {
+        secs = '00';
+    } else if (secs < 10) {
+        secs = '0' + secs;
+    }
+
+    ret += hrs + ":" + mins + ":" + secs;
+    return ret;
+}
+
 // https://stackoverflow.com/questions/1634748/how-can-i-delete-a-query-string-parameter-in-javascript
 function RemoveParameterFromUrl(url, parameter) {
     return url

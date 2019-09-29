@@ -316,7 +316,7 @@ class ProcessController extends ControllerSupervisorBase
             {
                 $this->db->begin();
 
-                $sql = "DELETE FROM process WHERE server_id = {$server_id}";
+                $sql = "DELETE FROM process WHERE server_id = {$server_id} AND is_sys = 0";
                 $success = $this->db->execute($sql);
 
                 if (!$success)
@@ -369,7 +369,7 @@ class ProcessController extends ControllerSupervisorBase
         if (!isset($ini))
         {
             $processes = Process::find([
-                'server_id = :server_id:',
+                'server_id = :server_id: AND is_sys = 0',
                 'bind' => [
                     'server_id' => $this->server->id
                 ],

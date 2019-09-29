@@ -186,7 +186,7 @@ class CronController extends ControllerSupervisorBase
                 'c.update_time as update_time',
                 'c.description as description',
             ])
-            ->orderBy('c.id desc')
+            ->orderBy('g.sort desc, c.id asc')
             ->offset($offset)
             ->limit($limit)
             ->getQuery()

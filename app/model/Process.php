@@ -122,4 +122,9 @@ class Process extends Model
 
         return $data;
     }
+
+    public static function isSystemProcess($program)
+    {
+        return strpos($program, '_supervisor') === 0;
+    }
 }
