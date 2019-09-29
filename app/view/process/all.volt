@@ -2,25 +2,14 @@
 {{ flashSession.output() }}
 {% include 'server-group/nav.volt' %}
 
-<script>
-    var server_group_id = 0;
-    {% if serverGroup is not empty %}
-        server_group_id = {{ serverGroup.id }};
-    {% endif %}
-</script>
-
-<table id="server-list" class="table table-bordered table-striped table-hover">
+<table id="process-list" class="table table-bordered table-hover">
     <thead>
     <tr>
         <th></th>
         <th>ID</th>
-        <th>所属分组</th>
-        <th>IP 地址</th>
-        <th>端口</th>
-        <th>用户名</th>
-        <th>密码</th>
-        <th>agent port</th>
-        <th>agent root</th>
+        <th>所在分组</th>
+        <th>所在服务器</th>
+        <th>进程名称</th>
         <th>更新时间</th>
         <th>操作</th>
     </tr>
@@ -28,28 +17,25 @@
 </table>
 
 <script>
-
 $(function() {
-    var $serverList = $('#server-list');
-    var dataTable = $serverList.DataTable({
+    var $processList = $('#process-list');
+
+    var dataTable = $processList.DataTable({
         processing: true,
-        pageLength: 25,
+        pageLength: 10,
         lengthChange: false,
         searching: true,
         serverSide: false,
         stateSave: true,
-        ajax: {
-            url: '/server/list',
-            data: function ( d ) {
-                d.group_id = {{ group_id }};
-            }
-        },
+        ajax: '/process/list',
         searchHighlight: true,
         select: {
             style:    'os',
             selector: 'td:first-child'
         },
-
+        order: [
+            [2, 'desc']
+        ],
         columnDefs: [
             {
                 data: null,
@@ -67,65 +53,40 @@ $(function() {
                 }
             },
             {
-                data: 'server_group_id',
+                data: 'group_name',
                 targets: 2,
-                orderable: false,
-                render: function (data, type, full, meta) {
-                    return full.server_group_name;
-                }
-            },
-            {
-                data: 'ip',
-                targets: 3,
                 orderable: false,
                 render: function (data, type, full, meta) {
                     return data;
                 }
             },
             {
-                data: 'port',
+                data: 'server_ip',
+                targets: 3,
+                orderable: false
+            },
+            {
+                data: 'program',
                 targets: 4,
-                orderable: false
-            },
-            {
-                data: 'username',
-                targets: 5,
-                orderable: false
-            },
-            {
-                data: 'password',
-                targets: 6,
-                orderable: false
-            },
-            {
-                data: 'agent_port',
-                targets: 7,
-                orderable: false
-            },
-            {
-                data: 'agent_root',
-                targets: 8,
-                orderable: false
+                orderable: false,
+                visible: true
             },
             {
                 data: 'update_time',
-                targets: 9,
+                targets: 5,
                 orderable: false,
                 render: function (data, type, full, meta) {
                     return timeAgo(data);
                 }
             },
             {
-                targets: 10,
+                targets: 6,
                 data: 'id',
                 orderable: false,
                 render: function (data, type, full, meta) {
-                    var html = '<a href="/server/edit/'+ data + '">修改</a>';
+                    var html = '<a href="/process?server_id='+ full.server_id +'&ip='+ full.server_ip +'&port='+ full.server_port +'#'+ full.program +'" target="_blank" data-nopjax>查看</a>';
                     html += '<span class="text-muted"> | </span>';
-                    html += '<a href="javascript: void(0);" class="delete">删除</a>';
-                    html += '<span class="text-muted"> | </span>';
-                    html += '<a href="/process?server_id='+ full.id +'&ip='+ full.ip +'&port='+ full.port +'" target="_blank" data-nopjax>Supervisor 控制台</a>';
-
+                    html += '<a href="/process/edit/'+ data +'?server_id='+ full.server_id + '" target="_blank" data-nopjax>修改</a>';
                     return html;
                 }
             }
@@ -145,14 +106,12 @@ $(function() {
 
                     if (count <= 0)
                     {
-                        alert('请先选择服务器');
+                        alert('请先选择分组');
                         return false;
                     }
 
-                    if (confirm("真的要删除这 "+ count +" 台服务器吗？")) {
-
-                        var url = "/server/delete?group_id={{ group_id }}";
-
+                    if (confirm("真的要删除这 "+ count +" 个分组吗？")) {
+                        var url = '/server-group/delete';
                         $.pjax({
                             url: url,
                             container: '#pjax-container',
@@ -165,19 +124,19 @@ $(function() {
             }
         ],
         initComplete: function(settings, json) {
-            dataTable.buttons().container().appendTo('#server-list_wrapper .col-sm-6:eq(0)');
+            dataTable.buttons().container().appendTo('#server-group-list_wrapper .col-sm-6:eq(0)');
         }
     });
 
-    $serverList.on('click', 'td a.delete', function () {
+    $processList.on('click', 'td a.delete', function () {
         var row = dataTable.row($(this).closest('tr'));
         var data = row.data();
 
-        if (!confirm('真的要删除 '+ data.ip + ':' + data.port +' 这台服务器吗？')) {
+        if (!confirm('真的要删除 '+ data.name +' 吗？')) {
             return false;
         }
 
-        var url = '/server/delete?group_id={{ group_id }}';
+        var url = '/server-group/delete';
         $.pjax({
             url: url,
             container: '#pjax-container',
@@ -185,14 +144,6 @@ $(function() {
             data: {ids: data.id},
             push: false
         });
-    });
-
-    $("#select-all").on( "click", function(e) {
-        if ($(this).is( ":checked" )) {
-            dataTable.rows(  ).select();
-        } else {
-            dataTable.rows(  ).deselect();
-        }
     });
 });
 </script>

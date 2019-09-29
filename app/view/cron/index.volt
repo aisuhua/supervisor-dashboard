@@ -12,14 +12,14 @@
         <th>状态</th>
         <th>下次执行时间</th>
         <th>上次执行时间</th>
-        {#<th>更新时间</th>#}
+        <th>更新时间</th>
         <th>备注</th>
         <th>操作</th>
     </tr>
     </thead>
     <tbody>
         {% for cron in cron_arr %}
-        <tr>
+        <tr id="{{ cron['id'] }}">
             <td>{{ cron['id'] }}</td>
             <td>{{ cron['user'] }}</td>
             <td><code>{{ cron['time'] }}</code></td>
@@ -45,7 +45,13 @@
 
                 {% endif %}
             </td>
-            {#<td>{{ date ('Y-m-d H:i', cron['update_time']) }}</td>#}
+            <td>
+                {% if time() - cron['update_time'] < 60 %}
+                    <span class="text-success">几秒前</span>
+                {% else %}
+                        {{ date ('Y-m-d H:i', cron['update_time']) }}
+                {% endif %}
+            </td>
             <td>{{ cron['description'] }}</td>
             <td>
                 <a href="/cron/edit/{{ cron['id'] }}?server_id={{ server.id }}">修改</a>
@@ -60,3 +66,25 @@
         {% endfor %}
     </tbody>
 </table>
+
+<script>
+$(function() {
+    var location_hash = window.location.hash;
+    if (location_hash) {
+        var $anchor = $(location_hash);
+        if ($anchor.size() > 0) {
+            $('html, body').animate({
+                    scrollTop: $anchor.offset().top - 63
+                }, 'fast'
+            );
+
+            var $tr = $anchor.closest('tr');
+            $tr.addClass('anchor-out');
+            $tr.addClass('anchor-hover');
+            setTimeout(function() {
+                $tr.removeClass('anchor-hover');
+            }, 1000);
+        }
+    }
+});
+</script>

@@ -29,3 +29,13 @@ samp,pre {
 samp#log {
     padding-bottom: 20px;
 }
+
+tr.anchor-out {
+    background-color: transparent;
+    transition: background-color 1s;
+}
+
+tr.anchor-hover {
+    background-color: #fcf8e3;
+    transition: background-color 1s;
+}

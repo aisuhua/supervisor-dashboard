@@ -39,6 +39,8 @@
                     <ul class="dropdown-menu">
                         <li><a href="/server-group">分组管理</a></li>
                         <li><a href="/server">服务器管理</a></li>
+                        <li><a href="/process/all">所有进程</a></li>
+                        <li><a href="/cron/all">所有定时任务</a></li>
                     </ul>
                 </li>
             </ul>

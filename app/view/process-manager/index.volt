@@ -83,6 +83,7 @@
     <tr>
         <th colspan="4">
             <span class="label label-info" style="font-size:14px">{{ group['program'] }}</span>&nbsp;
+            <a id="{{ group['program'] }}" class="invisible">{{ group['program'] }}</a>
         </th>
         <th>
             <a class="btn btn-xs btn-warning restart" href="/process-manager/restartGroup?server_id={{ server.id }}&group={{ group['program'] }}" data-nopjax>重启</a>&nbsp;
@@ -134,6 +135,24 @@
 
 <script>
 $(function () {
+
+    var location_hash = window.location.hash;
+    if (location_hash) {
+        var $anchor = $(location_hash);
+        if ($anchor.size() > 0) {
+            $('html, body').animate({
+                    scrollTop: $anchor.offset().top - 63
+                }, 'fast'
+            );
+
+            var $tr = $anchor.closest('tr');
+            $tr.addClass('anchor-out');
+            $tr.addClass('anchor-hover');
+            setTimeout(function() {
+                $tr.removeClass('anchor-hover');
+            }, 1500);
+        }
+    }
 
     $('.restartall, .stopall, .restart_supervisor, .delete').click(function() {
         if (!confirm($(this).attr('data-confirm'))) {

@@ -2,6 +2,8 @@
 namespace SupBoard\Controller;
 
 use Phalcon\Mvc\View;
+use SupBoard\Model\Server;
+use SupBoard\Model\ServerGroup;
 use SupBoard\Supervisor\StatusCode;
 use Zend\XmlRpc\Client\Exception\FaultException;
 use SupBoard\Model\Process;
