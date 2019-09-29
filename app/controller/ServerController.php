@@ -7,28 +7,10 @@ use SupBoard\Form\ServerForm;
 
 class ServerController extends ControllerBase
 {
-    public function initialize()
-    {
-        $server_group_id = $this->dispatcher->getParam('server_group_id');
-
-        if ($server_group_id)
-        {
-            $serverGroup = ServerGroup::findFirst($server_group_id);
-            if (!$serverGroup)
-            {
-                $this->flashSession->error("不存在该服务器组");
-                return $this->response->redirect($this->request->getHTTPReferer());
-            }
-
-            $this->view->serverGroup = $serverGroup;
-        }
-
-        //$this->view->setTemplateBefore('container');
-    }
-
     public function indexAction()
     {
-
+        $group_id = $this->request->get('group_id', 'int', 0);
+        $this->view->group_id = $group_id;
     }
 
     public function listAction()
@@ -36,43 +18,53 @@ class ServerController extends ControllerBase
         $draw = $this->request->get('draw', 'int', 0);
         $offset = $this->request->get('start', 'int', 0);
         $limit = $this->request->get('length', 'int', 25);
-        $server_group_id = $this->request->get('server_group_id', 'int');
+        $group_id = $this->request->get('group_id', 'int');
 
-        $where = '1=1';
-        $bind = [];
-        if ($server_group_id)
+        $builder = $this
+            ->modelsManager
+            ->createBuilder()
+            ->from(['g' => ServerGroup::class])
+            ->leftJoin(Server::class, "s.server_group_id = g.id", 's');
+
+        if ($group_id)
         {
-            $where .= ' AND server_group_id = :server_group_id:';
-            $bind['server_group_id'] = $server_group_id;
+            $builder->where('server_group_id = :server_group_id:', [
+                'server_group_id' => $group_id
+            ]);
         }
 
-        $servers = Server::find([
-            $where,
-            'bind' => $bind,
-            'limit' => $limit,
-            'offset' => $offset,
-            'order' => 'ip asc'
-        ]);
+        $servers = $builder->columns([
+            'g.id as server_group_id',
+            'g.name as server_group_name',
+            's.id as id',
+            's.ip as ip',
+            's.port as port',
+            's.username as username',
+            's.password as password',
+            's.agent_port as agent_port',
+            's.agent_root as agent_root',
+            's.update_time as update_time',
+            's.create_time as create_time',
+        ])
+        ->orderBy('g.sort DESC, s.ip ASC')
+        ->offset($offset)
+        ->limit($limit)
+        ->getQuery()
+        ->execute();
 
-        $total = Server::count();
-
-        $data = $servers->toArray();
-        foreach ($servers as $key => $server)
-        {
-            $data[$key]['serverGroup'] = $server->serverGroup->toArray();
-        }
-
+        $total = $servers->count();
         $result = [];
         $result['draw'] = $draw + 1;
         $result['recordsTotal'] = $total;
         $result['recordsFiltered'] = $total;
-        $result['data'] = $data;
+        $result['data'] = $servers;
 
         return $this->response->setJsonContent($result);
     }
 
-    public function createAction($server_group_id = 0)
+    public function createAction()
     {
+        $group_id = $this->request->get('group_id', 'int', 0);
         $form = new ServerForm(null);
 
         if ($this->request->isPost())
@@ -92,9 +84,8 @@ class ServerController extends ControllerBase
                     'port' => $this->request->getPost('port', ['trim', 'int'], 0),
                     'username' => $this->request->getPost('username', ['trim', 'string'], ''),
                     'password' => $this->request->getPost('password', ['trim']),
-                    'sync_conf_port' => $this->request->getPost('sync_conf_port', ['trim', 'int'], 0),
-                    'conf_path' => $this->request->getPost('conf_path', ['trim', 'string'], ''),
-                    'sort' => $this->request->getPost('sort', 'int', 0)
+                    'agent_port' => $this->request->getPost('agent_port', ['trim', 'int'], 0),
+                    'agent_root' => $this->request->getPost('agent_root', ['trim', 'string'], '')
                 ]);
 
                 if (!$server->create())
@@ -103,52 +94,39 @@ class ServerController extends ControllerBase
                 }
                 else
                 {
-                    $this->flashSession->success("添加成功");
+                    $this->flash->success("添加成功");
                     $form->clear();
-
-                    if ($server_group_id > 0)
-                    {
-                        return $this->response->redirect("/server-group/{$server_group_id}/server");
-                    }
-                    else
-                    {
-                        return $this->response->redirect("/server");
-                    }
                 }
             }
         }
 
         $this->view->form = $form;
+        $this->view->group_id = $group_id;
     }
 
-    public function editAction($server_group_id = 0, $id = 0)
+    public function editAction($id)
     {
-        // 兼容
-        // server-group/:server_group_id/server/edit/:id
-        // /server/edit/:id
-        $server_id = $id;
-        if (!$id)
-        {
-            $server_id = $server_group_id;
-        }
-
-        $server = Server::findFirst($server_id);
-
+        $server = Server::findFirst($id);
         if (!$server)
         {
-            $this->flashSession->error("不存在该服务器");
+            $this->flash->error("该服务器不存在");
+            $this->dispatcher->forward([
+                'action' => 'index'
+            ]);
 
-            return $this->response->redirect(
-                $this->request->getHTTPReferer()
-            );
+            return false;
         }
 
         if ($this->request->isPost())
         {
             $server->assign([
-                'name' => $this->request->getPost('name', ['trim', 'string'], ''),
-                'description' => $this->request->getPost('description', ['trim', 'string'], ''),
-                'sort' => $this->request->getPost('sort', 'int', 0)
+                'server_group_id' => $this->request->getPost('server_group_id', ['trim', 'int'], 0),
+                'ip' => $this->request->getPost('ip', ['trim', 'string'], ''),
+                'port' => $this->request->getPost('port', ['trim', 'int'], 0),
+                'username' => $this->request->getPost('username', ['trim', 'string'], ''),
+                'password' => $this->request->getPost('password', ['trim']),
+                'agent_port' => $this->request->getPost('agent_port', ['trim', 'int'], 0),
+                'agent_root' => $this->request->getPost('agent_root', ['trim', 'string'], '')
             ]);
 
             $form = new ServerForm($server, [
@@ -170,17 +148,8 @@ class ServerController extends ControllerBase
                 }
                 else
                 {
-                    $this->flashSession->success("修改成功");
+                    $this->flash->success("修改成功");
                     $form->clear();
-
-                    if ($id > 0)
-                    {
-                        return $this->response->redirect("/server-group/{$server_group_id}/server");
-                    }
-                    else
-                    {
-                        return $this->response->redirect("/server");
-                    }
                 }
             }
         }
@@ -201,7 +170,7 @@ class ServerController extends ControllerBase
 
         if (empty($id_arr))
         {
-            $this->flashSession->error("请先选择服务器");
+            $this->flash->error("请先选择服务器");
         }
         else
         {
@@ -213,21 +182,22 @@ class ServerController extends ControllerBase
 
             if ($result->success())
             {
-                $this->flashSession->success("删除成功");
+                $this->flash->success("删除成功");
             }
             else
             {
                 $messages = $result->getMessages();
                 foreach ($messages as $message)
                 {
-                    $this->flashSession->error($message->getMessage());
+                    $this->flash->error($message->getMessage());
                 }
             }
         }
 
-        return $this->response->redirect(
-            $this->request->getHTTPReferer()
-        );
+        $this->dispatcher->forward([
+            'action' => 'index'
+        ]);
+
+        return false;
     }
 }
-

@@ -6,20 +6,20 @@ function getParam(str) {
 /**
  * @link https://muffinman.io/javascript-time-ago-function/
  */
-function timeAgo(dateParam) {
-    if (!dateParam) {
-        return null;
+function timeAgo(timestamp) {
+    if (!timestamp) {
+        return '';
     }
 
-    const date = typeof dateParam === 'object' ? dateParam : new Date(dateParam);
+    const date = new Date(timestamp * 1000);
     const today = new Date();
     const seconds = Math.round((today - date) / 1000);
 
-    if (seconds < 3) {
-        return '刚刚';
+    if (seconds < 60) {
+        return '<span class="text-success">几秒前</span>';
     }
 
-    return date.format('Y-m-d');
+    return date.format('Y-m-d H:i');
 }
 
 // https://stackoverflow.com/questions/1634748/how-can-i-delete-a-query-string-parameter-in-javascript

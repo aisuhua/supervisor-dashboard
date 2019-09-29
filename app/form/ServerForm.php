@@ -71,7 +71,7 @@ class ServerForm extends Form
         // port
         $port = new Text('port', [
             'class' => 'form-control',
-            'autocomplete' => 'off',
+            'autocomplete' => 'on',
             'value' => '9001'
         ]);
 
@@ -98,7 +98,9 @@ class ServerForm extends Form
         // username
         $username = new Text('username', [
             'class' => 'form-control',
-            'autocomplete' => 'off',
+            'autocomplete' => 'on',
+            'placeholder' => "留空则使用系统用户名",
+            'value' => $GLOBALS['supervisor']['username']
         ]);
 
         $username->addValidators([
@@ -112,7 +114,8 @@ class ServerForm extends Form
         // password
         $password = new Text('password', [
             'class' => 'form-control',
-            'autocomplete' => 'off',
+            'autocomplete' => 'on',
+            'value' => $GLOBALS['supervisor']['password']
         ]);
 
         $password->addValidators([
@@ -126,7 +129,7 @@ class ServerForm extends Form
         // agent port
         $agent_port = new Text('agent_port', [
             'class' => 'form-control',
-            'autocomplete' => 'off',
+            'autocomplete' => 'on',
             'value' => '9002'
         ]);
 
@@ -150,7 +153,7 @@ class ServerForm extends Form
         // agent root
         $agent_root = new Text('agent_root', [
             'class' => 'form-control',
-            'autocomplete' => 'off',
+            'autocomplete' => 'on',
             'value' => '/www/web/supervisor-agent'
         ]);
 

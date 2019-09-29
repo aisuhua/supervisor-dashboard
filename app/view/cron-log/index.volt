@@ -137,7 +137,7 @@ $(function() {
         buttons: [
             {
                 text: '删除',
-                className: 'btn btn-default',
+                className: 'btn btn-danger',
                 action: function () {
                     var ids = '';
                     var count = 0;

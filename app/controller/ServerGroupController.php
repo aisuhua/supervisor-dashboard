@@ -6,12 +6,6 @@ use SupBoard\Form\ServerGroupForm;
 
 class ServerGroupController extends ControllerBase
 {
-    public function initialize()
-    {
-        $this->tag->setTitle('分组管理');
-        //$this->view->setTemplateBefore('container');
-    }
-
     public function indexAction()
     {
 
@@ -67,10 +61,8 @@ class ServerGroupController extends ControllerBase
                 }
                 else
                 {
-                    $this->flashSession->success("添加成功");
+                    $this->flash->success("添加成功");
                     $form->clear();
-
-                    return $this->response->redirect('server-group');
                 }
             }
         }
@@ -78,51 +70,17 @@ class ServerGroupController extends ControllerBase
         $this->view->form = $form;
     }
 
-    public function deleteAction()
-    {
-        $ids = $this->request->getPost('ids', 'string', '');
-
-        $id_arr = array_filter(explode(',', $ids), function($item) {
-            return is_numeric($item);
-        });
-
-        if (empty($id_arr))
-        {
-            $this->flashSession->error("请选择分组");
-        }
-        else
-        {
-            $phql = "DELETE FROM ServerGroup WHERE id IN ({ids:array-int})";
-            $result = $this->modelsManager->executeQuery(
-                $phql,
-                ['ids' => $id_arr]
-            );
-
-            if ($result->success())
-            {
-                $this->flashSession->success("删除成功");
-            }
-            else
-            {
-                $messages = $result->getMessages();
-                foreach ($messages as $message)
-                {
-                    $this->flashSession->error($message->getMessage());
-                }
-            }
-        }
-
-        return $this->response->redirect('server-group');
-    }
-
     public function editAction($id)
     {
         $serverGroup = ServerGroup::findFirst($id);
         if (!$serverGroup)
         {
-            $this->flashSession->error("不存在该分组");
+            $this->flash->error("不存在该分组");
+            $this->dispatcher->forward([
+                'action' => 'index'
+            ]);
 
-            return $this->response->redirect("server-group");
+            return false;
         }
 
         if ($this->request->isPost())
@@ -152,10 +110,8 @@ class ServerGroupController extends ControllerBase
                 }
                 else
                 {
-                    $this->flashSession->success("修改成功");
+                    $this->flash->success("修改成功");
                     $form->clear();
-
-                    return $this->response->redirect('server-group');
                 }
             }
         }
@@ -164,5 +120,45 @@ class ServerGroupController extends ControllerBase
         $this->view->form = new ServerGroupForm($serverGroup, [
             'edit' => true
         ]);
+    }
+
+    public function deleteAction()
+    {
+        $ids = $this->request->getPost('ids', 'string', '');
+
+        $id_arr = array_filter(explode(',', $ids), function($item) {
+            return is_numeric($item);
+        });
+
+        if (empty($id_arr))
+        {
+            $this->flash->error("请选择分组");
+        }
+        else
+        {
+            $phql = "DELETE FROM " . ServerGroup::class . " WHERE id IN ({ids:array-int})";
+            $result = $this->modelsManager->executeQuery($phql, [
+                'ids' => $id_arr
+            ]);
+
+            if ($result->success())
+            {
+                $this->flash->success("删除成功");
+            }
+            else
+            {
+                $messages = $result->getMessages();
+                foreach ($messages as $message)
+                {
+                    $this->flash->error($message->getMessage());
+                }
+            }
+        }
+
+        $this->dispatcher->forward([
+            'action' => 'index'
+        ]);
+
+        return false;
     }
 }

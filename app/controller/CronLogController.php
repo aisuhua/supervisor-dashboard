@@ -14,7 +14,6 @@ class CronLogController extends ControllerSupervisorBase
     public function indexAction()
     {
         $cron_id = $this->request->get('cron_id', 'int', 0);
-
         $this->view->cron_id = $cron_id;
     }
 

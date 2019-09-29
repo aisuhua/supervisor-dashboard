@@ -26,14 +26,14 @@ class CronForm extends Form
 
         $server_id = new Hidden('server_id', [
             'class' => 'form-control',
-            'autocomplete' => 'off'
+            'autocomplete' => 'on'
         ]);
 
         $this->add($server_id);
 
         $user = new Text('user', [
             'class' => 'form-control',
-            'autocomplete' => 'off',
+            'autocomplete' => 'on',
             'value' => 'www-data'
         ]);
 
@@ -48,7 +48,7 @@ class CronForm extends Form
         // command
         $command = new Text('command', [
             'class' => 'form-control',
-            'autocomplete' => 'off'
+            'autocomplete' => 'on'
         ]);
 
         $command->addValidators([
@@ -67,7 +67,7 @@ class CronForm extends Form
 
         $time = new Text('time', [
             'class' => 'form-control',
-            'autocomplete' => 'off',
+            'autocomplete' => 'on',
             'placeholder' => '* * * * *',
             'style' => "width: 300px;"
         ]);
@@ -96,7 +96,7 @@ class CronForm extends Form
         // port
         $description = new Text('description', [
             'class' => 'form-control',
-            'autocomplete' => 'off',
+            'autocomplete' => 'on',
             'value' => ''
         ]);
 

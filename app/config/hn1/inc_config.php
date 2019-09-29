@@ -7,3 +7,6 @@ $GLOBALS['db']['dbname'] = 'supervisor-dashboard';
 $GLOBALS['db']['charset'] = 'utf8mb4';
 
 $GLOBALS['api']['key'] = '7X5F68BmuNCvA4eH7DEd5EVJ';
+
+$GLOBALS['supervisor']['username'] = 'worker';
+$GLOBALS['supervisor']['password'] = 'CeHg43LgfpkKzB';

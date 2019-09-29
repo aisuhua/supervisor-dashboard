@@ -82,13 +82,10 @@
     <![endif]-->
 </head>
 <body>
-
-
     <div id="wrapper">
         <div class="container-fluid">
             {{ content() }}
         </div>
     </div>
-
 </body>
 </html>

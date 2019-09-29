@@ -22,7 +22,7 @@ class ServerGroupForm extends Form
         // name
         $name = new Text('name', [
             'class' => 'form-control',
-            'autocomplete' => 'off'
+            'autocomplete' => 'on'
         ]);
 
         $name->addValidators([
@@ -36,7 +36,7 @@ class ServerGroupForm extends Form
         // description
         $description = new Text('description', [
             'class' => 'form-control',
-            'autocomplete' => 'off'
+            'autocomplete' => 'on'
         ]);
 
         $this->add($description);
@@ -44,7 +44,7 @@ class ServerGroupForm extends Form
         // sort
         $sort = new Text('sort', [
             'class' => 'form-control',
-            'autocomplete' => 'off',
+            'autocomplete' => 'on',
             'value' => 0
         ]);
 
