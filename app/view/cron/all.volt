@@ -95,7 +95,7 @@ $(function() {
                 targets: 7,
                 orderable: false,
                 render: function (data, type, full, meta) {
-                    if (data) {
+                    if (data == 1) {
                         return '<span class="text-success">启用</span>';
                     } else {
                         return '<span class="text-danger">停用</span>';

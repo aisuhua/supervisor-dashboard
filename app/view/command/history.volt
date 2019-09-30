@@ -99,8 +99,7 @@
                     targets:5,
                     orderable: false,
                     render: function (data, type, full, meta) {
-                        var date = new Date(data * 1000);
-                        return date.format('Y-m-d H:i:s');
+                        return timeAgo(data);
                     }
                 },
                 {

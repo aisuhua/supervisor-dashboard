@@ -32,9 +32,7 @@ function fancyTimeFormat(time) {
     var ret = "";
 
     if (hrs == 0) {
-        hrs = '00';
-    } else if (hrs < 10) {
-        hrs = '0' + hrs;
+        hrs = '0';
     }
 
     if (mins == 0) {
