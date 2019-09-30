@@ -30,6 +30,11 @@ class Supervisor extends SupervisorBase
         return $this->rpcClient->call('supervisor.tailProcessStdoutLog', array($name, $offset, $length));
     }
 
+    public function tailProcessStderrLog($name, $offset, $length)
+    {
+        return $this->rpcClient->call('supervisor.tailProcessStderrLog', array($name, $offset, $length));
+    }
+
     public function readProcessStdoutLog($name, $offset, $length)
     {
         return $this->rpcClient->call('supervisor.readProcessStdoutLog', array($name, $offset, $length));

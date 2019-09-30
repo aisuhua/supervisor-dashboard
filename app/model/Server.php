@@ -70,6 +70,7 @@ class Server extends Model
         $cronProcess->program = '_supervisor_cron';
         $cronProcess->command = "/usr/bin/php " . rtrim($this->agent_root, '/') . "/app/cli.php cron start {$this->id}";;
         $cronProcess->user = 'root';
+        $cronProcess->is_sys = 1;
         $cronProcess->save();
     }
 

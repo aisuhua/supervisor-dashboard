@@ -439,6 +439,7 @@ class ProcessManagerController extends ControllerSupervisorBase
     {
         $group = $this->request->get('group', 'string');
         $name = $this->request->get('name', 'string');
+        $stderr = $this->request->get('stderr', 'int', 0);
 
         $process_name = $group . ':' . $name;
         $running = false;
@@ -451,12 +452,14 @@ class ProcessManagerController extends ControllerSupervisorBase
 
         // 只看前面 1M 的日志
         // 注意这里应开启 strip_ansi = true，否则当日志含有 ansi 字符时讲无法查看日志
-        $log_info = $this->supervisor->tailProcessStdoutLog($process_name, 0, 1024 * 1024);
+        $log_function = $stderr ? 'tailProcessStderrLog' : 'tailProcessStdoutLog';
+        $log_info = $this->supervisor->{$log_function}($process_name, 0, 1024 * 1024);
 
         $this->view->disableLevel([
             View::LEVEL_LAYOUT => true,
         ]);
 
+        $this->view->stderr = $stderr;
         $this->view->running = $running;
         $this->view->group = $group;
         $this->view->name = $name;
@@ -471,8 +474,10 @@ class ProcessManagerController extends ControllerSupervisorBase
         $group = $this->request->get('group', 'string');
         $name = $this->request->get('name', 'string');
         $offset = $this->request->get('offset', 'int', 0);
+        $stderr = $this->request->get('stderr', 'int', 0);
 
         $process_name = $group . ':' . $name;
+        $log_function = $stderr ? 'tailProcessStderrLog' : 'tailProcessStdoutLog';
         $timeout = 10;
         $start_time = time();
         $log = [];
@@ -482,13 +487,13 @@ class ProcessManagerController extends ControllerSupervisorBase
             try
             {
                 // 先查看是否有新日志产生
-                $log = $this->supervisor->tailProcessStdoutLog($process_name, 0, 0);
+                $log = $this->supervisor->{$log_function}($process_name, 0, 0);
 
                 $offset = $log[1] < $offset ? 0 : $offset;
                 if ($log[1] > $offset)
                 {
                     // 有新日志产生
-                    $log = $this->supervisor->tailProcessStdoutLog($process_name, 0, $log[1] - $offset);
+                    $log = $this->supervisor->{$log_function}($process_name, 0, $log[1] - $offset);
                     break;
                 }
             }
@@ -525,10 +530,12 @@ class ProcessManagerController extends ControllerSupervisorBase
     {
         $group = $this->request->get('group', 'string');
         $name = $this->request->get('name', 'string');
+        $stderr = $this->request->get('stderr', 'int', 0);
 
         $process_name = $group . ':' . $name;
+        $log_function = $stderr ? 'tailProcessStderrLog' : 'tailProcessStdoutLog';
         $filename = $name . '_' . $this->server_id .'_' . date('YmdHis') . '.log';
-        $log_info = $this->supervisor->tailProcessStdoutLog($process_name, 0, 1 * 1024 * 1024);
+        $log_info = $this->supervisor->{$log_function}($process_name, 0, 50 * 1024 * 1024);
 
         header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');

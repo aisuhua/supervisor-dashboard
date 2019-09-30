@@ -24,6 +24,7 @@ class Process extends Model
     public $stdout_logfile;
     public $stdout_logfile_backups;
     public $stdout_logfile_maxbytes;
+    public $is_sys;
     public $update_time;
     public $create_time;
 

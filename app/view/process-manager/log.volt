@@ -11,9 +11,9 @@
         </div>
         <div class="collapse navbar-collapse navbar-right">
             {% if running %}
-            <a class="btn btn-primary btn-sm navbar-btn" id="refresh" href="/process-manager/tail?server_id={{ server.id }}&group={{ group }}&name={{ name }}" data-nopjax>自动刷新</a>
+            <a class="btn btn-primary btn-sm navbar-btn" id="refresh" href="/process-manager/tail?server_id={{ server.id }}&group={{ group }}&name={{ name }}&stderr={{ stderr }}" data-nopjax>自动刷新</a>
             {% endif %}
-            <a class="btn btn-default btn-sm navbar-btn" href="/process-manager/download?server_id={{ server.id }}&group={{ group }}&name={{ name }}" data-nopjax>下载日志</a>
+            <a class="btn btn-default btn-sm navbar-btn" href="/process-manager/download?server_id={{ server.id }}&group={{ group }}&name={{ name }}&stderr={{ stderr }}" data-nopjax>下载日志</a>
         </div>
     </div>
 </nav>

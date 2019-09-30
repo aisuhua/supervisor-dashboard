@@ -118,11 +118,16 @@
                     <span class="label label-{{ label_name }}">{{ process['statename'] }}</span>
                 </td>
                 <td>
+                    {% if process['stderr_logfile'] is not empty %}
+                        {% set stderr = 1 %}
+                    {% else %}
+                        {% set stderr = 0 %}
+                    {% endif %}
                     <a href="/process-manager/restart?server_id={{ server.id }}&group={{ process['group'] }}&name={{ process['name'] }}" data-nopjax class="restart">重启</a>&nbsp;
                     <a href="/process-manager/start?server_id={{ server.id }}&group={{ process['group'] }}&name={{ process['name'] }}" data-nopjax class="start">启动</a>&nbsp;
                     <a href="/process-manager/stop?server_id={{ server.id }}&group={{ process['group'] }}&name={{ process['name'] }}" data-nopjax class="stop">停止</a>&nbsp;
-                    <a href="/process/log?server_id={{ server.id }}&group={{ process['group'] }}&name={{ process['name'] }}&ip={{ server.ip }}&port={{ server.port }}" data-nopjax target="_blank" class="tail_log">查看日志</a>&nbsp;
-                    <a href="/process-manager/clearLog?server_id={{ server.id }}&group={{ process['group'] }}&name={{ process['name'] }}" data-nopjax class="clear_log">清理日志</a>&nbsp;
+                    <a href="/process/log?server_id={{ server.id }}&group={{ process['group'] }}&name={{ process['name'] }}&ip={{ server.ip }}&port={{ server.port }}&stderr={{ stderr }}" data-nopjax target="_blank" class="tail_log">查看日志</a>&nbsp;
+                    <a href="/process-manager/clearLog?server_id={{ server.id }}&group={{ process['group'] }}&name={{ process['name'] }}{{ stderr }}" data-nopjax class="clear_log">清理日志</a>&nbsp;
                 </td>
             </tr>
             {% endif %}
