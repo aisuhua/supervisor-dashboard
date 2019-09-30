@@ -47,6 +47,10 @@
                 {{ form.render('user') }}
             </div>
             <div class="form-group">
+                <label for="stopwaitsecs">停止等待秒数</label>
+                {{ form.render('stopwaitsecs') }}
+            </div>
+            <div class="form-group">
                 <label for="directory">目录</label>
                 {{ form.render('directory') }}
             </div>

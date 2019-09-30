@@ -29,7 +29,7 @@ $(function() {
     var dataTable = $processList.DataTable({
         processing: true,
         pageLength: 10,
-        lengthChange: false,
+        lengthChange: true,
         searching: true,
         serverSide: false,
         stateSave: true,
@@ -154,60 +154,7 @@ $(function() {
                     return html;
                 }
             }
-        ],
-        buttons: [
-            {
-                text: '删除',
-                className: 'btn btn-danger',
-                action: function () {
-                    var ids = '';
-                    var count = 0;
-                    dataTable.rows({selected: true}).every( function () {
-                        var d = this.data();
-                        ids += d.id + ',';
-                        count++;
-                    });
-
-                    if (count <= 0)
-                    {
-                        alert('请先选择分组');
-                        return false;
-                    }
-
-                    if (confirm("真的要删除这 "+ count +" 个分组吗？")) {
-                        var url = '/server-group/delete';
-                        $.pjax({
-                            url: url,
-                            container: '#pjax-container',
-                            type: 'POST',
-                            data: {ids: ids},
-                            push: false
-                        });
-                    }
-                }
-            }
-        ],
-        initComplete: function(settings, json) {
-            dataTable.buttons().container().appendTo('#server-group-list_wrapper .col-sm-6:eq(0)');
-        }
-    });
-
-    $processList.on('click', 'td a.delete', function () {
-        var row = dataTable.row($(this).closest('tr'));
-        var data = row.data();
-
-        if (!confirm('真的要删除 '+ data.name +' 吗？')) {
-            return false;
-        }
-
-        var url = '/server-group/delete';
-        $.pjax({
-            url: url,
-            container: '#pjax-container',
-            type: 'POST',
-            data: {ids: data.id},
-            push: false
-        });
+        ]
     });
 });
 </script>

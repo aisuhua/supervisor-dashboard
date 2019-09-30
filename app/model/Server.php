@@ -8,6 +8,7 @@ use Phalcon\Validation\Validator\Uniqueness;
 use Phalcon\Validation\Validator\PresenceOf;
 use SupBoard\Supervisor\SupAgent;
 use SupBoard\Supervisor\Supervisor;
+use Phalcon\Mvc\Model\Relation;
 
 class Server extends Model
 {
@@ -30,6 +31,30 @@ class Server extends Model
         $this->belongsTo('server_group_id', ServerGroup::class, 'id', [
             'alias' => 'ServerGroup',
             'reusable' => true
+        ]);
+
+        $this->hasMany('id', Process::class, 'server_id', [
+            'alias' => 'processes',
+            'reusable' => true,
+            'foreignKey' => [
+                'action' => Relation::ACTION_CASCADE,
+            ]
+        ]);
+
+        $this->hasMany('id', Cron::class, 'server_id', [
+            'alias' => 'cronLogs',
+            'reusable' => true,
+            'foreignKey' => [
+                'action' => Relation::ACTION_CASCADE,
+            ]
+        ]);
+
+        $this->hasMany('id', Command::class, 'server_id', [
+            'alias' => 'commands',
+            'reusable' => true,
+            'foreignKey' => [
+                'action' => Relation::ACTION_CASCADE,
+            ]
         ]);
     }
 

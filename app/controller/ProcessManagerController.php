@@ -24,7 +24,7 @@ class ProcessManagerController extends ControllerSupervisorBase
             // 不显示系统进程
             if (!$show_sys && Process::isSystemProcess($process['group']))
             {
-                continue;
+                // continue;
             }
 
             $process_groups[] = $process['group'];

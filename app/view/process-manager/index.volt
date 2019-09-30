@@ -150,10 +150,11 @@ $(function () {
             );
 
             var $tr = $anchor.closest('tr');
-            $tr.addClass('anchor-out');
-            $tr.addClass('anchor-hover');
+            var $nextUntil = $tr.nextUntil('tr:has(th)').add($tr);
+
+            $nextUntil.addClass('anchor-out anchor-hover');
             setTimeout(function() {
-                $tr.removeClass('anchor-hover');
+                $nextUntil.removeClass('anchor-hover');
             }, 1000);
         }
     }

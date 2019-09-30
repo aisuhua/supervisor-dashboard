@@ -164,6 +164,27 @@ class ProcessForm extends Form
 
         $this->add($user);
 
+        // stopwaitsecs
+        $stopwaitsecs = new Text('stopwaitsecs', [
+            'class' => 'form-control',
+            'autocomplete' => 'on',
+            'value' => 10
+        ]);
+
+        $stopwaitsecs->setFilters([
+            'string',
+            'trim'
+        ]);
+
+        $stopwaitsecs->addValidators([
+            new Numericality([
+                'message' => '停止等待秒数必须是数字',
+                'allowEmpty' => true
+            ]),
+        ]);
+
+        $this->add($stopwaitsecs);
+
         // directory
         $directory = new Text('directory', [
             'class' => 'form-control',

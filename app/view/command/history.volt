@@ -127,7 +127,7 @@
             buttons: [
                 {
                     text: '删除',
-                    className: 'btn btn-danger',
+                    className: 'btn btn-default',
                     action: function () {
                         var ids = '';
                         var count = 0;

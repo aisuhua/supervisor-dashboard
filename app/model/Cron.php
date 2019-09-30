@@ -5,6 +5,7 @@ use Phalcon\Mvc\Model;
 use Phalcon\Validation;
 use Phalcon\Validation\Validator\Uniqueness;
 use Phalcon\Validation\Validator\PresenceOf;
+use Phalcon\Mvc\Model\Relation;
 
 /**
  * Class Cron
@@ -35,6 +36,14 @@ class Cron extends Model
         $this->belongsTo('server_id', Server::class, 'id', [
             'alias' => 'Server',
             'reusable' => false
+        ]);
+
+        $this->hasMany('id', CronLog::class, 'cron_id', [
+            'alias' => 'cronLog',
+            'reusable' => true,
+            'foreignKey' => [
+                'action' => Relation::ACTION_CASCADE,
+            ]
         ]);
     }
 
