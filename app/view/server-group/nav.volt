@@ -1,7 +1,3 @@
-{#<ol class="breadcrumb">#}
-    {#<li class="active">分组管理</li>#}
-{#</ol>#}
-
 {% set group_class = '' %}
 {% set group_create_class = '' %}
 {% set server_class = '' %}

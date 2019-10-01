@@ -39,7 +39,6 @@ class ProcessForm extends Form
         // program
         $program = new Text('program', [
             'class' => 'form-control',
-            'autocomplete' => 'on',
             'value' => ''
         ]);
 
@@ -65,7 +64,6 @@ class ProcessForm extends Form
         // command
         $command = new Text('command', [
             'class' => 'form-control',
-            'autocomplete' => 'on',
             'value' => ''
         ]);
 
@@ -91,7 +89,6 @@ class ProcessForm extends Form
         // process_name
         $process_name = new Text('process_name', [
             'class' => 'form-control',
-            'autocomplete' => 'on',
             'value' => '%(program_name)s_%(process_num)s'
         ]);
 
@@ -105,7 +102,6 @@ class ProcessForm extends Form
         // numprocs
         $numprocs = new Text('numprocs', [
             'class' => 'form-control',
-            'autocomplete' => 'on',
             'value' => 1
         ]);
 
@@ -133,7 +129,6 @@ class ProcessForm extends Form
         // numprocs_start
         $numprocs_start = new Text('numprocs_start', [
             'class' => 'form-control',
-            'autocomplete' => 'on',
             'value' => 0
         ]);
 
@@ -153,7 +148,6 @@ class ProcessForm extends Form
         // user
         $user = new Text('user', [
             'class' => 'form-control',
-            'autocomplete' => 'on',
             'value' => 'www-data'
         ]);
 
@@ -167,7 +161,6 @@ class ProcessForm extends Form
         // stopwaitsecs
         $stopwaitsecs = new Text('stopwaitsecs', [
             'class' => 'form-control',
-            'autocomplete' => 'on',
             'value' => 10
         ]);
 
@@ -188,7 +181,6 @@ class ProcessForm extends Form
         // directory
         $directory = new Text('directory', [
             'class' => 'form-control',
-            'autocomplete' => 'on',
             'value' => '%(here)s'
         ]);
 
@@ -224,7 +216,6 @@ class ProcessForm extends Form
         // startretries
         $startretries = new Text('startretries', [
             'class' => 'form-control',
-            'autocomplete' => 'on',
             'value' => 20
         ]);
 
@@ -298,7 +289,6 @@ class ProcessForm extends Form
         // stdout_logfile
         $stdout_logfile = new Text('stdout_logfile', [
             'class' => 'form-control',
-            'autocomplete' => 'on',
             'value' => 'AUTO'
         ]);
 
@@ -312,7 +302,6 @@ class ProcessForm extends Form
         // stdout_logfile_backups
         $stdout_logfile_backups = new Text('stdout_logfile_backups', [
             'class' => 'form-control',
-            'autocomplete' => 'on',
             'value' => 0
         ]);
 
@@ -340,7 +329,6 @@ class ProcessForm extends Form
         // stdout_logfile_maxbytes
         $stdout_logfile_maxbytes = new Text('stdout_logfile_maxbytes', [
             'class' => 'form-control',
-            'autocomplete' => 'on',
             'value' => '1MB'
         ]);
 

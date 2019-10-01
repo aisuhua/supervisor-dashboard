@@ -296,7 +296,7 @@ class ProcessController extends ControllerSupervisorBase
                 // 非 Debug 模式下，忽略系统进程
                 if (Process::isSystemProcess($value['program']))
                 {
-                    if (!DEBUG) continue;
+                    if (!DEBUG_MODE) continue;
                     $value['is_sys'] = 1;
                 }
 
@@ -325,7 +325,7 @@ class ProcessController extends ControllerSupervisorBase
                 $this->db->begin();
 
                 // 非 Debug 模式下不删除系统进程
-                $and_where = DEBUG ? '' : 'AND is_sys = 0';
+                $and_where = DEBUG_MODE ? '' : 'AND is_sys = 0';
                 $sql = "DELETE FROM process WHERE server_id = {$server_id} {$and_where}";
 
                 $success = $this->db->execute($sql);
@@ -380,7 +380,7 @@ class ProcessController extends ControllerSupervisorBase
         if (!isset($ini))
         {
             // 非 Debug 模式下不显示系统进程
-            $and_where = DEBUG ? '' : 'AND is_sys = 0';
+            $and_where = DEBUG_MODE ? '' : 'AND is_sys = 0';
             $processes = Process::find([
                 "server_id = :server_id: {$and_where}",
                 'bind' => [
@@ -445,7 +445,7 @@ class ProcessController extends ControllerSupervisorBase
         $offset = $this->request->get('start', 'int', 0);
         $limit = $this->request->get('length', 'int', 10000);
 
-        $processes = $this
+        $builder = $this
             ->modelsManager
             ->createBuilder()
             ->from(['p' => Process::class])
@@ -460,7 +460,14 @@ class ProcessController extends ControllerSupervisorBase
                 'p.program as program',
                 'p.id as id',
                 'p.update_time as update_time',
-            ])
+            ]);
+
+        if (!DEBUG_MODE)
+        {
+            $builder->where('is_sys = 0');
+        }
+
+        $processes = $builder
             ->orderBy('g.sort desc, s.ip asc, p.program asc')
             ->offset($offset)
             ->limit($limit)

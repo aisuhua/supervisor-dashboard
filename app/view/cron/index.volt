@@ -74,7 +74,7 @@ $(function() {
         var $anchor = $(location_hash);
         if ($anchor.size() > 0) {
             $('html, body').animate({
-                    scrollTop: $anchor.offset().top - 63
+                    scrollTop: $anchor.offset().top - 100
                 }, 'fast'
             );
 

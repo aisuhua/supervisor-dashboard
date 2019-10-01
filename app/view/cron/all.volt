@@ -2,7 +2,7 @@
 {{ flashSession.output() }}
 {% include 'server-group/nav.volt' %}
 
-<table id="process-list" class="table table-bordered table-hover">
+<table id="process-list" class="table table-bordered table-hover nowrap">
     <thead>
     <tr>
         <th></th>
@@ -17,7 +17,7 @@
         <th>上次执行时间</th>
         <th>更新时间</th>
         <th>备注</th>
-        <th>操作</th>
+        <th style="overflow-x: hidden;">操作</th>
     </tr>
     </thead>
 </table>

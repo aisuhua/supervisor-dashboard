@@ -2,14 +2,7 @@
 {{ flashSession.output() }}
 {% include 'server-group/nav.volt' %}
 
-<script>
-    var server_group_id = 0;
-    {% if serverGroup is not empty %}
-        server_group_id = {{ serverGroup.id }};
-    {% endif %}
-</script>
-
-<table id="server-list" class="table table-bordered table-striped table-hover">
+<table id="server-list" class="table table-bordered table-hover">
     <thead>
     <tr>
         <th></th>

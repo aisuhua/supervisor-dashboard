@@ -50,7 +50,7 @@ require PATH_CONFIG_IDC . '/inc_constant.php';
 require PATH_CONFIG_IDC . '/inc_config.php';
 
 // 是否打开调试模式
-if (DEBUG)
+if (DEBUG_MODE)
 {
     ini_set('error_log', PATH_LOG . '/php_error.log');
     ini_set('log_errors', 1);
