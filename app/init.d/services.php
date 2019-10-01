@@ -38,7 +38,7 @@ $di->setShared('view', function () {
 
             $volt->setOptions([
                 'compiledPath' => PATH_CACHE . '/volt/',
-                'compileAlways' => DEBUG_LEVEL ? true : false
+                'compileAlways' => DEBUG ? true : false
             ]);
 
             return $volt;

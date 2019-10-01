@@ -291,6 +291,14 @@ class ProcessController extends ControllerSupervisorBase
 
                 $value['program'] = explode(':', trim($key))[1];
                 $value['server_id'] = $server_id;
+                $value['is_sys'] = 0;
+
+                // 非 Debug 模式下，忽略系统进程
+                if (Process::isSystemProcess($value['program']))
+                {
+                    if (!DEBUG) continue;
+                    $value['is_sys'] = 1;
+                }
 
                 // 验证配置文件是否填写正确
                 if (!$form->isValid($value))
@@ -316,7 +324,10 @@ class ProcessController extends ControllerSupervisorBase
             {
                 $this->db->begin();
 
-                $sql = "DELETE FROM process WHERE server_id = {$server_id}";
+                // 非 Debug 模式下不删除系统进程
+                $and_where = DEBUG ? '' : 'AND is_sys = 0';
+                $sql = "DELETE FROM process WHERE server_id = {$server_id} {$and_where}";
+
                 $success = $this->db->execute($sql);
 
                 if (!$success)
@@ -368,8 +379,10 @@ class ProcessController extends ControllerSupervisorBase
 
         if (!isset($ini))
         {
+            // 非 Debug 模式下不显示系统进程
+            $and_where = DEBUG ? '' : 'AND is_sys = 0';
             $processes = Process::find([
-                'server_id = :server_id:',
+                "server_id = :server_id: {$and_where}",
                 'bind' => [
                     'server_id' => $this->server->id
                 ],
