@@ -1,5 +1,4 @@
 <?php
-
 $GLOBALS['db']['host'] = '47.106.191.241';
 $GLOBALS['db']['port'] = 5201;
 $GLOBALS['db']['username'] = 'supervisor';
