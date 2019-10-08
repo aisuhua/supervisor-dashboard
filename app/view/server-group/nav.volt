@@ -31,7 +31,7 @@
     <li role="presentation" class="{{ group_class }}"><a href="/server-group">分组列表</a></li>
     <li role="presentation" class="{{ group_create_class }}"><a href="/server-group/create">添加/修改分组</a></li>
     <li role="presentation" class="{{ server_class }}"><a href="/server">服务器列表</a></li>
-    <li role="presentation" class="{{ server_create_class }}"><a href="/server/create?group_id={{ group_id }}">添加/修改服务器</a></li>
+    <li role="presentation" class="{{ server_create_class }}"><a href="/server/create">添加/修改服务器</a></li>
     <li role="presentation" class="{{ process_all_class }}"><a href="/process/all">所有进程</a></li>
     <li role="presentation" class="{{ cron_all_class }}"><a href="/cron/all">所有定时任务</a></li>
 </ul>

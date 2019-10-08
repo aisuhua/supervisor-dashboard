@@ -93,3 +93,28 @@ function size_format($bytes, $length = 2, $max_unit = '')
     }
     return round($bytes, $length) . $extension;
 }
+
+/**
+ * @link https://www.php.net/manual/zh/function.var-export.php#54440
+ * @param $var
+ * @param bool $return
+ * @return mixed|string
+ */
+function var_export_min($var, $return = false)
+{
+    if (is_array($var))
+    {
+        $toImplode = array();
+        foreach ($var as $key => $value)
+        {
+            $toImplode[] = var_export($key, true).' => '.var_export_min($value, true);
+        }
+        $code = '['.implode(', ', $toImplode).']';
+        if ($return) return $code;
+        else echo $code;
+    }
+    else
+    {
+        return var_export($var, $return);
+    }
+}

@@ -3,7 +3,8 @@
 use Phalcon\Mvc\View;
 use Phalcon\Mvc\Url as UrlResolver;
 use Phalcon\Mvc\View\Engine\Volt as VoltEngine;
-use Phalcon\Mvc\Model\Metadata\Memory as MetaDataAdapter;
+use Phalcon\Mvc\Model\Metadata\Memory as MemoryMetaData;
+use Phalcon\Mvc\Model\MetaData\Files as FileMetaData;
 use Phalcon\Session\Adapter\Files as SessionAdapter;
 use Phalcon\Flash\Session as FlashSession;
 use Phalcon\Flash\Direct as FlashDirect;
@@ -17,7 +18,8 @@ use SupBoard\Model\Server;
 use SupBoard\Supervisor\Supervisor;
 
 /** @var Di $di */
-$di->setShared('url', function () {
+$di->setShared('url', function ()
+{
     $url = new UrlResolver();
     $url->setBaseUri('/');
 
@@ -27,13 +29,15 @@ $di->setShared('url', function () {
 /**
  * Setting up the view component
  */
-$di->setShared('view', function () {
+$di->setShared('view', function ()
+{
     $view = new View();
     $view->setDI($this);
     $view->setViewsDir(PATH_APP . '/view/');
 
     $view->registerEngines([
-        '.volt' => function ($view) {
+        '.volt' => function ($view)
+        {
             $volt = new VoltEngine($view, $this);
 
             $volt->setOptions([
@@ -51,7 +55,8 @@ $di->setShared('view', function () {
 /**
  * 日志服务
  */
-$di->setShared('logger', function($filename = null) {
+$di->setShared('logger', function($filename = null)
+{
     $filename = empty($filename) ? 'default.log' : $filename;
     $logger = new FileLogger(PATH_LOG . '/' . $filename);
 
@@ -61,7 +66,8 @@ $di->setShared('logger', function($filename = null) {
 /**
  * Database connection is created based in the parameters defined in the configuration file
  */
-$di->setShared('db', function () {
+$di->setShared('db', function ()
+{
     $connection = new Mysql([
         'host' => $GLOBALS['db']['host'],
         'port' => $GLOBALS['db']['port'],
@@ -71,50 +77,65 @@ $di->setShared('db', function () {
         'charset' => $GLOBALS['db']['charset'],
     ]);
 
-    $em = new EventsManager();
+    if (!DEBUG_MODE)
+    {
+        return $connection;
+    }
+
+    $eventManager = new EventsManager();
     $di = $this;
 
-    $em->attach('db', function (Event $event, Mysql $connection) use ($di) {
+    $eventManager->attach('db', function (Event $event, Mysql $connection) use ($di)
+    {
         if ($event->getType() == 'beforeQuery')
         {
             $variables = $connection->getSQLVariables();
             $string = $connection->getSQLStatement();
+            $context   = $variables ?: [];
+            /** @var Di $di */
+            $logger = $di->get('logger', ['db.log']);
 
-            if ($variables)
+            if (!empty($context))
             {
-                if (is_array(current($variables)))
-                {
-                    $string .= ' [' . join(',', current($variables)) . ']';
-                }
-                else
-                {
-                    $string .= ' [' . join(',', $variables) . ']';
-                }
+                $context = ' ' . var_export_min($context, true);
+            }
+            else
+            {
+                $context = '';
             }
 
-            /** @var Di $di */
-            $di->get('logger', ['db.log'])->debug($string);
+            $logger->debug($string . $context);
         }
     });
 
-    $connection->setEventsManager($em);
+    $connection->setEventsManager($eventManager);
 
     return $connection;
 });
 
+$di->setShared('modelsMetadata', function ()
+{
+    if (DEBUG_MODE)
+    {
+        return new MemoryMetaData();
+    }
 
-$di->setShared('modelsMetadata', function () {
-    return new MetaDataAdapter();
+    return new FileMetaData([
+        'metaDataDir' => PATH_CACHE . '/metadata/',
+        'lifetime' => 86400
+    ]);
 });
 
-$di->setShared('session', function () {
+$di->setShared('session', function ()
+{
     $session = new SessionAdapter();
     $session->start();
 
     return $session;
 });
 
-$di->set('flashSession', function () {
+$di->set('flashSession', function ()
+{
     return new FlashSession([
         'error'   => 'alert alert-danger pnotify fade',
         'success' => 'alert alert-success pnotify fade',
@@ -123,22 +144,23 @@ $di->set('flashSession', function () {
     ]);
 });
 
-$di->set('flash', function () {
-    $flash = new FlashDirect([
+$di->set('flash', function ()
+{
+    return new FlashDirect([
         'error'   => 'alert alert-danger pnotify fade',
         'success' => 'alert alert-success pnotify fade',
         'notice'  => 'alert alert-info pnotify fade',
         'warning' => 'alert alert-warning pnotify fade'
     ]);
-
-    return $flash;
 });
 
-$di->set('supervisor', function ($name, $ip, $port, $username = null, $password = null) {
+$di->set('supervisor', function ($name, $ip, $port, $username = null, $password = null)
+{
     return new Supervisor($name, $ip, $username, $password, $port);
 });
 
-$di->setShared('supAgent', function (Server $server) {
+$di->setShared('supAgent', function (Server $server)
+{
     return new SupAgent($server);
 });
 
