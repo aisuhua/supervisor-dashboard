@@ -2,6 +2,7 @@
 use Phalcon\Loader;
 use Phalcon\Di\FactoryDefault;
 use Phalcon\Di\FactoryDefault\Cli as CliDI;
+use SupBoard\Library\ErrorHandler;
 
 error_reporting(-1);
 
@@ -19,6 +20,11 @@ define('PATH_LOG', PATH_APP . '/log');
 define('PATH_LIBRARY', PATH_APP . '/library');
 define('IDC_HN1', 'HN1');
 define('IDC_RC', 'RC');
+define('DEBUG_MODE', false);
+
+// 记录错误日志
+ini_set('error_log', PATH_LOG . '/php_error.log');
+ini_set('log_errors', 1);
 
 // 判断当前机房
 if (is_file("/www/web/IDC_HN1"))
@@ -49,20 +55,6 @@ require PATH_CONFIG_COMMON . '/inc_language.php';
 require PATH_CONFIG_IDC . '/inc_constant.php';
 require PATH_CONFIG_IDC . '/inc_config.php';
 
-// 是否打开调试模式
-if (DEBUG_MODE)
-{
-    ini_set('error_log', PATH_LOG . '/php_error.log');
-    ini_set('log_errors', 1);
-    ini_set('display_errors', 'On');
-}
-else
-{
-    ini_set('error_log', PATH_LOG . '/php_error.log');
-    ini_set('log_errors', 1);
-    ini_set('display_errors', 'Off');
-}
-
 // 加载库函数
 require PATH_LIBRARY . '/lib_func.php';
 
@@ -92,3 +84,14 @@ else
 
 // 注册公共服务
 require PATH_INIT . '/services.php';
+
+// 处理错误和异常
+if (DEBUG_MODE)
+{
+    ini_set('display_errors', 'On');
+}
+else
+{
+    ini_set('display_errors', 'Off');
+    ErrorHandler::init();
+}

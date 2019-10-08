@@ -20,14 +20,23 @@ class ControllerSupervisorBase extends ControllerBase
      */
     protected $supervisor;
 
-    /**
-     * @var Callback $callback
-     */
-    protected $callback;
-
     public function initialize()
     {
         $server_id = $this->request->get('server_id', 'int', 0);
+
+        $controller = $this->dispatcher->getControllerName();
+        $action = $this->dispatcher->getActionName();
+
+        // server_id 不允许为空的情况
+        if (!$server_id)
+        {
+            if (($controller != 'process' && $action != 'all') &&
+                ($controller != 'cron' && $action != 'all')
+            )
+            {
+
+            }
+        }
 
         if ($server_id)
         {
@@ -39,15 +48,29 @@ class ControllerSupervisorBase extends ControllerBase
                 return $this->response->redirect($this->request->getHTTPReferer());
             }
 
-            $supervisor = $server->getSupervisor();
-
             $this->server_id = $server_id;
             $this->server = $server;
-            $this->supervisor = $supervisor;
+            $this->supervisor = $server->getSupervisor();
 
             $this->view->server_id = $server_id;
             $this->view->server = $server;
         }
+    }
+
+    public function server()
+    {
+        $server_id = $this->request->get('server_id', 'int', 0);
+
+        $server = Server::findFirst($server_id);
+        if (!$server)
+        {
+            $this->flashSession->error("不存在该服务器");
+            return $this->response->redirect($this->request->getHTTPReferer());
+        }
+
+        $this->server_id = $server_id;
+        $this->server = $server;
+        $this->supervisor = $supervisor;
     }
 
     protected function formatMessage($message, $only = false)

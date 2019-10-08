@@ -10,12 +10,14 @@ use Phalcon\Flash\Session as FlashSession;
 use Phalcon\Flash\Direct as FlashDirect;
 use Phalcon\Events\Manager as EventsManager;
 use Phalcon\Logger\Adapter\File as FileLogger;
+use Phalcon\Logger\Adapter\Stream as StreamLogger;
 use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Events\Event;
 use Phalcon\Di;
 use SupBoard\Supervisor\SupAgent;
 use SupBoard\Model\Server;
 use SupBoard\Supervisor\Supervisor;
+use Phalcon\Logger\Formatter\Line as FormatterLine;
 
 /** @var Di $di */
 $di->setShared('url', function ()
@@ -57,8 +59,20 @@ $di->setShared('view', function ()
  */
 $di->setShared('logger', function($filename = null)
 {
+    $formatter = new FormatterLine(null, 'c');
+
     $filename = empty($filename) ? 'default.log' : $filename;
     $logger = new FileLogger(PATH_LOG . '/' . $filename);
+    $logger->setFormatter($formatter);
+
+    return $logger;
+});
+
+$di->setShared('streamLogger', function($filename = null)
+{
+    $formatter = new FormatterLine(null, 'c');
+    $logger = new StreamLogger('php://stderr');
+    $logger->setFormatter($formatter);
 
     return $logger;
 });

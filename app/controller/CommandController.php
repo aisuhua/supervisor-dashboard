@@ -19,7 +19,7 @@ class CommandController extends ControllerSupervisorBase
             $supAgent = $this->server->getSupAgent();
             if (!$supAgent->ping())
             {
-                $this->flash->error("执行失败，无法连接 <a href='#'>SupAgent</a> 服务");
+                $this->flash->error("执行失败，无法连接 <a href='#'>supervisor agent</a> 服务");
                 goto end;
             }
 
