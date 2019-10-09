@@ -104,7 +104,7 @@ class ErrorHandler
         $view = $di->get('view');
         $response = $di->get('response');
 
-        // $dispatcher->setNamespaceName('SupBoard\Controller');
+        $dispatcher->setNamespaceName('SupBoard\Controller');
         $dispatcher->setControllerName('error');
         $dispatcher->setActionName('index');
 
