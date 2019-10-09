@@ -10,8 +10,8 @@ use Phalcon\Validation\Validator\PresenceOf;
 use Phalcon\Validation\Validator\Between;
 use Phalcon\Validation\Validator\Regex;
 use Phalcon\Validation\Validator\Numericality;
+use SupBoard\Library\Pattern;
 use SupBoard\Model\Cron;
-use SupBoard\Tool\Tool;
 
 class CronForm extends Form
 {
@@ -54,7 +54,7 @@ class CronForm extends Form
             ]),
             new Regex(
                 [
-                    "pattern" => Tool::commandPattern(),
+                    "pattern" => Pattern::command(),
                     "message" => "命令格式不正确"
                 ]
             )

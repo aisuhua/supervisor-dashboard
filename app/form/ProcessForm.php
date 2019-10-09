@@ -11,6 +11,7 @@ use Phalcon\Validation\Validator\Between;
 use Phalcon\Validation\Validator\Regex;
 use Phalcon\Validation\Validator\Numericality;
 use Phalcon\Validation\Validator\InclusionIn;
+use SupBoard\Library\Pattern;
 use SupBoard\Tool\Tool;
 
 class ProcessForm extends Form
@@ -78,7 +79,7 @@ class ProcessForm extends Form
             ]),
             new Regex(
                 [
-                    "pattern" => Tool::commandPattern(),
+                    "pattern" => Pattern::command(),
                     "message" => "命令格式不正确"
                 ]
             )

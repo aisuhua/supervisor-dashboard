@@ -10,7 +10,7 @@ use Phalcon\Validation\Validator\PresenceOf;
 use Phalcon\Validation\Validator\Between;
 use Phalcon\Validation\Validator\Regex;
 use Phalcon\Validation\Validator\Numericality;
-use SupBoard\Tool\Tool;
+use SupBoard\Library\Pattern;
 
 class CommandForm extends Form
 {
@@ -59,7 +59,7 @@ class CommandForm extends Form
             ]),
             new Regex(
                 [
-                    "pattern" => Tool::commandPattern(),
+                    "pattern" => Pattern::command(),
                     "message" => "命令格式不正确"
                 ]
             )
