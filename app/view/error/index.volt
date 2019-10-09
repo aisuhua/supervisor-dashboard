@@ -5,6 +5,6 @@
     <title>Supervisor Dashboard</title>
 </head>
 <body>
-    500 Internal Server Error
+    404 Not Found
 </body>
 </html>

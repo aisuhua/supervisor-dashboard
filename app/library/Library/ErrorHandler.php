@@ -41,7 +41,6 @@ class ErrorHandler
         if (PHP_SAPI === 'cli')
         {
             $di->get('streamLogger')->log($log_type, var_export($data, true));
-            return true;
         }
 
         switch ($errno)
@@ -58,7 +57,7 @@ class ErrorHandler
             case E_ALL:
                 break;
             default:
-                self::renderErrorPage();
+                self::handleResponse();
         }
     }
 
@@ -80,7 +79,16 @@ class ErrorHandler
         if (PHP_SAPI === 'cli')
         {
             $di->get('streamLogger')->error(var_export($data, true));
-            return true;
+        }
+
+        self::handleResponse();
+    }
+
+    protected static function handleResponse()
+    {
+        if (PHP_SAPI == 'cli')
+        {
+            exit(1);
         }
 
         self::renderErrorPage();
@@ -96,6 +104,7 @@ class ErrorHandler
         $view = $di->get('view');
         $response = $di->get('response');
 
+        $dispatcher->setNamespaceName('SupBoard\Controller');
         $dispatcher->setControllerName('error');
         $dispatcher->setActionName('index');
 

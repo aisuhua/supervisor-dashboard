@@ -11,7 +11,7 @@ class ErrorController extends ControllerBase
         {
             $this->response->setJsonContent([
                 'state' => 0,
-                'message' => '服务异常，请稍后重试'
+                'message' => '404 Not Found'
             ])->send();
 
             exit();
