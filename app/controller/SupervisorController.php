@@ -3,7 +3,7 @@ namespace SupBoard\Controller;
 
 use Phalcon\Mvc\View;
 
-class SupervisorController extends ControllerSupervisorBase
+class SupervisorController extends ControllerSupervisor
 {
     public function readLogAction()
     {

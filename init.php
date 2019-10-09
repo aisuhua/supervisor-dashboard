@@ -20,7 +20,7 @@ define('PATH_LOG', PATH_APP . '/log');
 define('PATH_LIBRARY', PATH_APP . '/library');
 define('IDC_HN1', 'HN1');
 define('IDC_RC', 'RC');
-define('DEBUG_MODE', false);
+define('DEBUG_MODE', true);
 
 // 记录错误日志
 ini_set('error_log', PATH_LOG . '/php_error.log');

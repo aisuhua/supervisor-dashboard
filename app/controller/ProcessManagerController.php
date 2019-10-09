@@ -9,7 +9,7 @@ use Zend\XmlRpc\Client\Exception\FaultException;
 use SupBoard\Model\Process;
 use SupBoard\Form\ProcessForm;
 
-class ProcessManagerController extends ControllerSupervisorBase
+class ProcessManagerController extends ControllerSupervisor
 {
     public function indexAction()
     {

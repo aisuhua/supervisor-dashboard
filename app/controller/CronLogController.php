@@ -9,7 +9,7 @@ use SupBoard\Supervisor\StatusCode;
 use SupBoard\Supervisor\SupAgent;
 use Zend\XmlRpc\Client\Exception\FaultException;
 
-class CronLogController extends ControllerSupervisorBase
+class CronLogController extends ControllerSupervisor
 {
     public function indexAction()
     {

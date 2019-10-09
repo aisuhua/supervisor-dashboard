@@ -17,12 +17,10 @@
     {% elseif dispatcher.getActionName() == 'create' or dispatcher.getActionName() == 'edit' %}
         {% set server_create_class = 'active' %}
     {% endif %}
-{% elseif dispatcher.getControllerName() == 'process' %}
-    {% if dispatcher.getActionName() == 'all' %}
+{% elseif dispatcher.getControllerName() == 'manager' %}
+    {% if dispatcher.getActionName() == 'processAll' %}
         {% set process_all_class = 'active' %}
-    {% endif %}
-{% elseif dispatcher.getControllerName() == 'cron' %}
-    {% if dispatcher.getActionName() == 'all' %}
+    {% elseif dispatcher.getActionName() == 'cronAll' %}
         {% set cron_all_class = 'active' %}
     {% endif %}
 {% endif %}
@@ -34,4 +32,5 @@
     <li role="presentation" class="{{ server_create_class }}"><a href="/server/create">添加/修改服务器</a></li>
     <li role="presentation" class="{{ process_all_class }}"><a href="/process/all">所有进程</a></li>
     <li role="presentation" class="{{ cron_all_class }}"><a href="/cron/all">所有定时任务</a></li>
+
 </ul>

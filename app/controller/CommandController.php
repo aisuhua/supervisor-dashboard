@@ -8,7 +8,7 @@ use SupBoard\Model\CronLog;
 use SupBoard\Supervisor\StatusCode;
 use Zend\XmlRpc\Client\Exception\FaultException;
 
-class CommandController extends ControllerSupervisorBase
+class CommandController extends ControllerSupervisor
 {
     public function indexAction()
     {

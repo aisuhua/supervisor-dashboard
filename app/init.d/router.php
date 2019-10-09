@@ -16,4 +16,24 @@ $router->add('/process/log', [
     'action' => 'log'
 ]);
 
+$router->add('/process/all', [
+    'controller' => 'manager',
+    'action' => 'processAll'
+]);
+
+$router->add('/process/list', [
+    'controller' => 'manager',
+    'action' => 'processList'
+]);
+
+$router->add('/cron/all', [
+    'controller' => 'manager',
+    'action' => 'cronAll'
+]);
+
+$router->add('/cron/list', [
+    'controller' => 'manager',
+    'action' => 'cronList'
+]);
+
 $router->handle();
