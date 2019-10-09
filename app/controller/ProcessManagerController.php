@@ -2,6 +2,7 @@
 namespace SupBoard\Controller;
 
 use Phalcon\Mvc\View;
+use SupBoard\Exception\Exception;
 use SupBoard\Model\Server;
 use SupBoard\Model\ServerGroup;
 use SupBoard\Supervisor\StatusCode;
@@ -310,7 +311,7 @@ class ProcessManagerController extends ControllerSupervisor
         if (!$supAgent->ping())
         {
             $result['state'] = 0;
-            $result['message'] = "同步失败，无法连接 <a href='#'>SupAgent</a> 服务";
+            $result['message'] = "同步失败，无法连接 <a href='#'>supervisor agent</a> 服务";
             return $this->response->setJsonContent($result);
         }
 

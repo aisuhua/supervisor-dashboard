@@ -36,4 +36,10 @@ $router->add('/cron/list', [
     'action' => 'cronList'
 ]);
 
+// 404 Not Found
+$router->notFound([
+    'controller' => 'error',
+    'action' => 'show404'
+]);
+
 $router->handle();

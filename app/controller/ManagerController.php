@@ -10,7 +10,6 @@ use SupBoard\Model\ServerGroup;
 
 class ManagerController extends ControllerBase
 {
-
     public function processAllAction()
     {
 
@@ -22,36 +21,39 @@ class ManagerController extends ControllerBase
         $offset = $this->request->get('start', 'int', 0);
         $limit = $this->request->get('length', 'int', 10000);
 
-        $builder = $this
-            ->modelsManager
-            ->createBuilder()
-            ->from(['p' => Process::class])
-            ->leftJoin(Server::class, "p.server_id = s.id", 's')
-            ->leftJoin(ServerGroup::class, 's.server_group_id = g.id', 'g')
-            ->columns([
-                'g.id as group_id',
-                'g.name as group_name',
-                's.id as server_id',
-                's.ip as server_ip',
-                's.port as server_port',
-                'p.program as program',
-                'p.id as id',
-                'p.update_time as update_time',
-            ]);
-
+        $where = "1 = 1";
         if (!DEBUG_MODE)
         {
-            $builder->where('is_sys = 0');
+            $where .= ' AND is_sys = 0';
         }
 
-        $processes = $builder
-            ->orderBy('g.sort desc, s.ip asc, p.program asc')
-            ->offset($offset)
-            ->limit($limit)
-            ->getQuery()
-            ->execute();
+        $processes = Process::find([
+            'conditions' => $where,
+            'columns' => "id, server_id, program, update_time",
+            'order' => 'id desc',
+            'offset' => $offset,
+            'limit' => $limit
+        ])->toArray();
 
-        $total = $processes->count();
+        $servers = Server::find();
+        $serverGroups = ServerGroup::find();
+
+        $server_columns = array_column($servers->toArray(), null, 'id');
+        $group_columns = array_column($serverGroups->toArray(), null, 'id');
+
+        foreach ($processes as &$process)
+        {
+            $server = $server_columns[$process['server_id']];
+            $group = $group_columns[$server['server_group_id']];
+
+            $process['group_id'] = $group['id'];
+            $process['group_name'] = $group['name'];
+            $process['server_id'] = $server['id'];
+            $process['server_ip'] = $server['ip'];
+            $process['server_port'] = $server['port'];
+        }
+
+        $total = count($processes);
         $result = [];
         $result['draw'] = $draw + 1;
         $result['recordsTotal'] = $total;

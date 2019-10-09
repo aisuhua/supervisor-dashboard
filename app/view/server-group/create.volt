@@ -16,5 +16,5 @@
         <label for="description">备注</label>
         {{ form.render('description') }}
     </div>
-    <button type="submit" class="btn btn-primary">提交</button>
+    <button type="submit" class="btn btn-primary">添加</button>
 </form>

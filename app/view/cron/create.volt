@@ -22,7 +22,7 @@
             <label for="description">备注</label>
             {{ form.render('description') }}
         </div>
-        <button type="submit" class="btn btn-primary">保存</button>
+        <button type="submit" class="btn btn-primary">添加</button>
     </div>
     <div class="col-lg-6">
         <div class="form-group">

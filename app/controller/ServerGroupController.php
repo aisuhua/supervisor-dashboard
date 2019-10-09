@@ -110,7 +110,7 @@ class ServerGroupController extends ControllerBase
                 }
                 else
                 {
-                    $this->flash->success("修改成功");
+                    $this->flash->success("保存成功");
                     $form->clear();
                 }
             }

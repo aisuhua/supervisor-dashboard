@@ -155,7 +155,7 @@ class ProcessController extends ControllerSupervisor
                 }
                 else
                 {
-                    $this->flash->success("修改成功");
+                    $this->flash->success("保存成功");
                     $form->clear();
                     $this->view->reload = true;
                 }
@@ -219,7 +219,7 @@ class ProcessController extends ControllerSupervisor
                         {
                             unset($ini);
                             $form->clear();
-                            $this->flash->success("修改成功");
+                            $this->flash->success("保存成功");
                             $this->view->reload = true;
                         }
                     }
@@ -364,13 +364,13 @@ class ProcessController extends ControllerSupervisor
 
                 unset($ini);
                 $this->db->commit();
-                $this->flash->success('修改成功');
+                $this->flash->success('保存成功');
                 $this->view->reload = true;
             }
             catch (\Exception $e)
             {
                 $this->db->rollback();
-                $this->flash->error("修改失败：{$e->getMessage()}");
+                $this->flash->error("保存失败：{$e->getMessage()}");
             }
         }
 
@@ -411,7 +411,7 @@ class ProcessController extends ControllerSupervisor
         if (!$process)
         {
             $result['state'] = 0;
-            $result['message'] = '不存在该进程配置';
+            $result['message'] = '该进程配置不存在';
 
             return $this->response->setJsonContent($result);
         }
