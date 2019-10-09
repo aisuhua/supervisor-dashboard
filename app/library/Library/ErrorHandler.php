@@ -3,7 +3,6 @@ namespace SupBoard\Library;
 
 use PHalcon\Di;
 use Phalcon\Mvc\Dispatcher;
-use Phalcon\Mvc\Dispatcher\Exception as DispatcherException;
 use Phalcon\Logger;
 
 class ErrorHandler

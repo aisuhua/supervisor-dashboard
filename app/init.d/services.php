@@ -1,4 +1,7 @@
 <?php
+/**
+ * @var Phalcon\Di $di
+ */
 
 use Phalcon\Mvc\View;
 use Phalcon\Mvc\Url as UrlResolver;
@@ -19,7 +22,9 @@ use SupBoard\Model\Server;
 use SupBoard\Supervisor\Supervisor;
 use Phalcon\Logger\Formatter\Line as FormatterLine;
 
-/** @var Di $di */
+/**
+ * 地址服务
+ */
 $di->setShared('url', function ()
 {
     $url = new UrlResolver();
@@ -29,7 +34,7 @@ $di->setShared('url', function ()
 });
 
 /**
- * Setting up the view component
+ * 视图服务
  */
 $di->setShared('view', function ()
 {
@@ -55,7 +60,7 @@ $di->setShared('view', function ()
 });
 
 /**
- * 日志服务
+ * 文件日志服务
  */
 $di->setShared('logger', function($filename = null)
 {
@@ -68,6 +73,9 @@ $di->setShared('logger', function($filename = null)
     return $logger;
 });
 
+/**
+ * 标准错误输出日志服务
+ */
 $di->setShared('streamLogger', function($filename = null)
 {
     $formatter = new FormatterLine(null, 'c');
@@ -78,7 +86,7 @@ $di->setShared('streamLogger', function($filename = null)
 });
 
 /**
- * Database connection is created based in the parameters defined in the configuration file
+ * 数据库服务
  */
 $di->setShared('db', function ()
 {
@@ -127,6 +135,9 @@ $di->setShared('db', function ()
     return $connection;
 });
 
+/**
+ * 数据库元数据服务
+ */
 $di->setShared('modelsMetadata', function ()
 {
     if (DEBUG_MODE)
@@ -140,6 +151,9 @@ $di->setShared('modelsMetadata', function ()
     ]);
 });
 
+/**
+ * session 服务
+ */
 $di->setShared('session', function ()
 {
     $session = new SessionAdapter();
@@ -148,6 +162,9 @@ $di->setShared('session', function ()
     return $session;
 });
 
+/**
+ * flash session
+ */
 $di->set('flashSession', function ()
 {
     return new FlashSession([
@@ -158,6 +175,9 @@ $di->set('flashSession', function ()
     ]);
 });
 
+/**
+ * flash
+ */
 $di->set('flash', function ()
 {
     return new FlashDirect([
@@ -168,11 +188,17 @@ $di->set('flash', function ()
     ]);
 });
 
+/**
+ * Supervisor 服务
+ */
 $di->set('supervisor', function ($name, $ip, $port, $username = null, $password = null)
 {
     return new Supervisor($name, $ip, $username, $password, $port);
 });
 
+/**
+ * Supervisor Agent 服务
+ */
 $di->setShared('supAgent', function (Server $server)
 {
     return new SupAgent($server);
