@@ -5,6 +5,6 @@
     <title>Supervisor Dashboard</title>
 </head>
 <body>
-    404 Not Found
+    请求失败，请重试
 </body>
 </html>

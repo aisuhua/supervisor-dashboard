@@ -8,18 +8,18 @@ use SupBoard\Model\Server;
 
 class ControllerBase extends Controller
 {
-    protected $isPjax = false;
+    protected $is_pjax = false;
 
     public function isPjax()
     {
-        return $this->isPjax;
+        return $this->is_pjax;
     }
 
     public function beforeExecuteRoute()
     {
         if(isset($_SERVER["HTTP_X_PJAX"]))
         {
-            $this->isPjax = true;
+            $this->is_pjax = true;
 
             //302跳转是由浏览器自动发起，此时将不会带上 _pjax 参数
             //因此，利用此特征来有选择性地修改url地址

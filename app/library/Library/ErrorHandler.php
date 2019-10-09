@@ -104,7 +104,7 @@ class ErrorHandler
         $view = $di->get('view');
         $response = $di->get('response');
 
-        $dispatcher->setNamespaceName('SupBoard\Controller');
+        // $dispatcher->setNamespaceName('SupBoard\Controller');
         $dispatcher->setControllerName('error');
         $dispatcher->setActionName('index');
 
@@ -112,6 +112,7 @@ class ErrorHandler
         $dispatcher->dispatch();
         $view->render('error', 'index', $dispatcher->getParams());
         $view->finish();
+
         $response->setContent($view->getContent())->send();
     }
 
