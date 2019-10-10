@@ -44,7 +44,7 @@ PHP 环境安装
 
 ## 初始化
 
-设置缓存和日志目录有可写权限
+设置目录可写
 
 ```
 chmod -R u+w app/cache/metadata app/cache/volt app/log
