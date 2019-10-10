@@ -96,7 +96,7 @@ server {
 }
 ```
 
-初始化数据库
+创建数据库
 
 ```
 # resources/mysql/supervisor_dashboard.sql
