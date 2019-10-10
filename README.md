@@ -2,7 +2,7 @@
 
 Supervisor 进程控制台，能集中管理服务器上的进程（eg. task/worker）、定时任务以及在服务器上执行命令或脚本。
 
-[Live Demo](#Live Demo)
+[Live Demo](http://supervisor.demo.com)
 
 ## 功能模块
 
