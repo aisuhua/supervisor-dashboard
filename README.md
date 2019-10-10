@@ -1,8 +1,8 @@
 # Supervisor Dashboard
 
-Supervisor 进程控制台，能集中管理服务器上的进程（eg. task/worker）、定时任务和在服务器上执行命令或脚本。
+Supervisor 进程控制台，能集中管理服务器上的进程（eg. task/worker）、定时任务以及在服务器上执行命令或脚本。
 
-[Live Demo](Live Demo)
+[Live Demo](#Live Demo)
 
 ## 功能模块
 
@@ -19,7 +19,7 @@ Supervisor 进程控制台，能集中管理服务器上的进程（eg. task/wor
 
 ## 前提条件
 
-它需要搭配 supervisor-agent 项目一起使用，请先将 agent 安装到每一台需要管理的服务器节点上。
+请先将 supervisor-agent 安装到每一台需要管理的服务器节点上。
 
 ![The relationship between Supervisor Dashboard and Supervisor Agent](resouces/img/supervisor-dashboard.jpg)
 
