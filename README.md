@@ -50,9 +50,10 @@ PHP 环境安装
 chmod -R u+w app/cache/metadata app/cache/volt app/log
 ```
 
-添加 Nginx 配置，配置示例文件 resources/nginx/nginx.conf
+添加 Nginx 配置
 
 ```
+# resources/nginx/nginx.conf
 server {
     listen        80;
     server_name   www.domain.com;
@@ -95,9 +96,10 @@ server {
 }
 ```
 
-创建数据库，表结构文件 resources/mysql/supervisor_dashboard.sql
+初始化数据库
 
 ```
+# resources/mysql/supervisor_dashboard.sql
 mysqladmin -u username -ppassword create supervisor_dashboard
 mysql -u username -ppassword supervisor_dashboard < supervisor_dashboard.sql  
 ```
