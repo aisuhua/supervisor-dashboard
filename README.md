@@ -50,7 +50,7 @@ PHP 环境安装
 chmod -R u+w app/cache/metadata app/cache/volt app/log
 ```
 
-添加 Nginx 配置，配置示例在 `resources/nginx/nginx.conf`
+添加 Nginx 配置，配置示例在 resources/nginx/nginx.conf
 
 ```
 server {
@@ -95,7 +95,7 @@ server {
 }
 ```
 
-创建数据库，表结构在 `resources/mysql/supervisor_dashboard.sql`
+创建数据库，表结构在 resources/mysql/supervisor_dashboard.sql
 
 ```
 mysqladmin -u username -ppassword create supervisor_dashboard
