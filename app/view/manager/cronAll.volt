@@ -13,8 +13,6 @@
         <th>时间</th>
         <th>命令</th>
         <th>状态</th>
-        <th>下次执行时间</th>
-        <th>上次执行时间</th>
         <th>更新时间</th>
         <th>备注</th>
         <th style="overflow-x: hidden;">操作</th>
@@ -103,32 +101,8 @@ $(function() {
                 }
             },
             {
-                data: 'next_time',
-                targets: 8,
-                orderable: false,
-                render: function (data, type, full, meta) {
-                    if (data > 0) {
-                        var date = new Date(data * 1000);
-                        return date.format('Y-m-d H:i');
-                    }
-                    return '';
-                }
-            },
-            {
-                data: 'last_time',
-                targets: 9,
-                orderable: false,
-                render: function (data, type, full, meta) {
-                    if (data > 0) {
-                        var date = new Date(data * 1000);
-                        return date.format('Y-m-d H:i');
-                    }
-                    return '';
-                }
-            },
-            {
                 data: 'update_time',
-                targets: 10,
+                targets: 8,
                 orderable: false,
                 render: function (data, type, full, meta) {
                     return timeAgo(data);
@@ -136,14 +110,14 @@ $(function() {
             },
             {
                 data: 'description',
-                targets: 11,
+                targets: 9,
                 orderable: false,
                 render: function (data, type, full, meta) {
                     return data;
                 }
             },
             {
-                targets: 12,
+                targets: 10,
                 data: 'id',
                 orderable: false,
                 render: function (data, type, full, meta) {
