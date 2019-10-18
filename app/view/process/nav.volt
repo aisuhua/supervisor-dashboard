@@ -63,6 +63,18 @@ function reloadConfig() {
     $.get('/process-manager/reloadConfig?server_id={{ server.id }}');
 }
 
+function restartCronTask() {
+    $.get('/process-manager/restartCronTask?server_id={{ server.id }}');
+}
+
+{% if reload is not empty %}
+reloadConfig();
+{% endif %}
+
+{% if restart_cron_task is not empty %}
+restartCronTask();
+{% endif %}
+
 $(function() {
     var ini_editor = document.getElementById('ini');
 
@@ -76,8 +88,3 @@ $(function() {
     }
 });
 </script>
-
-{% if reload is not empty %}
-<script>reloadConfig();</script>
-{% endif %}
-

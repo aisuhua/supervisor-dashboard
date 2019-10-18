@@ -6,6 +6,9 @@ use SupBoard\Form\CronForm;
 use SupBoard\Model\Cron;
 use SupBoard\Model\Server;
 use SupBoard\Model\ServerGroup;
+use SupBoard\Supervisor\SupervisorCron;
+use Zend\XmlRpc\Client\Exception\FaultException;
+use SupBoard\Supervisor\StatusCode;
 
 class CronController extends ControllerSupervisor
 {
@@ -57,7 +60,7 @@ class CronController extends ControllerSupervisor
                 {
                     $form->clear();
                     $this->flash->success("添加成功");
-                    $this->view->reload_config = true;
+                    $this->view->restart_cron_task = true;
                 }
             }
         }
@@ -84,6 +87,9 @@ class CronController extends ControllerSupervisor
 
         if ($this->request->isPost())
         {
+            // 是否需要重启定时任务守护进程
+            $restart_cron_task = false;
+
             $form = new CronForm($cron, [
                 'edit' => true
             ]);
@@ -104,6 +110,7 @@ class CronController extends ControllerSupervisor
                 )
                 {
                     $cron->last_time = 0;
+                    $restart_cron_task = true;
                 }
 
                 if (!$cron->save())
@@ -114,6 +121,7 @@ class CronController extends ControllerSupervisor
                 {
                     $this->flash->success("保存成功");
                     $form->clear();
+                    $this->view->restart_cron_task = $restart_cron_task;
                 }
             }
         }
@@ -126,6 +134,7 @@ class CronController extends ControllerSupervisor
 
     public function deleteAction($id)
     {
+        /** @var Cron $cron */
         $cron = Cron::findFirst($id);
 
         if (!$cron)
@@ -141,6 +150,11 @@ class CronController extends ControllerSupervisor
             else
             {
                 $this->flash->success('删除成功');
+
+                if ($cron->status == Cron::STATUS_ACTIVE)
+                {
+                    $this->view->restart_cron_task = true;
+                }
             }
         }
 

@@ -6,6 +6,7 @@ use SupBoard\Exception\Exception;
 use SupBoard\Model\Server;
 use SupBoard\Model\ServerGroup;
 use SupBoard\Supervisor\StatusCode;
+use SupBoard\Supervisor\SupervisorCron;
 use Zend\XmlRpc\Client\Exception\FaultException;
 use SupBoard\Model\Process;
 use SupBoard\Form\ProcessForm;
@@ -435,6 +436,33 @@ class ProcessManagerController extends ControllerSupervisor
         );
     }
 
+    public function restartCronTaskAction()
+    {
+        $supervisor = $this->supervisor;
+
+        try
+        {
+            $supervisor->stopProcessGroup(SupervisorCron::NAME, true);
+        }
+        catch (FaultException $e)
+        {
+            $this->handleStopException($e);
+        }
+
+        try
+        {
+            $supervisor->startProcessGroup(SupervisorCron::NAME, false);
+        }
+        catch (FaultException $e)
+        {
+            $this->handleStartException($e);
+        }
+
+        $result['state'] = 1;
+        $result['message'] = "重启成功";
+
+        return $this->response->setJsonContent($result);
+    }
 
     public function logAction()
     {

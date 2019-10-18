@@ -89,14 +89,7 @@ class Server extends Model
      */
     public function afterCreate()
     {
-        // 添加一个　cron 进程
-        $cronProcess = new Process();
-        $cronProcess->server_id = $this->id;
-        $cronProcess->program = '_supervisor_cron';
-        $cronProcess->command = "/usr/bin/php " . rtrim($this->agent_root, '/') . "/app/cli.php cron start {$this->id}";;
-        $cronProcess->user = 'root';
-        $cronProcess->is_sys = 1;
-        $cronProcess->save();
+
     }
 
     /**
