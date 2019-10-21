@@ -125,7 +125,7 @@ class ServerForm extends Form
         // agent port
         $agent_port = new Text('agent_port', [
             'class' => 'form-control',
-            'value' => '9002'
+            'value' => '8001'
         ]);
 
         $agent_port->addValidators([

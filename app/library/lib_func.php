@@ -19,12 +19,12 @@ function curl_post($url, $fields = '', $timeout = 1)
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
     $data = curl_exec($ch);
-    curl_close($ch);
 
     if ($data === false)
     {
         throw new Exception(curl_error($ch));
     }
+    curl_close($ch);
 
     return $data;
 }
@@ -49,12 +49,12 @@ function curl_get($url, $fields = [], $timeout = 1)
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
     $data = curl_exec($ch);
-    curl_close($ch);
 
     if ($data === false)
     {
         throw new Exception(curl_error($ch));
     }
+    curl_close($ch);
 
     return $data;
 }

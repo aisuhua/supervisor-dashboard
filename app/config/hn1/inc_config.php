@@ -1,8 +1,8 @@
 <?php
-$GLOBALS['db']['host'] = '127.0.0.1';
-$GLOBALS['db']['port'] = '3306';
-$GLOBALS['db']['username'] = 'user';
-$GLOBALS['db']['password'] = 'passwd';
+$GLOBALS['db']['host'] = 'DB_HOST';
+$GLOBALS['db']['port'] = 'DB_PORT';
+$GLOBALS['db']['username'] = 'DB_USER';
+$GLOBALS['db']['password'] = 'DB_PASSWORD';
 $GLOBALS['db']['dbname'] = 'supervisor_dashboard';
 $GLOBALS['db']['charset'] = 'utf8mb4';
 

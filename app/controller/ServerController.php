@@ -23,8 +23,8 @@ class ServerController extends ControllerBase
         $builder = $this
             ->modelsManager
             ->createBuilder()
-            ->from(['g' => ServerGroup::class])
-            ->leftJoin(Server::class, "s.server_group_id = g.id", 's');
+            ->from(['s' => Server::class])
+            ->leftJoin(ServerGroup::class, "s.server_group_id = g.id", 'g');
 
         if ($group_id)
         {
