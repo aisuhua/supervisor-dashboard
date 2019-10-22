@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.7.27, for Linux (x86_64)
+-- MySQL dump 10.16  Distrib 10.2.21-MariaDB, for debian-linux-gnu (x86_64)
 --
--- Host: localhost    Database: supervisor_dashboard
+-- Host: 192.168.14.2    Database: supervisor_dashboard
 -- ------------------------------------------------------
--- Server version	5.7.27-0ubuntu0.16.04.1
+-- Server version	5.6.44-log
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -34,7 +34,7 @@ CREATE TABLE `command` (
   `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '修改时间',
   `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '添加时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COMMENT='命令执行记录表';
+) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=utf8mb4 COMMENT='命令执行记录表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -56,7 +56,7 @@ CREATE TABLE `cron` (
   `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '修改时间',
   `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '添加时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COMMENT='定时任务表';
+) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COMMENT='定时任务表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -79,7 +79,7 @@ CREATE TABLE `cron_log` (
   `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '修改时间',
   `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '添加时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=27781 DEFAULT CHARSET=utf8mb4 COMMENT='定时任务执行记录表';
+) ENGINE=InnoDB AUTO_INCREMENT=27605 DEFAULT CHARSET=utf8mb4 COMMENT='定时任务执行记录表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -114,7 +114,7 @@ CREATE TABLE `process` (
   KEY `program` (`program`),
   KEY `server_id` (`server_id`),
   KEY `create_time` (`create_time`)
-) ENGINE=InnoDB AUTO_INCREMENT=5104 DEFAULT CHARSET=utf8mb4 COMMENT='进程配置表';
+) ENGINE=InnoDB AUTO_INCREMENT=5001 DEFAULT CHARSET=utf8mb4 COMMENT='进程配置表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -138,7 +138,7 @@ CREATE TABLE `server` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `ip_port` (`ip`,`port`),
   KEY `group_id` (`server_group_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=85 DEFAULT CHARSET=utf8mb4 COMMENT='服务器表';
+) ENGINE=InnoDB AUTO_INCREMENT=87 DEFAULT CHARSET=utf8mb4 COMMENT='服务器表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -155,11 +155,10 @@ CREATE TABLE `server_group` (
   `sort` smallint(11) unsigned NOT NULL DEFAULT '0' COMMENT '排序字段',
   `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '修改时间',
   `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '添加时间',
-  `suhua` varchar(100) NOT NULL DEFAULT '' COMMENT 'suhua',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   KEY `sort` (`sort`)
-) ENGINE=InnoDB AUTO_INCREMENT=219 DEFAULT CHARSET=utf8mb4 COMMENT='服务器分组表';
+) ENGINE=InnoDB AUTO_INCREMENT=217 DEFAULT CHARSET=utf8mb4 COMMENT='服务器分组表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -171,4 +170,4 @@ CREATE TABLE `server_group` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-10-09 16:39:18
+-- Dump completed on 2019-10-22 15:44:34
