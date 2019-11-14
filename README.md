@@ -36,11 +36,7 @@ Phalcon 是一个全栈式、灵活性高和耦合度低的框架，简单明了
 
 ## 安装
 
-PHP 环境安装
-
-```bash
-
-```
+PHP 环境安装参考：https://github.com/aisuhua/wiki/tree/master/php
 
 ## 初始化
 
