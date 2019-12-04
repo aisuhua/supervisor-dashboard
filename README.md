@@ -2,7 +2,7 @@
 
 Supervisor 控制台能集中管理服务器上的进程（eg. task/worker）、定时任务以及在服务器上执行命令或脚本。
 
-[Live Demo](http://supervisor.demo.com)
+[Live Demo](http://122.51.144.50/process?server_id=87&ip=172.18.0.2&port=9001)
 
 ## 功能模块
 
@@ -25,6 +25,7 @@ Supervisor 控制台能集中管理服务器上的进程（eg. task/worker）、
 
 ## 项目依赖
 
+- supervisor-agent 这个项目必须先部署到每一台节点服务器上
 - PHP 7.0+
 - Phalcon Framework 3.4+
 - MySQL 5.6+
