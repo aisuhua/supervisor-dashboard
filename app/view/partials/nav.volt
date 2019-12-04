@@ -22,9 +22,9 @@
                             {% endfor %}
 
                             <li role="separator" class="divider"></li>
-                            <li><a href="/server-group/{{ id }}/server">服务器管理</a></li>
+                            <li><a href="/server?group_id={{ id }}">服务器管理</a></li>
                         {% else %}
-                            <li><a href="/server-group/{{ id }}/server/create">添加服务器</a></li>
+                            <li><a href="/server/create">添加服务器</a></li>
                         {% endif %}
                     </ul>
                 </li>
