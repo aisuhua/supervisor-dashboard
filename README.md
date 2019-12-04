@@ -25,7 +25,7 @@ Supervisor 控制台能集中管理服务器上的进程（eg. task/worker）、
 
 ## 项目依赖
 
-- supervisor-agent 这个项目必须先部署到每一台节点服务器上
+- [supervisor-agent](https://github.com/aisuhua/supervisor-agent) 这个项目必须先部署到每一台节点服务器上
 - PHP 7.0+
 - Phalcon Framework 3.4+
 - MySQL 5.6+
