@@ -20,7 +20,7 @@ $(function() {
     }
 
     $refreshBtn.click(function() {
-        var url = $(this).attr('href');
+        var url = $(this).attr('data-href');
 
         if (log.innerHTML == '没有任何日志记录') {
             log.innerHTML = '';
