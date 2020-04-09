@@ -72,6 +72,7 @@ class CronController extends ControllerSupervisor
     {
         /** @var Cron $cron */
         $cron = Cron::findFirst($id);
+
         if (!$cron)
         {
             $this->flash->error("不存在该定时任务");
@@ -88,11 +89,8 @@ class CronController extends ControllerSupervisor
         if ($this->request->isPost())
         {
             // 是否需要重启定时任务守护进程
-            $restart_cron_task = false;
-
-            $form = new CronForm($cron, [
-                'edit' => true
-            ]);
+            $restart_cron_task = true;
+            $form = new CronForm($cron);
 
             if (!$form->isValid($this->request->getPost()))
             {

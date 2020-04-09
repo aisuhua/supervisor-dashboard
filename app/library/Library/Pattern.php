@@ -23,9 +23,6 @@ class Pattern
             'aria2c',
             '/usr/bin/aria2c',
             '/www',
-            'cat',
-            '/bin/cat',
-            'date'
         ];
 
         $cmd = array_map(function($item) {
